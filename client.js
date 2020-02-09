@@ -16,7 +16,7 @@ class Client {
 
         // Next hash table is used by _buildMenuInterface() to find what buttons appropriate Phase needs
         //'End Rally' - what button, :bool - disabled or not . We can add any other bt-ns ('Rally All At Once''Choose Next To Rally')
-
+        //dd
         this.phaseInterfaceMenuTable = {
 
             'firstPlayerRallyPhase' : {'End Phase':true}, 
