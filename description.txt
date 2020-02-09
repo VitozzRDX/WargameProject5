@@ -2,6 +2,8 @@
 Создаем Серверлесс вариант Переключения Фаз
 базируемся на файлах Counters under fire (b) + E8 Phases New Interface (e) AddingAllBtn (a)
  + E8 CheckLoS(b)CnvsOutOfCntr(a)Phases(a) + E8 Phases Old UI(c works)
+ 
+E:\AllTheNodeProjects\NodePrjct\19.01.2020\Counters under fire (b)
 
 1) 3агрузка 2х экранов 
 2) Загрузка Ронделя
