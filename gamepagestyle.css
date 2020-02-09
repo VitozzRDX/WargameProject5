@@ -1,0 +1,179 @@
+* {
+    margin: 0;
+    padding: 0;
+}
+
+html,
+body {
+    width: 100%;
+    height: 100%;
+}
+
+#canvasContainer2 {
+    position:absolute;
+    left: 1130px;
+      top: 5px;
+}
+#UIContainer .endRally {
+    background: linear-gradient(to bottom, #ffffff 1%, #85b166 73%, #398235 100%);
+    width: 118px;
+    height: 50px;
+    position:absolute;
+        left: 85%;/*1145px;*/
+          top: 200px;
+    color: rgb(0, 0, 0);
+    font-size:1rem;
+    font-weight: bold;
+    outline: 0;
+    border-radius: 10px;
+    border: 4px solid #000000;
+    text-transform: uppercase;
+}
+
+#UIContainer .endPhase {
+    background: linear-gradient(to bottom, #ffffff 1%, #85b166 73%, #398235 100%);
+    width: 118px;
+    height: 50px;
+    position:absolute;
+    left: 1145px; 
+    top: 250px; 
+    color: rgb(219, 0, 0);
+    font-size:1rem;
+    font-weight: bold;
+    outline: 0;
+    border-radius: 10px;
+    border: 4px solid #000000;
+    text-transform: uppercase;
+}
+
+#UIContainer .Rally {
+    background: linear-gradient(to bottom, #ffffff 1%, #7a66b1 73%, #2b0f91 100%);
+    width: 90px;
+    height: 50px;
+    position:absolute;
+    left: 1115px; 
+    top: 350px; 
+    color: rgb(219, 0, 0);
+    font-size:1rem;
+    font-weight: bold;
+    outline: 0;
+    border-radius: 10px;
+    border: 4px solid #000000;
+    text-transform: uppercase;
+}
+
+#UIContainer .PrepareToFire {
+    background: linear-gradient(to bottom, #ffffff 1%, #7a66b1 73%, #2b0f91 100%);
+    width: 90px;
+    height: 50px;
+    position:absolute;
+    left: 1215px; 
+    top: 350px; 
+    color: rgb(219, 0, 0);
+    font-size:1rem;
+    font-weight: bold;
+    outline: 0;
+    border-radius: 10px;
+    border: 4px solid #000000;
+    text-transform: uppercase;
+}
+
+#UIContainer .CancelFirePreparation {
+    background: linear-gradient(to bottom, #ffffff 1%, #85b166 73%, #398235 100%);
+    width: 118px;
+    height: 50px;
+    position:absolute;
+        left: 85%;/*1145px;*/
+          top: 350px;
+    color: rgb(0, 0, 0);
+    font-size:0.75rem;
+    font-weight: bold;
+    outline: 0;
+    border-radius: 10px;
+    border: 4px solid #000000;
+    text-transform: uppercase;
+}
+
+#UIContainer .StillFireasSeparateGroups {
+    background: linear-gradient(to bottom, #ffffff 1%, #85b166 73%, #398235 100%);
+    width: 90px;
+    height: 50px;
+    position:absolute;
+        left: 1115px;
+        top: 400px;
+    color: rgb(0, 0, 0);
+    font-size:0.6rem;
+    font-weight: bold;
+    outline: 0;
+    border-radius: 10px;
+    border: 4px solid #000000;
+    text-transform: lowercase;
+}
+
+
+#UIContainer .FireFromEveryHex {
+    background: linear-gradient(to bottom, #ffffff 1%, #85b166 73%, #398235 100%);
+    width: 90px;
+    height: 50px;
+    position:absolute;
+        left: 1115px;
+        top: 460px;
+    color: rgb(0, 0, 0);
+    font-size:0.6rem;
+    font-weight: bold;
+    outline: 0;
+    border-radius: 10px;
+    border: 4px solid #000000;
+    text-transform: lowercase;
+}
+
+#UIContainer .StillFireasSeparateGroups:active {
+    background: linear-gradient(to bottom, #cccccc 1%,#bbbbbb 73%, #ffffff 100%); 
+    color: #5a5a5a;
+}
+
+#UIContainer .FireFromEveryHex:active {
+    background: linear-gradient(to bottom, #cccccc 1%,#bbbbbb 73%, #ffffff 100%); 
+    color: #5a5a5a;
+}
+
+#UIContainer .CancelFirePreparation:active {
+    background: linear-gradient(to bottom, #cccccc 1%,#bbbbbb 73%, #ffffff 100%); 
+    color: #5a5a5a;
+}
+#UIContainer  .PrepareToFire:active {
+    background: linear-gradient(to bottom, #cccccc 1%,#bbbbbb 73%, #ffffff 100%); 
+    color: #5a5a5a;
+}
+
+#UIContainer  .PrepareToFire:disabled {
+    background: linear-gradient(to bottom, #cccccc 1%,#bbbbbb 73%, #ffffff 100%);
+    color: #5a5a5a;
+}
+
+#UIContainer  .endRally:active {
+    background: linear-gradient(to bottom, #cccccc 1%,#bbbbbb 73%, #ffffff 100%);
+    color: #5a5a5a;
+}
+#UIContainer  .endPhase:active { 
+    background: linear-gradient(to bottom, #cccccc 1%,#bbbbbb 73%, #ffffff 100%);
+    color: #5a5a5a;
+}
+#UIContainer  .Rally:active { 
+    background: linear-gradient(to bottom, #cccccc 1%,#bbbbbb 73%, #ffffff 100%); 
+    color: #5a5a5a;
+}
+
+
+#UIContainer  .endRally:disabled {
+    background: linear-gradient(to bottom, #cccccc 1%,#bbbbbb 73%, #ffffff 100%);
+    color: #5a5a5a;
+}
+#UIContainer  .endPhase:disabled { 
+    background: linear-gradient(to bottom, #cccccc 1%,#bbbbbb 73%, #ffffff 100%);
+    color: #5a5a5a;
+}
+#UIContainer  .Rally:disabled { 
+    background: linear-gradient(to bottom, #cccccc 1%,#bbbbbb 73%, #ffffff 100%);
+    color: #5a5a5a;
+}
