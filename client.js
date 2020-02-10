@@ -1,7 +1,7 @@
 
 import {Canv} from './canv.js'
 import { Interface } from './ui.js'
-import { Game } from './game.js'
+
 
 
 
@@ -33,7 +33,7 @@ class Client {
 
         this.canvasObj = new Canv();
         this.interface = new Interface();
-        this.game = new Game()
+
 
     }
 
@@ -108,15 +108,6 @@ class Client {
         }
         
     }
-
-
-
-    clearAllUI() {
-
-        this.interface.clearAllUI()
-
-    }
-
 
 }
 
