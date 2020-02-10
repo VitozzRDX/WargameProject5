@@ -60,6 +60,8 @@ class Client {
         // where to place , how to look , what to do and be disabled or not
         // 
         // and finally we need to draw a Rondel with appropriate Angle
+
+        this.canvasObj.drawRondelImage('assets/turnphase.gif')
         
     };
 
@@ -83,9 +85,7 @@ class Client {
     }
 
 
-    endPhaseCallback() {
-        console.log('pressed End Phase button')
-    };
+
     
     _getCallbackForMouseClickOnCanvasBy(phaseTitle) {
 
@@ -106,8 +106,19 @@ class Client {
             console.log('clicked on empty space in FPRPhase')
             return
         }
+    };
+    
+    //-----------this callback is called when clicking on canvas on FPRPhase --------------------
+
+    endPhaseCallback(button) {
         
-    }
+        console.log('pressed End Phase button')
+
+        let newPhaseCallback = this.allPhases_CallbacksHash['firstPlayerRallyPhase']
+
+        // -- order canvas to draw changes and cast forward a new Phase cb ot turn it on ending rotation
+        this.canvasObj._rotateTurnRondel(button,newPhaseCallback);
+    };
 
 }
 
