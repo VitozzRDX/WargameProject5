@@ -61,8 +61,25 @@ class Client {
         // 
         // and finally we need to draw a Rondel with appropriate Angle
 
-        this.canvasObj.drawRondelImage('assets/turnphase.gif')
-        
+//-----------------------------------------------------------------------------------
+        //this.canvasObj.drawRondelImage('assets/turnphase.gif')
+//-----------------------------------------------------------------------------------
+        //this.canvasObj.drawRI('assets/turnphase.gif')
+
+        // let prom = this.canvasObj.creatingPromise('assets/turnphase.gif');
+
+        // let ops = {
+        //     originX: 'center',
+        //     originY: 'center',
+        //     top: self.canvas.height / 9,
+        //     left: self.canvas.width / 2,
+        //     selectable: false,
+        //     opacity: 0.5,
+        //     evented: false
+        // }
+        // this.canvasObj.draw(prom,ops)
+
+        this.canvasObj.preloadAndDrawRondel('assets/turnphase.gif')
     };
 
 

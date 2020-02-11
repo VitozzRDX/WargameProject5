@@ -25,7 +25,7 @@ class Canv {
 
 
     drawText(text, param) {
-        var options ={
+        var options = {
 
             fill: '#880E4F',
             strokeWidth: 0.1,
@@ -37,20 +37,20 @@ class Canv {
             evented: false
         }
 
-        if(param) {
-           Object.assign(options,param)
+        if (param) {
+            Object.assign(options, param)
         }
 
         var textbox = new fabric.Textbox(text, options)
         //textbox.set(where)
         this.canvas.add(textbox)
     }
-// ----------- added  10 02 2020 -----------------
+    // ----------- added  10 02 2020 -----------------
     getRondelPicture() {
         return this.rondelPicture
     };
 
-    animateRondelRotation(angle, img,button,newPhaseCallback) {
+    animateRondelRotation(angle, img, button, newPhaseCallback) {
 
         //----- let's turn button End Phase off , to not let another rotation starting
         button.disabled = true
@@ -58,7 +58,7 @@ class Canv {
         // -- plus we don't need any interaction while rotation
         this.setOffMouseClickListener()
 
-        let ops = {           
+        let ops = {
             // -- with it we can see smooth rotation                                                     
             onChange: this.canvas.requestRenderAll.bind(this.canvas),
             duration: 500,
@@ -70,17 +70,17 @@ class Canv {
                 this.setMouseClickListener(newPhaseCallback)
             },
         };
-        img.animate('angle', angle,ops);
+        img.animate('angle', angle, ops);
     };
 
-    _rotateTurnRondel(button,newPhaseCallback) {                                   
+    _rotateTurnRondel(button, newPhaseCallback) {
         let rondel = this.getRondelPicture()
-        this.animateRondelRotation('-=45', rondel,button,newPhaseCallback)
+        this.animateRondelRotation('-=45', rondel, button, newPhaseCallback)
     };
 
-    drawRondelImage(reference){
+    drawRondelImage(reference) {
         var self = this;
-        window.fabric.Image.fromURL(reference,(img)=>{
+        window.fabric.Image.fromURL(reference, (img) => {
             img.set({
                 originX: 'center',
                 originY: 'center',
@@ -95,6 +95,91 @@ class Canv {
         })
     }
 
+    // ----------- added  10 02 2020 -----------------
+
+    drawRI(reference) {
+        var self = this
+
+        async function loadingImg() {
+
+            let promise = new Promise((resolve, reject) => {
+                window.fabric.Image.fromURL(reference, (img) => {
+                    resolve(img)
+                });
+            })
+
+            let img = await promise
+
+            self.rondelPicture = img
+            self.canvas.add(img);
+
+        }
+
+        loadingImg()
+
+        //self.canvas.add(img);
+    }
+
+    // ----------- added  11 02 2020 -----------------
+
+    creatingPromise(reference) {
+        let promise = new Promise((resolve, reject) => {
+            window.fabric.Image.fromURL(reference, (img) => {
+                resolve(img)
+            })
+        })
+
+        return promise
+    }
+
+    draw(prom,ops,cb) {
+        // we got Promise to load image , options that image set (if any) and any function we want to start after finish image loading
+
+        var self = this;
+
+        async function loadingImg() {
+            let img = await prom;       // continuation of function will halt till prom is resolved
+
+            // now we can set options for image, or do something else with it
+            if(ops) {
+                img.set(ops)
+            };
+            
+            if(cb){
+                cb(img)
+                
+            };
+
+
+            self.canvas.add(img);
+
+        }
+
+        loadingImg()
+
+        
+    }
+
+    preloadAndDrawRondel(ref) {
+        var self = this;
+
+        let cb = (img)=>{
+            self.rondelPicture = img
+        }
+        let ops = {
+            originX: 'center',
+            originY: 'center',
+            top: self.canvas.height / 9,
+            left: self.canvas.width / 2,
+            selectable: false,
+            opacity: 0.5,
+            evented: false
+        }
+        let prom = this.creatingPromise(ref)
+
+        this.draw(prom,ops,cb)
+
+    }
 };
 
 
