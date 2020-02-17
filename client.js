@@ -1,7 +1,7 @@
 
-import {Canv} from './canv.js'
+import { Canv } from './canv.js'
 import { Interface } from './ui.js'
-
+import { Game } from './game.js'
 
 
 
@@ -11,7 +11,10 @@ class Client {
         this.allPhases_CallbacksHash = {
 
             'firstPlayerRallyPhase': this.firstPlayerRallyPhase.bind(this),
-            
+            'secondPlayerRallyPhase': this.secondPlayerRallyPhase.bind(this),
+            'firstPlayerPrepFirePhase': this.firstPlayerPrepFirePhase.bind(this),
+            'firstPlayerMovementPhase': this.firstPlayerMovementPhase.bind(this)
+
         };
 
         // Next hash table is used by _buildMenuInterface() to find what buttons appropriate Phase needs
@@ -19,7 +22,10 @@ class Client {
         //dd
         this.phaseInterfaceMenuTable = {
 
-            'firstPlayerRallyPhase' : {'End Phase':true}, 
+            'firstPlayerRallyPhase': { 'End Phase': true },
+            'secondPlayerRallyPhase': { 'End Opp"s Rally': true, 'Waitng For Opponents Rally': true },
+            'firstPlayerPrepFirePhase': { 'End Phase': true },
+            'firstPlayerMovementPhase': { 'End Phase': true },
         };
 
         this.interfaceScheme = {
@@ -29,15 +35,31 @@ class Client {
                 'class': 'endPhase',
                 'name': 'End Phase'
             },
+
+            'End Opp"s Rally': {
+                'callback': this.endOppsRallyCallback.bind(this),
+                'class': 'EndOppsRally',
+                'name': 'End Opp"s Rally'
+            },
+
+            'Waitng For Opponents Rally': {
+                'callback': this.waitngForOpponentsRallyCallback.bind(this),
+                'class': 'WaitngForOpponentsRally',
+                'name': 'Waitng For Opponents Rally'
+            },
         };
 
         this.canvasObj = new Canv();
         this.interface = new Interface();
+        this.game = new Game()
 
 
     }
 
     init(options) {
+
+        // let's set starting Phase . Because it is Single Player variant there will be all phases one by one
+        // But in full version all Phases will go in parallel . So despite of same names they will be absolutely different
 
         // let's process options , that we got from Main and build a Visual, Interface, and Reaction according to it
 
@@ -53,7 +75,7 @@ class Client {
         this._removeAllCallbacksOffCanvasAndSetNew(callback)
 
         // then let's build appropriate UI to control Phase switching
-        
+
         this._buildMenuInterface(startingPhaseTitle)
 
         // our Interface's module buildMenuButton(x,y,...,z) should get those things :
@@ -61,25 +83,11 @@ class Client {
         // 
         // and finally we need to draw a Rondel with appropriate Angle
 
-//-----------------------------------------------------------------------------------
-        //this.canvasObj.drawRondelImage('assets/turnphase.gif')
-//-----------------------------------------------------------------------------------
-        //this.canvasObj.drawRI('assets/turnphase.gif')
-
-        // let prom = this.canvasObj.creatingPromise('assets/turnphase.gif');
-
-        // let ops = {
-        //     originX: 'center',
-        //     originY: 'center',
-        //     top: self.canvas.height / 9,
-        //     left: self.canvas.width / 2,
-        //     selectable: false,
-        //     opacity: 0.5,
-        //     evented: false
-        // }
-        // this.canvasObj.draw(prom,ops)
-
         this.canvasObj.preloadAndDrawRondel('assets/turnphase.gif')
+
+        // ------------- added 13 02 2020 ---------------------------
+
+        this.game.setGamePhase(options.startingPhase)
     };
 
 
@@ -90,7 +98,7 @@ class Client {
 
         // get  object 'sheme' from phaseInterfaceMenuTable like {End Phase:true,...}
 
-        let scheme = this.phaseInterfaceMenuTable[phaseTitle] 
+        let scheme = this.phaseInterfaceMenuTable[phaseTitle]
 
         // if there are several names in this object let's build a button for every one of them
         for (let name in scheme) {
@@ -99,18 +107,18 @@ class Client {
             // we need a set of propertires for every button like class, callback , and name that it got . We'll get it from interfaceScheme
             this.interface.buildButton(this.interfaceScheme[name], result)
         }
-    }
+    };
 
 
 
-    
+
     _getCallbackForMouseClickOnCanvasBy(phaseTitle) {
 
         return this.allPhases_CallbacksHash[phaseTitle]
 
     }
 
-    _removeAllCallbacksOffCanvasAndSetNew(callback) {           
+    _removeAllCallbacksOffCanvasAndSetNew(callback) {
         this.canvasObj.setOffMouseClickListener();
         this.canvasObj.setMouseClickListener(callback)
     };
@@ -124,19 +132,99 @@ class Client {
             return
         }
     };
-    
-    //-----------this callback is called when clicking on canvas on FPRPhase --------------------
+
+    //-----------this callback is called when clicking on End Phase button --------------------
 
     endPhaseCallback(button) {
-        
+
         console.log('pressed End Phase button')
 
-        let newPhaseCallback = this.allPhases_CallbacksHash['firstPlayerRallyPhase']
+        // 1 check what Phase now
+        this.game.switchToNextPhase()
 
-        // -- order canvas to draw changes and cast forward a new Phase cb ot turn it on ending rotation
-        this.canvasObj._rotateTurnRondel(button,newPhaseCallback);
+        let phase = this.game.getPhase()
+
+        
+        // --- is new Phase 'secondPlayerRallyPhase' ? In single Player variant it is same Phase as FPRP,so no Rondel Rotation
+        if (phase == 'secondPlayerRallyPhase') {
+
+            // ----  we don't need to Rotate Rondel , but  still need to  build new Menu
+            this.interface.clearAllUI()
+
+            // 3 Build appropriate MUI 
+            this._buildMenuInterface(phase)
+        }
+
+
+        let newPhaseCallback = this.allPhases_CallbacksHash[phase]
+
+        // --- is the new Phase any other ? ...
+        if (phase != 'secondPlayerRallyPhase') {
+            
+            // ____ THIS IS VARIANT WITHOUT PROMISE !!!!_______________
+
+            // -- order canvas to draw changes and cast forward a new Phase cb ot turn it on ending rotation
+            //this.canvasObj._rotateTurnRondel(button,newPhaseCallback);
+
+            // ____ ENDIN' PROMISELESS VARIANT !!!_____________________
+
+            // ---- ... let'start asinchronous animation of Rondel Rotation
+
+            let p = this.canvasObj._rotateTurnRondel2(button);
+            // --- and after completion set apropriate cb and build appropriate MUI
+            p.then(() => {
+                
+                this.canvasObj.setMouseClickListener(newPhaseCallback);
+
+                this.interface.clearAllUI()
+                
+                this._buildMenuInterface(phase)
+            })
+
+
+        }
     };
 
+    // ----------  added 13 02 2020 -------------------------
+
+    secondPlayerRallyPhase(options) {
+
+        // ---------- does we clicked on empty space ?
+        if (options.target == null) {
+            console.log('clicked on empty space in SPRPhase')
+            return
+        }
+    }
+
+    endOppsRallyCallback(button) {
+
+        console.log('pressed End Opp"s Rally button')
+
+        // at this moment we need just to launch Next Phase same as in End Phase Callback
+
+        this.endPhaseCallback(button)
+    }
+
+    waitngForOpponentsRallyCallback(button) {
+        console.log('DON"T TOUCH IT !!')
+    }
+
+    firstPlayerPrepFirePhase(options) {
+
+        // ---------- does we clicked on empty space ?
+        if (options.target == null) {
+            console.log('clicked on empty space in FPPFPhase')
+            return
+        }
+    }
+
+    firstPlayerMovementPhase(options) {
+        // ---------- does we clicked on empty space ?
+        if (options.target == null) {
+            console.log('clicked on empty space in FPMPhase')
+            return
+        }
+    }
 }
 
 export { Client };

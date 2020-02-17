@@ -67,9 +67,11 @@ class Canv {
                 //-- but on finishing rotation , we turn button back on
                 button.disabled = false
                 // -- .. and set callback according to new Phase
-                this.setMouseClickListener(newPhaseCallback)
+                if (newPhaseCallback) {
+                    this.setMouseClickListener(newPhaseCallback)
+                }
             },
-        };
+        }
         img.animate('angle', angle, ops);
     };
 
@@ -180,6 +182,35 @@ class Canv {
         this.draw(prom,ops,cb)
 
     }
+
+    animateRondelRotation2(angle, img, button, cb) {
+        console.log('startet Rondel Rotation')
+        //----- let's turn button End Phase off , to not let another rotation starting
+        console.log(button)
+        console.log('disabling button')
+        button.disabled = true
+
+        // -- plus we don't need any interaction while rotation
+        this.setOffMouseClickListener()
+
+        let ops = {
+            // -- with it we can see smooth rotation                                                     
+            onChange: this.canvas.requestRenderAll.bind(this.canvas),
+            duration: 500,
+            onComplete: () => {
+                button.disabled = false
+                cb()
+            },
+        }
+        img.animate('angle', angle, ops);
+    };
+
+    _rotateTurnRondel2(button) {
+        let rondel = this.getRondelPicture()
+        let promise = new Promise((resolve,reject)=>{this.animateRondelRotation2('-=45', rondel, button, resolve)})
+
+        return promise
+    };
 };
 
 

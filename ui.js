@@ -4,7 +4,7 @@ class Interface {
     }
 
     buildButton(obj,bool,options) {
-        console.log(obj)
+        console.log('----------------------------------------------------')
         let button = document.createElement('button');
         //-------------------------------------------------------------
 
@@ -23,7 +23,7 @@ class Interface {
 
         //-------------------------------------------------------------
         let m = document.getElementById('UIContainer')
-        console.log(m)
+
         m.appendChild(button)
 
         this.buttonsHash[obj.name] = button
