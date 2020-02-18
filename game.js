@@ -31,6 +31,14 @@ class Game {
             'secondPlayerRallyPhase' : {'End Rally':true},//,{'Rally All At Once' : 'enabled'},{"Choose Next To Rally":'enabled'}],
             'firstPlayerPrepFirePhase' : {'End Phase':true},
             'firstPlayerMovementPhase': {'End Phase':true},
+            'secondPlayerDefenciveFirePhase' : {'End Opp"s DFPh':true},
+            'firstPlayerAdvFirePhase':{'End Phase':true},
+            'firstPlayerRoutPhase':{},
+            'secondPlayerRoutPhase':{},
+            'firstPlayerAdvancePhase':{},
+            'firstPlayerCloseCombatPhase' :{},
+
+            'secondPlayerRallyPhaseHalfTurn' :{},
             'firstPlayerDefenciveFirePhase' :  {'End Phase':'disabled'},
             'firstPlayerAdvancingFirePhase' : [{'End Phase':true}],
             'firstPlayerRoutPhase' : [{'End Phase':true}],
@@ -72,7 +80,7 @@ class Game {
     switchToNextPhase () {
 
         let phase = this.getPhase()
-        console.log(phase)
+
         let i = this.allPhasesArr.indexOf(phase);
         let nextPhase = this.allPhasesArr[i+1]
 

@@ -16,7 +16,11 @@ Main.client = new Client();
 // --- for example we can get from server different initialSettings of starting Phase ---
 // --- in this case user will see different Phase on Rondel and will get different reaction
 
-let initialSettings = {startingPhase:'firstPlayerRallyPhase'}
+let initialSettings = {
+    startingPhase:'firstPlayerRallyPhase',
+    startingSidePictureSrc:'assets/turnphaseaxis.gif',
+    otherSidePictureSrc:'assets/turnphaseallied.gif'
+}
 
 Main.client.init(initialSettings)
 //--------- -------------------------------------------------------------

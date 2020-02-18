@@ -13,20 +13,42 @@ class Client {
             'firstPlayerRallyPhase': this.firstPlayerRallyPhase.bind(this),
             'secondPlayerRallyPhase': this.secondPlayerRallyPhase.bind(this),
             'firstPlayerPrepFirePhase': this.firstPlayerPrepFirePhase.bind(this),
-            'firstPlayerMovementPhase': this.firstPlayerMovementPhase.bind(this)
+            'firstPlayerMovementPhase': this.firstPlayerMovementPhase.bind(this),
+            'secondPlayerDefenciveFirePhase': this.secondPlayerDefenciveFirePhase.bind(this),
+            'firstPlayerAdvFirePhase': this.firstPlayerAdvFirePhase.bind(this),
+            'firstPlayerRoutPhase': this.firstPlayerRoutPhase.bind(this),
+            'secondPlayerRoutPhase': this.secondPlayerRoutPhase.bind(this),
+            'firstPlayerAdvancePhase': this.firstPlayerAdvancePhase.bind(this),
+            'firstPlayerCloseCombatPhase': this.firstPlayerCloseCombatPhase.bind(this),
 
+
+            'secondPlayerRallyPhaseHalfTurn': this.secondPlayerRallyPhaseHalfTurn.bind(this),
         };
 
         // Next hash table is used by _buildMenuInterface() to find what buttons appropriate Phase needs
         //'End Rally' - what button, :bool - disabled or not . We can add any other bt-ns ('Rally All At Once''Choose Next To Rally')
-        //dd
+
         this.phaseInterfaceMenuTable = {
 
             'firstPlayerRallyPhase': { 'End Phase': true },
             'secondPlayerRallyPhase': { 'End Opp"s Rally': true, 'Waitng For Opponents Rally': true },
             'firstPlayerPrepFirePhase': { 'End Phase': true },
             'firstPlayerMovementPhase': { 'End Phase': true },
+            'secondPlayerDefenciveFirePhase': { 'End Opp"s DFPh': true, 'Waitng For Opponents DF': true },
+            'firstPlayerAdvFirePhase': { 'End Phase': true },
+            'firstPlayerRoutPhase': { 'End Phase': true },
+            'secondPlayerRoutPhase': { 'End Opp"s Rout': true, 'Waitng For Opponents Rout': true },
+            'firstPlayerAdvancePhase': { 'End Phase': true },
+            'firstPlayerCloseCombatPhase': { 'End Phase': true },
+
+            'secondPlayerRallyPhaseHalfTurn': { 'End Phase': true },
+            'firstPlayerRallyPhaseHalfTurn': { 'End Phase': true },
+            'secondPlayerPrepFirePhase': { 'End Phase': true },
+            'secondPlayerMovementPhase': { 'End Phase': true },
+            'firstPlayerDefenciveFirePhase': { 'End Phase': true },
         };
+
+        // ----- Here we store all buttons callback that we got --------------------------
 
         this.interfaceScheme = {
 
@@ -47,6 +69,31 @@ class Client {
                 'class': 'WaitngForOpponentsRally',
                 'name': 'Waitng For Opponents Rally'
             },
+
+            'Waitng For Opponents DF': {
+                'callback': this.waitngForOpponentsRallyCallback.bind(this),
+                'class': 'WaitngForOpponentsRally', // 'WaitngForOpponentsDF',
+                'name': 'Waitng For Opponents DF'
+            },
+
+            'End Opp"s DFPh': {
+                'callback': this.endOppsDFPhCallback.bind(this),
+                'class': 'EndOppsDFPh',
+                'name': 'End Opp"s DFPh'
+            },
+
+            'End Opp"s Rout': {
+                'callback': this.endOppsRoutCallback.bind(this),
+                'class': 'EndOppsRout',
+                'name': 'End Opp"s Rout'
+            },
+
+            'Waitng For Opponents Rout': {
+                'callback': this.waitngForOpponentsRallyCallback.bind(this),
+                'class': 'WaitngForOpponentsRally',//'WaitngForOpponentsRout',
+                'name': 'Waitng For Opponents Rout'
+            },
+
         };
 
         this.canvasObj = new Canv();
@@ -83,11 +130,20 @@ class Client {
         // 
         // and finally we need to draw a Rondel with appropriate Angle
 
-        this.canvasObj.preloadAndDrawRondel('assets/turnphase.gif')
+        //this.canvasObj.preloadAndDrawRondel('assets/turnphase.gif')
+        //this.canvasObj.setOtherSidePictureSrc(options.otherSidePictureSrc)
+
+        this.canvasObj.setSidePicturesSrc(options.startingSidePictureSrc,options.otherSidePictureSrc)
+        this.canvasObj.preloadAndDrawRondel2('assets/turnphase.gif')
 
         // ------------- added 13 02 2020 ---------------------------
 
         this.game.setGamePhase(options.startingPhase)
+        // ---------------- 18 02 2020
+
+        // let startingSidePictureSrc = options.startingSidePictureSrc
+
+        // this.canvasObj.drawSidePicture(startingSidePictureSrc)
     };
 
 
@@ -123,31 +179,32 @@ class Client {
         this.canvasObj.setMouseClickListener(callback)
     };
 
-    //-----------this callback is called when clicking on canvas on FPRPhase --------------------
-    firstPlayerRallyPhase(options) {
-
-        // ---------- does we clicked on empty space ?
-        if (options.target == null) {
-            console.log('clicked on empty space in FPRPhase')
-            return
-        }
-    };
-
     //-----------this callback is called when clicking on End Phase button --------------------
 
     endPhaseCallback(button) {
 
-        console.log('pressed End Phase button')
+        console.log('called End Phase ')
 
         // 1 check what Phase now
         this.game.switchToNextPhase()
 
         let phase = this.game.getPhase()
 
-        
-        // --- is new Phase 'secondPlayerRallyPhase' ? In single Player variant it is same Phase as FPRP,so no Rondel Rotation
-        if (phase == 'secondPlayerRallyPhase') {
+        let newPhaseCallback = this.allPhases_CallbacksHash[phase]
 
+        // --- does we get to opponent"s Half Turn ? ---------
+
+        if (phase == 'secondPlayerRallyPhaseHalfTurn') {
+
+            this.canvasObj._flipSidePicture()
+        }
+
+        // --- is new Phase 'secondPlayerRallyPhase' ? In single Player variant it is same Phase as FPRP,so no Rondel Rotation
+        if (phase == 'secondPlayerRallyPhase' || phase == 'secondPlayerRoutPhase') {
+
+            this.canvasObj.setOffMouseClickListener()
+
+            this.canvasObj.setMouseClickListener(newPhaseCallback);
             // ----  we don't need to Rotate Rondel , but  still need to  build new Menu
             this.interface.clearAllUI()
 
@@ -155,29 +212,21 @@ class Client {
             this._buildMenuInterface(phase)
         }
 
-
-        let newPhaseCallback = this.allPhases_CallbacksHash[phase]
-
         // --- is the new Phase any other ? ...
-        if (phase != 'secondPlayerRallyPhase') {
-            
-            // ____ THIS IS VARIANT WITHOUT PROMISE !!!!_______________
 
-            // -- order canvas to draw changes and cast forward a new Phase cb ot turn it on ending rotation
-            //this.canvasObj._rotateTurnRondel(button,newPhaseCallback);
 
-            // ____ ENDIN' PROMISELESS VARIANT !!!_____________________
+        else {
 
             // ---- ... let'start asinchronous animation of Rondel Rotation
 
             let p = this.canvasObj._rotateTurnRondel2(button);
             // --- and after completion set apropriate cb and build appropriate MUI
             p.then(() => {
-                
+
                 this.canvasObj.setMouseClickListener(newPhaseCallback);
 
                 this.interface.clearAllUI()
-                
+
                 this._buildMenuInterface(phase)
             })
 
@@ -187,14 +236,6 @@ class Client {
 
     // ----------  added 13 02 2020 -------------------------
 
-    secondPlayerRallyPhase(options) {
-
-        // ---------- does we clicked on empty space ?
-        if (options.target == null) {
-            console.log('clicked on empty space in SPRPhase')
-            return
-        }
-    }
 
     endOppsRallyCallback(button) {
 
@@ -209,11 +250,32 @@ class Client {
         console.log('DON"T TOUCH IT !!')
     }
 
+    // --------  All Phases Canvas Callbacks ---------------------------------------------------
+
+    firstPlayerRallyPhase(options) {
+
+        // ---------- does we clicked on empty space ?
+        if (options.target == null) {
+            console.log('clicked on empty space in FPRPhase')
+            return
+        }
+    };
+
     firstPlayerPrepFirePhase(options) {
 
         // ---------- does we clicked on empty space ?
         if (options.target == null) {
             console.log('clicked on empty space in FPPFPhase')
+            return
+        }
+    }
+
+
+    secondPlayerRallyPhase(options) {
+
+        // ---------- does we clicked on empty space ?
+        if (options.target == null) {
+            console.log('clicked on empty space in SPRPhase')
             return
         }
     }
@@ -225,6 +287,83 @@ class Client {
             return
         }
     }
+    // --------------------- added 17 02 2020
+    endOppsDFPhCallback(button) {
+
+        console.log('pressed End Opp"s DF button')
+
+        // at this moment we need just to launch Next Phase same as in End Phase Callback
+
+        this.endPhaseCallback(button)
+    }
+
+    endOppsRoutCallback(button) {
+
+        console.log('pressed End Opp"s Rout button')
+
+        // at this moment we need just to launch Next Phase same as in End Phase Callback
+
+        this.endPhaseCallback(button)
+    }
+
+
+
+    secondPlayerDefenciveFirePhase(options) {
+        // ---------- does we clicked on empty space ?
+        if (options.target == null) {
+            console.log('clicked on empty space in SPDFPhase')
+            return
+        }
+    }
+
+    firstPlayerAdvFirePhase(options) {
+        // ---------- does we clicked on empty space ?
+        if (options.target == null) {
+            console.log('clicked on empty space in FPAFPhase')
+            return
+        }
+    }
+
+    firstPlayerRoutPhase(options) {
+        // ---------- does we clicked on empty space ?
+        if (options.target == null) {
+            console.log('clicked on empty space in FPRtPhase')
+            return
+        }
+    }
+
+    secondPlayerRoutPhase(options) {
+        // ---------- does we clicked on empty space ?
+        if (options.target == null) {
+            console.log('clicked on empty space in SPRtPhase')
+            return
+        }
+    }
+
+    firstPlayerAdvancePhase(options) {
+        // ---------- does we clicked on empty space ?
+        if (options.target == null) {
+            console.log('clicked on empty space in FPAPhase')
+            return
+        }
+    }
+
+    firstPlayerCloseCombatPhase(options) {
+        // ---------- does we clicked on empty space ?
+        if (options.target == null) {
+            console.log('clicked on empty space in FPCCPhase')
+            return
+        }
+    };
+
+    secondPlayerRallyPhaseHalfTurn(options) {
+        // ---------- does we clicked on empty space ?
+        if (options.target == null) {
+            console.log('clicked on empty space in FPCCPhase')
+            return
+        }
+    }
+
 }
 
 export { Client };

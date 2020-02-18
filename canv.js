@@ -3,10 +3,16 @@ class Canv {
     constructor() {
         this.canvas = new window.fabric.CanvasEx('canvas');
 
+        this.canvas2 = new window.fabric.CanvasEx('canvas2');
+
         this.canvas.hoverCursor = 'pointer';
 
         // in this.rondelPicture we'll place a ref to rondel image element. At the initialization of Canv it stil not loaded
         this.rondelPicture = undefined;
+        this.startingSidePicture = undefined;
+
+        this.firstSidePictureSrc = undefined;
+        this.otherSidePictureSrc = undefined;
 
     };
 
@@ -50,80 +56,6 @@ class Canv {
         return this.rondelPicture
     };
 
-    animateRondelRotation(angle, img, button, newPhaseCallback) {
-
-        //----- let's turn button End Phase off , to not let another rotation starting
-        button.disabled = true
-
-        // -- plus we don't need any interaction while rotation
-        this.setOffMouseClickListener()
-
-        let ops = {
-            // -- with it we can see smooth rotation                                                     
-            onChange: this.canvas.requestRenderAll.bind(this.canvas),
-            duration: 500,
-            onComplete: () => {
-
-                //-- but on finishing rotation , we turn button back on
-                button.disabled = false
-                // -- .. and set callback according to new Phase
-                if (newPhaseCallback) {
-                    this.setMouseClickListener(newPhaseCallback)
-                }
-            },
-        }
-        img.animate('angle', angle, ops);
-    };
-
-    _rotateTurnRondel(button, newPhaseCallback) {
-        let rondel = this.getRondelPicture()
-        this.animateRondelRotation('-=45', rondel, button, newPhaseCallback)
-    };
-
-    drawRondelImage(reference) {
-        var self = this;
-        window.fabric.Image.fromURL(reference, (img) => {
-            img.set({
-                originX: 'center',
-                originY: 'center',
-                top: self.canvas.height / 9,
-                left: self.canvas.width / 2,
-                selectable: false,
-                opacity: 0.5,
-                evented: false
-            })
-            self.rondelPicture = img
-            self.canvas.add(img);
-        })
-    }
-
-    // ----------- added  10 02 2020 -----------------
-
-    drawRI(reference) {
-        var self = this
-
-        async function loadingImg() {
-
-            let promise = new Promise((resolve, reject) => {
-                window.fabric.Image.fromURL(reference, (img) => {
-                    resolve(img)
-                });
-            })
-
-            let img = await promise
-
-            self.rondelPicture = img
-            self.canvas.add(img);
-
-        }
-
-        loadingImg()
-
-        //self.canvas.add(img);
-    }
-
-    // ----------- added  11 02 2020 -----------------
-
     creatingPromise(reference) {
         let promise = new Promise((resolve, reject) => {
             window.fabric.Image.fromURL(reference, (img) => {
@@ -132,62 +64,86 @@ class Canv {
         })
 
         return promise
-    }
+    };
 
-    draw(prom,ops,cb) {
+    draw(prom, ops, cb, canv) {
         // we got Promise to load image , options that image set (if any) and any function we want to start after finish image loading
-
-        var self = this;
-
         async function loadingImg() {
             let img = await prom;       // continuation of function will halt till prom is resolved
 
             // now we can set options for image, or do something else with it
-            if(ops) {
+            if (ops) {
                 img.set(ops)
             };
-            
-            if(cb){
+
+            if (cb) {
                 cb(img)
-                
+
             };
 
-
-            self.canvas.add(img);
+            canv.add(img);
 
         }
 
         loadingImg()
 
-        
-    }
+    };
 
-    preloadAndDrawRondel(ref) {
+    // preloadAndDrawRondel(ref) {
+    //     var self = this;
+
+    //     let cb = (img)=>{
+    //         self.rondelPicture = img
+    //     }
+    //     let ops = {
+    //         originX: 'center',
+    //         originY: 'center',
+    //         top: self.canvas2.height / 2,
+    //         left: self.canvas2.width / 2,//1.14
+    //         selectable: false,
+    //         opacity: 0.5,
+    //         evented: false
+    //     }
+    //     let prom = this.creatingPromise(ref)
+
+    //     this.draw(prom,ops,cb,self.canvas2)
+
+    // }
+
+    preloadAndDrawRondel2(ref) {    
         var self = this;
+        var ref2 = this.firstSidePictureSrc;
 
-        let cb = (img)=>{
+        let cb = (img) => {
             self.rondelPicture = img
         }
+
+        let cb2 = (img) => {
+            self.startingSidePicture = img
+        }
+
         let ops = {
             originX: 'center',
             originY: 'center',
-            top: self.canvas.height / 9,
-            left: self.canvas.width / 2,
+            top: self.canvas2.height / 2,
+            left: self.canvas2.width / 2,//1.14
             selectable: false,
             opacity: 0.5,
             evented: false
         }
-        let prom = this.creatingPromise(ref)
 
-        this.draw(prom,ops,cb)
+        let prom = this.creatingPromise(ref)
+        let prom2 = this.creatingPromise(ref2)
+
+        this.draw(prom, ops, cb, self.canvas2)
+        this.draw(prom2, ops, cb2, self.canvas2)
 
     }
 
     animateRondelRotation2(angle, img, button, cb) {
-        console.log('startet Rondel Rotation')
+
         //----- let's turn button End Phase off , to not let another rotation starting
-        console.log(button)
-        console.log('disabling button')
+
         button.disabled = true
 
         // -- plus we don't need any interaction while rotation
@@ -195,7 +151,7 @@ class Canv {
 
         let ops = {
             // -- with it we can see smooth rotation                                                     
-            onChange: this.canvas.requestRenderAll.bind(this.canvas),
+            onChange: this.canvas2.requestRenderAll.bind(this.canvas2),
             duration: 500,
             onComplete: () => {
                 button.disabled = false
@@ -207,10 +163,36 @@ class Canv {
 
     _rotateTurnRondel2(button) {
         let rondel = this.getRondelPicture()
-        let promise = new Promise((resolve,reject)=>{this.animateRondelRotation2('-=45', rondel, button, resolve)})
+        let promise = new Promise((resolve, reject) => { this.animateRondelRotation2('-=45', rondel, button, resolve) })
 
         return promise
     };
+
+    _flipSidePicture() {
+
+        let self = this;
+        let temp;
+
+        this.startingSidePicture.setSrc(self.otherSidePictureSrc, () => {
+            this.canvas2.renderAll()
+        })
+
+        temp = this.otherSidePictureSrc;
+        this.otherSidePictureSrc = this.firstSidePictureSrc
+        this.firstSidePictureSrc = temp
+
+    };
+
+    setOtherSidePictureSrc(src) {
+        this.otherSidePictureSrc = src
+    };
+
+    setSidePicturesSrc(src1, src2) {
+
+        this.firstSidePictureSrc = src1
+        this.otherSidePictureSrc = src2
+    }
+
 };
 
 
