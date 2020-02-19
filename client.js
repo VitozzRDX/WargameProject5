@@ -23,6 +23,15 @@ class Client {
 
 
             'secondPlayerRallyPhaseHalfTurn': this.secondPlayerRallyPhaseHalfTurn.bind(this),
+            'firstPlayerRallyPhaseHalfTurn': this.firstPlayerRallyPhaseHalfTurn.bind(this),
+            'secondPlayerPrepFirePhase': this.secondPlayerPrepFirePhase.bind(this),
+            'secondPlayerMovementPhase': this.secondPlayerMovementPhase.bind(this),
+            'firstPlayerDefenciveFirePhase': this.firstPlayerDefenciveFirePhase.bind(this),
+            'secondPlayerAdvFirePhase': this.secondPlayerAdvFirePhase.bind(this),
+            'secondPlayerRoutPhaseHalfTurn': this.secondPlayerRoutPhaseHalfTurn.bind(this),
+            'firstPlayerRoutPhaseHalfTurn': this.firstPlayerRoutPhaseHalfTurn.bind(this),
+            'secondPlayerAdvancePhase': this.secondPlayerAdvancePhase.bind(this),
+            'secondPlayerCloseCombatPhase': this.secondPlayerCloseCombatPhase.bind(this),
         };
 
         // Next hash table is used by _buildMenuInterface() to find what buttons appropriate Phase needs
@@ -42,59 +51,24 @@ class Client {
             'firstPlayerCloseCombatPhase': { 'End Phase': true },
 
             'secondPlayerRallyPhaseHalfTurn': { 'End Phase': true },
-            'firstPlayerRallyPhaseHalfTurn': { 'End Phase': true },
+            'firstPlayerRallyPhaseHalfTurn': { 'End Opp"s Rally': true, 'Waitng For Opponents Rally': true },
             'secondPlayerPrepFirePhase': { 'End Phase': true },
             'secondPlayerMovementPhase': { 'End Phase': true },
-            'firstPlayerDefenciveFirePhase': { 'End Phase': true },
+            'firstPlayerDefenciveFirePhase': { 'End Opp"s DFPh': true, 'Waitng For Opponents DF': true },
+            'secondPlayerAdvFirePhase': { 'End Phase': true },
+            'secondPlayerRoutPhaseHalfTurn': { 'End Phase': true },
+            'firstPlayerRoutPhaseHalfTurn': { 'End Opp"s Rout': true, 'Waitng For Opponents Rout': true },
+            'secondPlayerAdvancePhase': { 'End Phase': true },
+            'secondPlayerCloseCombatPhase': { 'End Phase': true },
         };
 
         // ----- Here we store all buttons callback that we got --------------------------
 
-        this.interfaceScheme = {
+        //let name = 'Ally'
+        //let name2 = 'Nazi'
 
-            'End Phase': {
-                'callback': this.endPhaseCallback.bind(this),
-                'class': 'endPhase',
-                'name': 'End Phase'
-            },
-
-            'End Opp"s Rally': {
-                'callback': this.endOppsRallyCallback.bind(this),
-                'class': 'EndOppsRally',
-                'name': 'End Opp"s Rally'
-            },
-
-            'Waitng For Opponents Rally': {
-                'callback': this.waitngForOpponentsRallyCallback.bind(this),
-                'class': 'WaitngForOpponentsRally',
-                'name': 'Waitng For Opponents Rally'
-            },
-
-            'Waitng For Opponents DF': {
-                'callback': this.waitngForOpponentsRallyCallback.bind(this),
-                'class': 'WaitngForOpponentsRally', // 'WaitngForOpponentsDF',
-                'name': 'Waitng For Opponents DF'
-            },
-
-            'End Opp"s DFPh': {
-                'callback': this.endOppsDFPhCallback.bind(this),
-                'class': 'EndOppsDFPh',
-                'name': 'End Opp"s DFPh'
-            },
-
-            'End Opp"s Rout': {
-                'callback': this.endOppsRoutCallback.bind(this),
-                'class': 'EndOppsRout',
-                'name': 'End Opp"s Rout'
-            },
-
-            'Waitng For Opponents Rout': {
-                'callback': this.waitngForOpponentsRallyCallback.bind(this),
-                'class': 'WaitngForOpponentsRally',//'WaitngForOpponentsRout',
-                'name': 'Waitng For Opponents Rout'
-            },
-
-        };
+        this.fistPlayer = undefined;
+        this.secondPlayer = undefined;
 
         this.canvasObj = new Canv();
         this.interface = new Interface();
@@ -102,9 +76,129 @@ class Client {
 
 
     }
+    // ---------------- added 19 02 2020 ------------------
+    firstPlayerRallyPhaseHalfTurn(options) {
+        if (options.target == null) {
+            console.log('clicked on empty space in SPDFPhase')
+            return
+        }
+    };
 
+    secondPlayerPrepFirePhase(options) {
+        if (options.target == null) {
+            console.log('clicked on empty space in SPDFPhase')
+            return
+        }
+    };
+
+    secondPlayerMovementPhase(options) {
+        if (options.target == null) {
+            console.log('clicked on empty space in SPDFPhase')
+            return
+        }
+    };
+
+    firstPlayerDefenciveFirePhase(options) {
+        if (options.target == null) {
+            console.log('clicked on empty space in FPDFPhase')
+            return
+        }
+    };
+
+    secondPlayerAdvFirePhase(options) {
+        if (options.target == null) {
+            console.log('clicked on empty space in SPDFPhase')
+            return
+        }
+    };
+
+    secondPlayerRoutPhaseHalfTurn(options) {
+        if (options.target == null) {
+            console.log('clicked on empty space in SPDFPhase')
+            return
+        }
+    };
+
+    firstPlayerRoutPhaseHalfTurn(options) {
+        if (options.target == null) {
+            console.log('clicked on empty space in SPDFPhase')
+            return
+        }
+    };
+
+    secondPlayerAdvancePhase(options) {
+        if (options.target == null) {
+            console.log('clicked on empty space in SPDFPhase')
+            return
+        }
+    };
+
+    secondPlayerCloseCombatPhase(options) {
+        if (options.target == null) {
+            console.log('clicked on empty space in SPDFPhase')
+            return
+        }
+    };
+
+    switchPlayers() {
+        let temp;
+        temp = this.firstPlayer;
+        this.firstPlayer = this.secondPlayer;
+        this.secondPlayer = temp
+    }
+    setInterfaceScheme() {
+        this.interfaceScheme = {
+
+            'End Phase': {
+                'callback': this.endPhaseCallback.bind(this),
+                'class': 'endPhase',
+                'name': `End ${this.firstPlayer}'s Phase`
+            },
+
+            'End Opp"s Rally': {
+                'callback': this.endOppsRallyCallback.bind(this),
+                'class': 'EndOppsRally',
+                'name': `End ${this.secondPlayer}'s Rally`
+            },
+
+            'Waitng For Opponents Rally': {
+                'callback': this.waitngForOpponentsRallyCallback.bind(this),
+                'class': 'WaitngForOpponentsRally',
+                'name': `Waitng For ${this.secondPlayer}'s Rally`
+            },
+
+            'Waitng For Opponents DF': {
+                'callback': this.waitngForOpponentsRallyCallback.bind(this),
+                'class': 'WaitngForOpponentsRally', // 'WaitngForOpponentsDF',
+                'name': `Waitng For ${this.secondPlayer}'s DF`
+            },
+
+            'End Opp"s DFPh': {
+                'callback': this.endOppsDFPhCallback.bind(this),
+                'class': 'EndOppsDFPh',
+                'name': `End ${this.secondPlayer}'s DFPh`
+            },
+
+            'End Opp"s Rout': {
+                'callback': this.endOppsRoutCallback.bind(this),
+                'class': 'EndOppsRout',
+                'name': `End ${this.secondPlayer}'s Rout`
+            },
+
+            'Waitng For Opponents Rout': {
+                'callback': this.waitngForOpponentsRallyCallback.bind(this),
+                'class': 'WaitngForOpponentsRally',//'WaitngForOpponentsRout',
+                'name': `Waitng For ${this.secondPlayer}'s Rout`
+            },
+
+        };
+    }
     init(options) {
 
+        this.firstPlayer = options.firstPlayer
+        this.secondPlayer = options.secondPlayer
+
+        this.setInterfaceScheme()
         // let's set starting Phase . Because it is Single Player variant there will be all phases one by one
         // But in full version all Phases will go in parallel . So despite of same names they will be absolutely different
 
@@ -133,7 +227,7 @@ class Client {
         //this.canvasObj.preloadAndDrawRondel('assets/turnphase.gif')
         //this.canvasObj.setOtherSidePictureSrc(options.otherSidePictureSrc)
 
-        this.canvasObj.setSidePicturesSrc(options.startingSidePictureSrc,options.otherSidePictureSrc)
+        this.canvasObj.setSidePicturesSrc(options.startingSidePictureSrc, options.otherSidePictureSrc)
         this.canvasObj.preloadAndDrawRondel2('assets/turnphase.gif')
 
         // ------------- added 13 02 2020 ---------------------------
@@ -188,19 +282,25 @@ class Client {
         // 1 check what Phase now
         this.game.switchToNextPhase()
 
-        let phase = this.game.getPhase()
+        let phase = this.game.getPhase()    // rename to newPhase
+
+        console.log('New phase :', phase)
+
 
         let newPhaseCallback = this.allPhases_CallbacksHash[phase]
 
         // --- does we get to opponent"s Half Turn ? ---------
 
-        if (phase == 'secondPlayerRallyPhaseHalfTurn') {
+        if (phase == 'secondPlayerRallyPhaseHalfTurn' || phase == 'firstPlayerRallyPhase') {
 
+            this.switchPlayers()
+            this.setInterfaceScheme()
             this.canvasObj._flipSidePicture()
         }
 
         // --- is new Phase 'secondPlayerRallyPhase' ? In single Player variant it is same Phase as FPRP,so no Rondel Rotation
-        if (phase == 'secondPlayerRallyPhase' || phase == 'secondPlayerRoutPhase') {
+        if (phase == 'secondPlayerRallyPhase' || phase == 'secondPlayerRoutPhase' || phase == 'firstPlayerRallyPhaseHalfTurn'
+            || phase == 'firstPlayerRoutPhaseHalfTurn') {
 
             this.canvasObj.setOffMouseClickListener()
 
@@ -228,6 +328,7 @@ class Client {
                 this.interface.clearAllUI()
 
                 this._buildMenuInterface(phase)
+
             })
 
 
@@ -359,7 +460,7 @@ class Client {
     secondPlayerRallyPhaseHalfTurn(options) {
         // ---------- does we clicked on empty space ?
         if (options.target == null) {
-            console.log('clicked on empty space in FPCCPhase')
+            console.log('clicked on empty space in SPCCPhase')
             return
         }
     }

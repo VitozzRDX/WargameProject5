@@ -17,6 +17,8 @@ Main.client = new Client();
 // --- in this case user will see different Phase on Rondel and will get different reaction
 
 let initialSettings = {
+    firstPlayer:'Nazi',
+    secondPlayer:'Ally',
     startingPhase:'firstPlayerRallyPhase',
     startingSidePictureSrc:'assets/turnphaseaxis.gif',
     otherSidePictureSrc:'assets/turnphaseallied.gif'
