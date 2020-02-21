@@ -3,6 +3,8 @@ import { Canv } from './canv.js'
 import { Interface } from './ui.js'
 import { Game } from './game.js'
 
+import { methods } from './clientMethods_ReactionOnCanvas.js'
+import { Counter, ManCounters } from './counters.js'
 
 
 class Client {
@@ -22,16 +24,16 @@ class Client {
             'firstPlayerCloseCombatPhase': this.firstPlayerCloseCombatPhase.bind(this),
 
 
-            'secondPlayerRallyPhaseHalfTurn': this.secondPlayerRallyPhaseHalfTurn.bind(this),
-            'firstPlayerRallyPhaseHalfTurn': this.firstPlayerRallyPhaseHalfTurn.bind(this),
-            'secondPlayerPrepFirePhase': this.secondPlayerPrepFirePhase.bind(this),
-            'secondPlayerMovementPhase': this.secondPlayerMovementPhase.bind(this),
-            'firstPlayerDefenciveFirePhase': this.firstPlayerDefenciveFirePhase.bind(this),
-            'secondPlayerAdvFirePhase': this.secondPlayerAdvFirePhase.bind(this),
-            'secondPlayerRoutPhaseHalfTurn': this.secondPlayerRoutPhaseHalfTurn.bind(this),
-            'firstPlayerRoutPhaseHalfTurn': this.firstPlayerRoutPhaseHalfTurn.bind(this),
-            'secondPlayerAdvancePhase': this.secondPlayerAdvancePhase.bind(this),
-            'secondPlayerCloseCombatPhase': this.secondPlayerCloseCombatPhase.bind(this),
+            // 'secondPlayerRallyPhaseHalfTurn': this.secondPlayerRallyPhaseHalfTurn.bind(this),
+            // 'firstPlayerRallyPhaseHalfTurn': this.firstPlayerRallyPhaseHalfTurn.bind(this),
+            // 'secondPlayerPrepFirePhase': this.secondPlayerPrepFirePhase.bind(this),
+            // 'secondPlayerMovementPhase': this.secondPlayerMovementPhase.bind(this),
+            // 'firstPlayerDefenciveFirePhase': this.firstPlayerDefenciveFirePhase.bind(this),
+            // 'secondPlayerAdvFirePhase': this.secondPlayerAdvFirePhase.bind(this),
+            // 'secondPlayerRoutPhaseHalfTurn': this.secondPlayerRoutPhaseHalfTurn.bind(this),
+            // 'firstPlayerRoutPhaseHalfTurn': this.firstPlayerRoutPhaseHalfTurn.bind(this),
+            // 'secondPlayerAdvancePhase': this.secondPlayerAdvancePhase.bind(this),
+            // 'secondPlayerCloseCombatPhase': this.secondPlayerCloseCombatPhase.bind(this),
         };
 
         // Next hash table is used by _buildMenuInterface() to find what buttons appropriate Phase needs
@@ -50,22 +52,17 @@ class Client {
             'firstPlayerAdvancePhase': { 'End Phase': true },
             'firstPlayerCloseCombatPhase': { 'End Phase': true },
 
-            'secondPlayerRallyPhaseHalfTurn': { 'End Phase': true },
-            'firstPlayerRallyPhaseHalfTurn': { 'End Opp"s Rally': true, 'Waitng For Opponents Rally': true },
-            'secondPlayerPrepFirePhase': { 'End Phase': true },
-            'secondPlayerMovementPhase': { 'End Phase': true },
-            'firstPlayerDefenciveFirePhase': { 'End Opp"s DFPh': true, 'Waitng For Opponents DF': true },
-            'secondPlayerAdvFirePhase': { 'End Phase': true },
-            'secondPlayerRoutPhaseHalfTurn': { 'End Phase': true },
-            'firstPlayerRoutPhaseHalfTurn': { 'End Opp"s Rout': true, 'Waitng For Opponents Rout': true },
-            'secondPlayerAdvancePhase': { 'End Phase': true },
-            'secondPlayerCloseCombatPhase': { 'End Phase': true },
+            // 'secondPlayerRallyPhaseHalfTurn': { 'End Phase': true },
+            // 'firstPlayerRallyPhaseHalfTurn': { 'End Opp"s Rally': true, 'Waitng For Opponents Rally': true },
+            // 'secondPlayerPrepFirePhase': { 'End Phase': true },
+            // 'secondPlayerMovementPhase': { 'End Phase': true },
+            // 'firstPlayerDefenciveFirePhase': { 'End Opp"s DFPh': true, 'Waitng For Opponents DF': true },
+            // 'secondPlayerAdvFirePhase': { 'End Phase': true },
+            // 'secondPlayerRoutPhaseHalfTurn': { 'End Phase': true },
+            // 'firstPlayerRoutPhaseHalfTurn': { 'End Opp"s Rout': true, 'Waitng For Opponents Rout': true },
+            // 'secondPlayerAdvancePhase': { 'End Phase': true },
+            // 'secondPlayerCloseCombatPhase': { 'End Phase': true },
         };
-
-        // ----- Here we store all buttons callback that we got --------------------------
-
-        //let name = 'Ally'
-        //let name2 = 'Nazi'
 
         this.fistPlayer = undefined;
         this.secondPlayer = undefined;
@@ -74,78 +71,35 @@ class Client {
         this.interface = new Interface();
         this.game = new Game()
 
+        this.counterTable = {
+            'Counter': Counter,
+            'ManCounters': ManCounters
+        }
 
+
+        this.squadType_propertiesHash = {               // refactor we should get table from server with squadTypes only for Scenario
+            'ruSquadE-0': {                             // refactor to array ?
+                src: 'assets/ru628S.gif',
+                otherSideSrc: 'assets/ruh7b.gif',
+                className: 'ManCounters',
+            },
+
+            'geSquadE-0': {
+                src: 'assets/ge467S.gif',
+                otherSideSrc: 'assets/geh7b.gif',
+                className: 'ManCounters',
+            },
+        }
     }
+
     // ---------------- added 19 02 2020 ------------------
-    firstPlayerRallyPhaseHalfTurn(options) {
-        if (options.target == null) {
-            console.log('clicked on empty space in SPDFPhase')
-            return
-        }
-    };
-
-    secondPlayerPrepFirePhase(options) {
-        if (options.target == null) {
-            console.log('clicked on empty space in SPDFPhase')
-            return
-        }
-    };
-
-    secondPlayerMovementPhase(options) {
-        if (options.target == null) {
-            console.log('clicked on empty space in SPDFPhase')
-            return
-        }
-    };
-
-    firstPlayerDefenciveFirePhase(options) {
-        if (options.target == null) {
-            console.log('clicked on empty space in FPDFPhase')
-            return
-        }
-    };
-
-    secondPlayerAdvFirePhase(options) {
-        if (options.target == null) {
-            console.log('clicked on empty space in SPDFPhase')
-            return
-        }
-    };
-
-    secondPlayerRoutPhaseHalfTurn(options) {
-        if (options.target == null) {
-            console.log('clicked on empty space in SPDFPhase')
-            return
-        }
-    };
-
-    firstPlayerRoutPhaseHalfTurn(options) {
-        if (options.target == null) {
-            console.log('clicked on empty space in SPDFPhase')
-            return
-        }
-    };
-
-    secondPlayerAdvancePhase(options) {
-        if (options.target == null) {
-            console.log('clicked on empty space in SPDFPhase')
-            return
-        }
-    };
-
-    secondPlayerCloseCombatPhase(options) {
-        if (options.target == null) {
-            console.log('clicked on empty space in SPDFPhase')
-            return
-        }
-    };
-
     switchPlayers() {
         let temp;
         temp = this.firstPlayer;
         this.firstPlayer = this.secondPlayer;
         this.secondPlayer = temp
     }
+
     setInterfaceScheme() {
         this.interfaceScheme = {
 
@@ -190,9 +144,10 @@ class Client {
                 'class': 'WaitngForOpponentsRally',//'WaitngForOpponentsRout',
                 'name': `Waitng For ${this.secondPlayer}'s Rout`
             },
-
         };
+
     }
+
     init(options) {
 
         this.firstPlayer = options.firstPlayer
@@ -230,43 +185,100 @@ class Client {
         this.canvasObj.setSidePicturesSrc(options.startingSidePictureSrc, options.otherSidePictureSrc)
         this.canvasObj.preloadAndDrawRondel2('assets/turnphase.gif')
 
-        // ------------- added 13 02 2020 ---------------------------
-
         this.game.setGamePhase(options.startingPhase)
-        // ---------------- 18 02 2020
 
-        // let startingSidePictureSrc = options.startingSidePictureSrc
+        // ---------------- 20 02 2020
+        // let arr = ['assets/ge467S.gif','assets/geh7b.gif','assets/ru628S.gif','assets/ruh7b.gif']
+        // this.canvasObj.preloadAndDraw(arr)
 
-        // this.canvasObj.drawSidePicture(startingSidePictureSrc)
+    //----------------------- added 21 02 2020
+        //this.canvasObj.preloadAndDrawBackground(options.mapSrc,{top:0,left:0})
+        //this._createAndDrawCounters(options.countersOptions)
+
+
+    // -------- Loading Creating and Drawing Background and Counters
+        let p = this.canvasObj.creatingPromise(options.mapSrc)
+        p.
+        then(()=>{
+            this.canvasObj.draw(p,{top:0,left:0,evented:false,selectable: false,})
+        }).
+        then(()=>{
+            this._createAndDrawCounters(options.countersOptions)
+        })
+
+        
+
+
+    };
+    //-----------added 20 20 2020----------------------------------------------------------
+
+    _createAndDrawCounters(countersOptions) {  //setOfOptionsforCounters
+
+        let parametersOnCreationHash = countersOptions.parametersOnCreationHash
+
+        for (let i in parametersOnCreationHash) {
+
+            let arrayOfCoords = parametersOnCreationHash[i]
+
+            arrayOfCoords.forEach((obj) => {
+      
+                let ops = countersOptions.squadType_propertiesHash[i] // { src: "assets/ge467S.gif", otherSideSrc: "assets/geh7b.gif", className: "ManCounters" }
+                ops.options = obj       // { top: 100, left: 100 }
+                let className = ops['className']
+
+                let c = this.createCounterObject(className, ops) //{ src: src, options: options, otherSideSrc: otherSideSrc }
+                this.drawCounter(c)
+                //this.addToCounterTray(c)
+            })
+        }
     };
 
+    createCounterObject(className, ops) {
+        let C = this.counterTable[className]
+        return new C(ops)
+    };
+
+    addToCounterTray(c) {
+        //this.counterTrayArray.push(c)
+    };
+
+    drawCounter(c) {
+
+        let ref = c.src
+        let ops = c.options
+        Object.assign(ops, {
+            originX: 'center',
+            originY: 'center',
+        })
+        let cb = (i) => {
+            c.img = i;
+            i.counter=c
+        }
+        let prom = this.canvasObj.creatingPromise(ref)
+
+        this.canvasObj.draw(prom, ops, cb)
+    }
 
 
     // phaseInterfaceMenuTable - what buttons must be in every Phase, and are they disabled or not
     // interfaceScheme - what properties every buttons has (class,cb.name)
+
     _buildMenuInterface(phaseTitle) {
 
         // get  object 'sheme' from phaseInterfaceMenuTable like {End Phase:true,...}
-
         let scheme = this.phaseInterfaceMenuTable[phaseTitle]
 
         // if there are several names in this object let's build a button for every one of them
         for (let name in scheme) {
-
             let result = scheme[name];
             // we need a set of propertires for every button like class, callback , and name that it got . We'll get it from interfaceScheme
             this.interface.buildButton(this.interfaceScheme[name], result)
         }
     };
 
-
-
-
     _getCallbackForMouseClickOnCanvasBy(phaseTitle) {
-
         return this.allPhases_CallbacksHash[phaseTitle]
-
-    }
+    };
 
     _removeAllCallbacksOffCanvasAndSetNew(callback) {
         this.canvasObj.setOffMouseClickListener();
@@ -274,25 +286,20 @@ class Client {
     };
 
     //-----------this callback is called when clicking on End Phase button --------------------
-
     endPhaseCallback(button) {
 
         console.log('called End Phase ')
 
         // 1 check what Phase now
         this.game.switchToNextPhase()
-
         let phase = this.game.getPhase()    // rename to newPhase
 
         console.log('New phase :', phase)
 
-
         let newPhaseCallback = this.allPhases_CallbacksHash[phase]
 
         // --- does we get to opponent"s Half Turn ? ---------
-
         if (phase == 'secondPlayerRallyPhaseHalfTurn' || phase == 'firstPlayerRallyPhase') {
-
             this.switchPlayers()
             this.setInterfaceScheme()
             this.canvasObj._flipSidePicture()
@@ -303,8 +310,8 @@ class Client {
             || phase == 'firstPlayerRoutPhaseHalfTurn') {
 
             this.canvasObj.setOffMouseClickListener()
-
             this.canvasObj.setMouseClickListener(newPhaseCallback);
+
             // ----  we don't need to Rotate Rondel , but  still need to  build new Menu
             this.interface.clearAllUI()
 
@@ -313,29 +320,19 @@ class Client {
         }
 
         // --- is the new Phase any other ? ...
-
-
         else {
-
             // ---- ... let'start asinchronous animation of Rondel Rotation
-
             let p = this.canvasObj._rotateTurnRondel2(button);
             // --- and after completion set apropriate cb and build appropriate MUI
             p.then(() => {
-
                 this.canvasObj.setMouseClickListener(newPhaseCallback);
-
                 this.interface.clearAllUI()
-
                 this._buildMenuInterface(phase)
-
             })
-
-
         }
-    };
 
-    // ----------  added 13 02 2020 -------------------------
+
+    };
 
 
     endOppsRallyCallback(button) {
@@ -351,43 +348,6 @@ class Client {
         console.log('DON"T TOUCH IT !!')
     }
 
-    // --------  All Phases Canvas Callbacks ---------------------------------------------------
-
-    firstPlayerRallyPhase(options) {
-
-        // ---------- does we clicked on empty space ?
-        if (options.target == null) {
-            console.log('clicked on empty space in FPRPhase')
-            return
-        }
-    };
-
-    firstPlayerPrepFirePhase(options) {
-
-        // ---------- does we clicked on empty space ?
-        if (options.target == null) {
-            console.log('clicked on empty space in FPPFPhase')
-            return
-        }
-    }
-
-
-    secondPlayerRallyPhase(options) {
-
-        // ---------- does we clicked on empty space ?
-        if (options.target == null) {
-            console.log('clicked on empty space in SPRPhase')
-            return
-        }
-    }
-
-    firstPlayerMovementPhase(options) {
-        // ---------- does we clicked on empty space ?
-        if (options.target == null) {
-            console.log('clicked on empty space in FPMPhase')
-            return
-        }
-    }
     // --------------------- added 17 02 2020
     endOppsDFPhCallback(button) {
 
@@ -409,62 +369,7 @@ class Client {
 
 
 
-    secondPlayerDefenciveFirePhase(options) {
-        // ---------- does we clicked on empty space ?
-        if (options.target == null) {
-            console.log('clicked on empty space in SPDFPhase')
-            return
-        }
-    }
-
-    firstPlayerAdvFirePhase(options) {
-        // ---------- does we clicked on empty space ?
-        if (options.target == null) {
-            console.log('clicked on empty space in FPAFPhase')
-            return
-        }
-    }
-
-    firstPlayerRoutPhase(options) {
-        // ---------- does we clicked on empty space ?
-        if (options.target == null) {
-            console.log('clicked on empty space in FPRtPhase')
-            return
-        }
-    }
-
-    secondPlayerRoutPhase(options) {
-        // ---------- does we clicked on empty space ?
-        if (options.target == null) {
-            console.log('clicked on empty space in SPRtPhase')
-            return
-        }
-    }
-
-    firstPlayerAdvancePhase(options) {
-        // ---------- does we clicked on empty space ?
-        if (options.target == null) {
-            console.log('clicked on empty space in FPAPhase')
-            return
-        }
-    }
-
-    firstPlayerCloseCombatPhase(options) {
-        // ---------- does we clicked on empty space ?
-        if (options.target == null) {
-            console.log('clicked on empty space in FPCCPhase')
-            return
-        }
-    };
-
-    secondPlayerRallyPhaseHalfTurn(options) {
-        // ---------- does we clicked on empty space ?
-        if (options.target == null) {
-            console.log('clicked on empty space in SPCCPhase')
-            return
-        }
-    }
-
 }
-
+// -- let's mix canvas reaction into our class
+Object.assign(Client.prototype, methods)
 export { Client };

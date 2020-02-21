@@ -67,6 +67,7 @@ class Canv {
     };
 
     draw(prom, ops, cb, canv) {
+        self = this
         // we got Promise to load image , options that image set (if any) and any function we want to start after finish image loading
         async function loadingImg() {
             let img = await prom;       // continuation of function will halt till prom is resolved
@@ -80,35 +81,50 @@ class Canv {
                 cb(img)
 
             };
+            if (canv) {
+                canv.add(img);
+            } else {
+                self.canvas.add(img)
+            }
 
-            canv.add(img);
-
+            //return img
         }
-
+        
         loadingImg()
-
     };
 
-    // preloadAndDrawRondel(ref) {
-    //     var self = this;
+    preloadAndDrawBackground(ref,ops) {
+        let p = this.creatingPromise(ref)
+        this.draw(p,ops)
+    }
 
-    //     let cb = (img)=>{
-    //         self.rondelPicture = img
-    //     }
-    //     let ops = {
-    //         originX: 'center',
-    //         originY: 'center',
-    //         top: self.canvas2.height / 2,
-    //         left: self.canvas2.width / 2,//1.14
-    //         selectable: false,
-    //         opacity: 0.5,
-    //         evented: false
-    //     }
-    //     let prom = this.creatingPromise(ref)
+    preloadAndDraw(arr){
+        self = this
 
-    //     this.draw(prom,ops,cb,self.canvas2)
+        arr.forEach((ref)=>{
 
-    // }
+            async function A(){
+
+                let promise = new Promise((resolve, reject) => {
+                    window.fabric.Image.fromURL(ref, (img) => {
+                        resolve(img)
+                    })
+                })
+                let image = await promise
+                image.set({
+                    originX: 'center',
+                    originY: 'center',
+                    top: self.canvas.height / 2,
+                    left: self.canvas.width / 2,//1.14
+                    //selectable: false,
+                    //opacity: 0.5,
+                    //evented: false
+                })
+                self.canvas.add(image);
+            }
+            A()
+        })
+    }
 
     preloadAndDrawRondel2(ref) {    
         var self = this;

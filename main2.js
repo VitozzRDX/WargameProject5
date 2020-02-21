@@ -1,4 +1,4 @@
-import {Client} from './client.js'
+import { Client } from './client.js'
 
 
 var canvas = document.getElementById('canvas')
@@ -17,11 +17,37 @@ Main.client = new Client();
 // --- in this case user will see different Phase on Rondel and will get different reaction
 
 let initialSettings = {
-    firstPlayer:'Nazi',
-    secondPlayer:'Ally',
-    startingPhase:'firstPlayerRallyPhase',
-    startingSidePictureSrc:'assets/turnphaseaxis.gif',
-    otherSidePictureSrc:'assets/turnphaseallied.gif'
+    firstPlayer: 'Nazi',
+    secondPlayer: 'Ally',
+    startingPhase: 'firstPlayerRallyPhase',
+    startingSidePictureSrc: 'assets/turnphaseaxis.gif',
+    otherSidePictureSrc: 'assets/turnphaseallied.gif',
+
+    mapSrc: 'assets/bdv.gif',
+
+    countersOptions: {
+        squadType_propertiesHash: {
+            'ruSquadE-0': {
+                src: 'assets/ru628S.gif',
+                otherSideSrc: 'assets/ruh7b.gif',
+                className: 'ManCounters',
+            },
+
+            'geSquadE-0': {
+                src: 'assets/ge467S.gif',
+                otherSideSrc: 'assets/geh7b.gif',
+                className: 'ManCounters',
+            },
+        },
+
+        parametersOnCreationHash : {
+            'ruSquadE-0':[{top:100,left:100}],
+            'geSquadE-0':[{top:300,left:300},{top:350,left:350}]
+        },
+
+        
+
+    }
 }
 
 Main.client.init(initialSettings)
