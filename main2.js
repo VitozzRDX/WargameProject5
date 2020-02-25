@@ -31,12 +31,14 @@ let initialSettings = {
                 src: 'assets/ru628S.gif',
                 otherSideSrc: 'assets/ruh7b.gif',
                 className: 'ManCounters',
+                owner:'Ally'
             },
 
             'geSquadE-0': {
                 src: 'assets/ge467S.gif',
                 otherSideSrc: 'assets/geh7b.gif',
                 className: 'ManCounters',
+                owner:'Nazi'
             },
         },
 
@@ -52,7 +54,22 @@ let initialSettings = {
 
 Main.client.init(initialSettings)
 //--------- -------------------------------------------------------------
+window.addEventListener('keydown', function(e) {
+    if( e.keyCode == 87 || e.keyCode == 65 || e.keyCode == 68 || e.keyCode == 83) {
+    e.preventDefault()};
+});
 
 document.getElementById('canvasContainer').tabIndex = 1000;
+
+document.getElementById('canvasContainer').focus()
+document.getElementById('canvasContainer').addEventListener("keydown", function(options) {        // we'll also need for blur event to come back focus on canv
+    Main.client.processKeyDown(options);
+});
+// document.getElementById('canvasContainer').addEventListener("keyup", function(options) {        // we'll also need for blur event to come back focus on canv
+//     Main.client.processKeyUp(options);
+// });
+
+
+
 
 //-------------------------------------------------------------------------------------------------------------------------------

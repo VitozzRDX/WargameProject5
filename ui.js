@@ -4,7 +4,7 @@ class Interface {
     }
 
     buildButton(obj,bool,options) {
-        console.log('----------------------------------------------------')
+
         let button = document.createElement('button');
         //-------------------------------------------------------------
 
@@ -31,7 +31,7 @@ class Interface {
     }
 
     remove(name) {
-
+console.log(name)
         this.buttonsHash[name].remove()
     }
 

@@ -5,11 +5,32 @@ let methods = {
             console.log('clicked on empty space in FPRPhase')
             return
         }
+       
+        let img = options.target
+        let counter = options.target.counter
+
+        if (!this._checkIfclickedCounterOwnerIsSameAsPhaseOwner(counter,this.firstPlayer)){
+            console.log('u click not your counter')
+            //return
+        }
+
+        //--let' go-------
+
+        this.clearCounterInterface()
+        this.buildCUI(counter)
+        this._setCurrentCounterInterface(counter)
+
+
+
 
         // if Player clicked on its counter && counter is broken - Rally
     },
-    
-    
+
+    _checkIfclickedCounterOwnerIsSameAsPhaseOwner(counter,player){
+        console.log(counter.owner,player)
+        return counter.owner == player
+    },
+
     secondPlayerRallyPhase(options) {
 
         // ---------- does we clicked on empty space ?

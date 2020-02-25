@@ -11,11 +11,25 @@ class Canv {
         this.rondelPicture = undefined;
         this.startingSidePicture = undefined;
 
-        this.firstSidePictureSrc = undefined;
+        this.firstSidePictureSrc = undefined;   // pictures of Sides (f.e. Axis vs Nazi)
         this.otherSidePictureSrc = undefined;
 
+this.ID_ImageHash = {}
+
+    };
+// ------------- added 21 02
+
+    createID() {
+        return (Math.random() + 1).toString(36).slice(2, 18);
+    }
+
+    fill_ID_ImageHash(id,img){
+        this.ID_ImageHash[id]=img
     };
 
+    getImageByID(id){
+        return this.ID_ImageHash[id]
+    };
 
     setOffMouseClickListener(callback) {
         this.canvas.off(
@@ -72,6 +86,10 @@ class Canv {
         async function loadingImg() {
             let img = await prom;       // continuation of function will halt till prom is resolved
 
+            let id = self.createID()
+            self.fill_ID_ImageHash(id,img)
+            img.id = id
+            
             // now we can set options for image, or do something else with it
             if (ops) {
                 img.set(ops)

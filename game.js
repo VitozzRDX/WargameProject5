@@ -18,17 +18,6 @@ class Game {
             'firstPlayerAdvancePhase': {},
             'firstPlayerCloseCombatPhase': {},
 
-            // 'secondPlayerRallyPhaseHalfTurn': {},
-            // 'firstPlayerRallyPhaseHalfTurn': { 'End Phase': true },
-            // 'secondPlayerPrepFirePhase': { 'End Phase': true },
-            // 'secondPlayerMovementPhase': { 'End Phase': true },
-            // 'firstPlayerDefenciveFirePhase': { 'End Phase': true },
-            // 'secondPlayerAdvFirePhase': { 'End Phase': true },
-            // 'secondPlayerRoutPhaseHalfTurn': { 'End Phase': true },
-            // 'firstPlayerRoutPhaseHalfTurn': { 'End Phase': true },
-            // 'secondPlayerAdvancePhase': { 'End Phase': true },
-            // 'secondPlayerCloseCombatPhase': { 'End Phase': true },
-
         }
         this.microPhaseUITable = {
             'MMCfireMicroPhase': { 'Cancel Fire Preparation': true, 'End Phase': true }

@@ -1,17 +1,26 @@
 class Counter {
     constructor(param) {
-        
+
         this.src = param.src;
 
-        this.owner = param.owner ;
+        this.owner = param.owner;
 
         this.options = param.options
 
 
         this.img = undefined;
-        
+
+        this.imageID = undefined;
+
     };
-    
+
+    getImageID() {
+        return this.imageID
+    }
+
+    getScheme(phase) {
+        return this.currentInterfaceElements[phase]
+    }
 }
 
 class SelfMovingCounters extends Counter {
@@ -29,7 +38,7 @@ class ManCounters extends SelfMovingCounters {
         //this.morale = param.morale
 
         this.currentInterfaceElements = {
-            'Rally' : false ,
+            'firstPlayerRallyPhase': { 'Rally': false },
         }
 
         this.otherSideSrc = param.otherSideSrc;

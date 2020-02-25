@@ -6,10 +6,10 @@ import { Game } from './game.js'
 import { methods } from './clientMethods_ReactionOnCanvas.js'
 import { Counter, ManCounters } from './counters.js'
 
-
 class Client {
     constructor() {
 
+        this.panning = false;
         this.allPhases_CallbacksHash = {
 
             'firstPlayerRallyPhase': this.firstPlayerRallyPhase.bind(this),
@@ -23,17 +23,6 @@ class Client {
             'firstPlayerAdvancePhase': this.firstPlayerAdvancePhase.bind(this),
             'firstPlayerCloseCombatPhase': this.firstPlayerCloseCombatPhase.bind(this),
 
-
-            // 'secondPlayerRallyPhaseHalfTurn': this.secondPlayerRallyPhaseHalfTurn.bind(this),
-            // 'firstPlayerRallyPhaseHalfTurn': this.firstPlayerRallyPhaseHalfTurn.bind(this),
-            // 'secondPlayerPrepFirePhase': this.secondPlayerPrepFirePhase.bind(this),
-            // 'secondPlayerMovementPhase': this.secondPlayerMovementPhase.bind(this),
-            // 'firstPlayerDefenciveFirePhase': this.firstPlayerDefenciveFirePhase.bind(this),
-            // 'secondPlayerAdvFirePhase': this.secondPlayerAdvFirePhase.bind(this),
-            // 'secondPlayerRoutPhaseHalfTurn': this.secondPlayerRoutPhaseHalfTurn.bind(this),
-            // 'firstPlayerRoutPhaseHalfTurn': this.firstPlayerRoutPhaseHalfTurn.bind(this),
-            // 'secondPlayerAdvancePhase': this.secondPlayerAdvancePhase.bind(this),
-            // 'secondPlayerCloseCombatPhase': this.secondPlayerCloseCombatPhase.bind(this),
         };
 
         // Next hash table is used by _buildMenuInterface() to find what buttons appropriate Phase needs
@@ -52,19 +41,9 @@ class Client {
             'firstPlayerAdvancePhase': { 'End Phase': true },
             'firstPlayerCloseCombatPhase': { 'End Phase': true },
 
-            // 'secondPlayerRallyPhaseHalfTurn': { 'End Phase': true },
-            // 'firstPlayerRallyPhaseHalfTurn': { 'End Opp"s Rally': true, 'Waitng For Opponents Rally': true },
-            // 'secondPlayerPrepFirePhase': { 'End Phase': true },
-            // 'secondPlayerMovementPhase': { 'End Phase': true },
-            // 'firstPlayerDefenciveFirePhase': { 'End Opp"s DFPh': true, 'Waitng For Opponents DF': true },
-            // 'secondPlayerAdvFirePhase': { 'End Phase': true },
-            // 'secondPlayerRoutPhaseHalfTurn': { 'End Phase': true },
-            // 'firstPlayerRoutPhaseHalfTurn': { 'End Opp"s Rout': true, 'Waitng For Opponents Rout': true },
-            // 'secondPlayerAdvancePhase': { 'End Phase': true },
-            // 'secondPlayerCloseCombatPhase': { 'End Phase': true },
         };
 
-        this.fistPlayer = undefined;
+        this.firstPlayer = undefined;
         this.secondPlayer = undefined;
 
         this.canvasObj = new Canv();
@@ -76,28 +55,7 @@ class Client {
             'ManCounters': ManCounters
         }
 
-
-        this.squadType_propertiesHash = {               // refactor we should get table from server with squadTypes only for Scenario
-            'ruSquadE-0': {                             // refactor to array ?
-                src: 'assets/ru628S.gif',
-                otherSideSrc: 'assets/ruh7b.gif',
-                className: 'ManCounters',
-            },
-
-            'geSquadE-0': {
-                src: 'assets/ge467S.gif',
-                otherSideSrc: 'assets/geh7b.gif',
-                className: 'ManCounters',
-            },
-        }
-    }
-
-    // ---------------- added 19 02 2020 ------------------
-    switchPlayers() {
-        let temp;
-        temp = this.firstPlayer;
-        this.firstPlayer = this.secondPlayer;
-        this.secondPlayer = temp
+        this.currentCounterInterface = undefined
     }
 
     setInterfaceScheme() {
@@ -144,6 +102,14 @@ class Client {
                 'class': 'WaitngForOpponentsRally',//'WaitngForOpponentsRout',
                 'name': `Waitng For ${this.secondPlayer}'s Rout`
             },
+
+            'Rally': {
+                //'enabledPhases': ['firstPlayerRallyPhase', 'secondPlayerRallyPhase', 'firstPlayerPrepFirePhaseCallback'],
+                'callback': this.rallyCallback.bind(this),
+                'class': 'Rally',
+                'name': 'Rally'
+            },
+
         };
 
     }
@@ -191,25 +157,25 @@ class Client {
         // let arr = ['assets/ge467S.gif','assets/geh7b.gif','assets/ru628S.gif','assets/ruh7b.gif']
         // this.canvasObj.preloadAndDraw(arr)
 
-    //----------------------- added 21 02 2020
+        //----------------------- added 21 02 2020
         //this.canvasObj.preloadAndDrawBackground(options.mapSrc,{top:0,left:0})
         //this._createAndDrawCounters(options.countersOptions)
 
 
-    // -------- Loading Creating and Drawing Background and Counters
+        // -------- Loading Creating and Drawing Background and Counters
         let p = this.canvasObj.creatingPromise(options.mapSrc)
         p.
-        then(()=>{
-            this.canvasObj.draw(p,{top:0,left:0,evented:false,selectable: false,})
-        }).
-        then(()=>{
-            this._createAndDrawCounters(options.countersOptions)
-        })
+            then(() => {
+                this.canvasObj.draw(p, { top: 0, left: 0, evented: false, selectable: false, })
+            }).
+            then(() => {
+                this._createAndDrawCounters(options.countersOptions)
+            })
 
+        //--------------------------------------------------------
         
-
-
     };
+
     //-----------added 20 20 2020----------------------------------------------------------
 
     _createAndDrawCounters(countersOptions) {  //setOfOptionsforCounters
@@ -221,7 +187,7 @@ class Client {
             let arrayOfCoords = parametersOnCreationHash[i]
 
             arrayOfCoords.forEach((obj) => {
-      
+
                 let ops = countersOptions.squadType_propertiesHash[i] // { src: "assets/ge467S.gif", otherSideSrc: "assets/geh7b.gif", className: "ManCounters" }
                 ops.options = obj       // { top: 100, left: 100 }
                 let className = ops['className']
@@ -251,14 +217,22 @@ class Client {
             originY: 'center',
         })
         let cb = (i) => {
-            c.img = i;
-            i.counter=c
+            c.imageID = i.id;
+            i.counter = c
         }
         let prom = this.canvasObj.creatingPromise(ref)
 
         this.canvasObj.draw(prom, ops, cb)
     }
 
+
+    // ---------------- added 19 02 2020 ------------------
+    switchPlayers() {
+        let temp;
+        temp = this.firstPlayer;
+        this.firstPlayer = this.secondPlayer;
+        this.secondPlayer = temp
+    }
 
     // phaseInterfaceMenuTable - what buttons must be in every Phase, and are they disabled or not
     // interfaceScheme - what properties every buttons has (class,cb.name)
@@ -367,6 +341,79 @@ class Client {
         this.endPhaseCallback(button)
     }
 
+    // ----------- added 22 02 2020
+
+    buildCUI(counter) {
+        let phase = this.game.getPhase()
+        let schemeObj = counter.getScheme(phase)  // {'phase':{'Do Something':false,...]} - we get {'Do Something': false,...}
+
+        for (let buttonName in schemeObj) {
+
+            console.log(buttonName)
+            let obj = this.interfaceScheme[buttonName]
+            let bool = schemeObj[buttonName]
+
+            this.interface.buildButton(obj, bool)
+        }
+    };
+
+    rallyCallback(button) {
+        console.log(button)
+    }
+
+    clearCounterInterface() {
+        console.log('clearing clearCounterInterface')
+        let currentCounterInterface = this.currentCounterInterface
+        // ---- is any counter already selected ?
+        console.log(currentCounterInterface)
+        if (currentCounterInterface) {
+            for (let name in currentCounterInterface) {
+                console.log(name)
+                this.interface.remove(name)
+            }
+        }
+    };
+
+    _setCurrentCounterInterface(counter) {
+        
+        console.log()
+        this.currentCounterInterface = counter.getScheme(this.game.getPhase())
+        console.log(this.currentCounterInterface)
+    }
+
+    processKeyDown(options) {
+        console.log(options.keyCode )
+        this.panning = true
+        // if (options.repeat) {
+        //     return;
+        // }
+        var units = 10
+        if (options.keyCode == 65) {                                    // refactor to case switch + change animateSliding(if o !== undef)
+
+            var delta = new fabric.Point(units,0) ;  //{ x: 10, y: 0 }
+    
+            this.canvasObj.canvas.relativePan(delta)
+        }
+        if (options.keyCode == 83) {                                    // refactor to case switch + change animateSliding(if o !== undef)
+
+            var delta = new fabric.Point(0,units) ;  //{ x: 10, y: 0 }
+    
+            this.canvasObj.canvas.relativePan(delta)
+        }
+        if (options.keyCode == 68) {                                    // refactor to case switch + change animateSliding(if o !== undef)
+            ;
+            var delta = new fabric.Point(-units,0) ;  //{ x: 10, y: 0 }
+    
+            this.canvasObj.canvas.relativePan(delta)
+        }
+        if (options.keyCode == 87) {                                    // refactor to case switch + change animateSliding(if o !== undef)
+            ;
+            var delta = new fabric.Point(0,-units) ;  //{ x: 10, y: 0 }
+    
+            this.canvasObj.canvas.relativePan(delta)
+        }
+
+    }
 
 
 }
