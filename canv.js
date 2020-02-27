@@ -95,15 +95,17 @@ this.ID_ImageHash = {}
                 img.set(ops)
             };
 
-            if (cb) {
-                cb(img)
 
-            };
             if (canv) {
                 canv.add(img);
             } else {
                 self.canvas.add(img)
             }
+
+            if (cb) {
+                cb(img)
+
+            };
 
             //return img
         }
@@ -226,7 +228,61 @@ this.ID_ImageHash = {}
         this.firstSidePictureSrc = src1
         this.otherSidePictureSrc = src2
     }
+// --------------------- 25 02 2020 -----------------------------------
+    setZoomListener() {
+        var self = this;
+        this.canvas.on('mouse:wheel', function (opt) {
+            var delta = opt.e.deltaY;
+            var zoom = self.canvas.getZoom();
+            zoom = zoom + delta / 200;
+            if (zoom > 20) zoom = 20;
+            if (zoom < 0.01) zoom = 0.01;
+            self.canvas.setZoom(zoom);
+            opt.e.preventDefault();
+            opt.e.stopPropagation();
 
+        })
+    };
+
+    drawPoly(sixCoords, color, callback, hex) {
+
+        var rect = new fabric.Polygon(sixCoords, {
+            stroke: 'green',
+            opacity: 0.3,
+            fill: color,
+            selectable: false,
+            evented: false
+        });
+        // if (color === 'red') {
+        //     rect.set({ evented: true })
+        //     rect.on('mousedown', () => { callback(hex) })
+        //     //this.listOfRedHexes.push(rect)
+        // }
+        this.canvas.add(rect);
+        //this.listOfRectsToDraw.push(rect)
+    }
+
+    // ------------------ 27 02 2020 -------------------
+
+    animate(img,where,cb){
+        let self= this
+        let ops =  {                                                                // add-on
+            onChange: self.canvas.requestRenderAll.bind(self.canvas),
+            duration: 300,
+            onComplete:()=>{
+                if (cb){
+                //console.log(cb)
+                cb()}
+            }
+        };
+
+        img.animate(where,ops);
+    }
+
+    createPromiseAnimation(img,where){
+
+        return  new Promise((resolve, reject) => { this.animate(img,where,resolve) })
+    }
 };
 
 

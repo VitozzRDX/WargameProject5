@@ -31,20 +31,22 @@ let initialSettings = {
                 src: 'assets/ru628S.gif',
                 otherSideSrc: 'assets/ruh7b.gif',
                 className: 'ManCounters',
-                owner:'Ally'
+                owner:'Ally',
+                movementFactor:4
             },
 
             'geSquadE-0': {
                 src: 'assets/ge467S.gif',
                 otherSideSrc: 'assets/geh7b.gif',
                 className: 'ManCounters',
-                owner:'Nazi'
+                owner:'Nazi',
+                movementFactor:4
             },
         },
 
         parametersOnCreationHash : {
-            'ruSquadE-0':[{top:100,left:100}],
-            'geSquadE-0':[{top:300,left:300},{top:350,left:350}]
+            'ruSquadE-0':[{q:6,r:0,s:-6}],                                        // {top:100,left:100}
+            'geSquadE-0':[{q:9,r:0,s:-9},{q:9,r:1,s:-10}]
         },
 
         

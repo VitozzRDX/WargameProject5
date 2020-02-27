@@ -2,6 +2,7 @@
 import { Canv } from './canv.js'
 import { Interface } from './ui.js'
 import { Game } from './game.js'
+import { Map } from './map.js'
 
 import { methods } from './clientMethods_ReactionOnCanvas.js'
 import { Counter, ManCounters } from './counters.js'
@@ -9,7 +10,6 @@ import { Counter, ManCounters } from './counters.js'
 class Client {
     constructor() {
 
-        this.panning = false;
         this.allPhases_CallbacksHash = {
 
             'firstPlayerRallyPhase': this.firstPlayerRallyPhase.bind(this),
@@ -49,6 +49,7 @@ class Client {
         this.canvasObj = new Canv();
         this.interface = new Interface();
         this.game = new Game()
+        this.map = new Map()
 
         this.counterTable = {
             'Counter': Counter,
@@ -56,6 +57,8 @@ class Client {
         }
 
         this.currentCounterInterface = undefined
+
+        this.selectedCounter = undefined
     }
 
     setInterfaceScheme() {
@@ -153,10 +156,6 @@ class Client {
 
         this.game.setGamePhase(options.startingPhase)
 
-        // ---------------- 20 02 2020
-        // let arr = ['assets/ge467S.gif','assets/geh7b.gif','assets/ru628S.gif','assets/ruh7b.gif']
-        // this.canvasObj.preloadAndDraw(arr)
-
         //----------------------- added 21 02 2020
         //this.canvasObj.preloadAndDrawBackground(options.mapSrc,{top:0,left:0})
         //this._createAndDrawCounters(options.countersOptions)
@@ -165,18 +164,26 @@ class Client {
         // -------- Loading Creating and Drawing Background and Counters
         let p = this.canvasObj.creatingPromise(options.mapSrc)
         p.
-            then(() => {
-                this.canvasObj.draw(p, { top: 0, left: 0, evented: false, selectable: false, })
+            then((img) => {
+                this.canvasObj.draw(p, { top: 0, left: 0, evented: false, selectable: false, }, () => { this.canvasObj.canvas.sendToBack(img) })//this.canvas.sendToBack(img) 
+
             }).
             then(() => {
                 this._createAndDrawCounters(options.countersOptions)
             })
 
         //--------------------------------------------------------
-        
+        this.canvasObj.setZoomListener()
+
+        // ----------- 25 02 20 20 ------------------------------
+
+        let polyCorners = this.map.getPolyCorners({ q: 5, r: 0, s: -5 })
+        this.canvasObj.drawPoly(polyCorners, 'red')
+
     };
 
     //-----------added 20 20 2020----------------------------------------------------------
+
 
     _createAndDrawCounters(countersOptions) {  //setOfOptionsforCounters
 
@@ -189,7 +196,10 @@ class Client {
             arrayOfCoords.forEach((obj) => {
 
                 let ops = countersOptions.squadType_propertiesHash[i] // { src: "assets/ge467S.gif", otherSideSrc: "assets/geh7b.gif", className: "ManCounters" }
-                ops.options = obj       // { top: 100, left: 100 }
+
+                let centerPoint = this.map.getCenterCoordsObjFromHex(obj)
+                ops.options = { top: centerPoint.y, left: centerPoint.x }       // {q:6,r:0,s:-6}
+                ops.ownHex = obj
                 let className = ops['className']
 
                 let c = this.createCounterObject(className, ops) //{ src: src, options: options, otherSideSrc: otherSideSrc }
@@ -365,7 +375,7 @@ class Client {
         console.log('clearing clearCounterInterface')
         let currentCounterInterface = this.currentCounterInterface
         // ---- is any counter already selected ?
-        console.log(currentCounterInterface)
+        //console.log(currentCounterInterface)
         if (currentCounterInterface) {
             for (let name in currentCounterInterface) {
                 console.log(name)
@@ -375,46 +385,143 @@ class Client {
     };
 
     _setCurrentCounterInterface(counter) {
-        
-        console.log()
+
         this.currentCounterInterface = counter.getScheme(this.game.getPhase())
-        console.log(this.currentCounterInterface)
+
     }
 
     processKeyDown(options) {
-        console.log(options.keyCode )
-        this.panning = true
         // if (options.repeat) {
         //     return;
         // }
         var units = 10
         if (options.keyCode == 65) {                                    // refactor to case switch + change animateSliding(if o !== undef)
 
-            var delta = new fabric.Point(units,0) ;  //{ x: 10, y: 0 }
-    
+            var delta = new fabric.Point(units, 0);  //{ x: 10, y: 0 }
+
             this.canvasObj.canvas.relativePan(delta)
         }
         if (options.keyCode == 83) {                                    // refactor to case switch + change animateSliding(if o !== undef)
 
-            var delta = new fabric.Point(0,units) ;  //{ x: 10, y: 0 }
-    
+            var delta = new fabric.Point(0, units);  //{ x: 10, y: 0 }
+
             this.canvasObj.canvas.relativePan(delta)
         }
         if (options.keyCode == 68) {                                    // refactor to case switch + change animateSliding(if o !== undef)
             ;
-            var delta = new fabric.Point(-units,0) ;  //{ x: 10, y: 0 }
-    
+            var delta = new fabric.Point(-units, 0);  //{ x: 10, y: 0 }
+
             this.canvasObj.canvas.relativePan(delta)
         }
         if (options.keyCode == 87) {                                    // refactor to case switch + change animateSliding(if o !== undef)
             ;
-            var delta = new fabric.Point(0,-units) ;  //{ x: 10, y: 0 }
-    
+            var delta = new fabric.Point(0, -units);  //{ x: 10, y: 0 }
+
             this.canvasObj.canvas.relativePan(delta)
         }
 
     }
+    // --------------------- added 26 02 2020
+    _checkIfCounterSelectionOccuredBefore() {
+        //console.log(this.selectedCounter)
+        if (this.selectedCounter) {
+            return true
+        }
+        return false
+    }
 
+    _checkIfSelectionHaveEndedItsMove() {
+        if (!this.selectedCounter) throw 'selection should be defined '
+
+        return false
+    }
+
+    _checkIfCounterIsNearTargetHex(coordsObj) {
+
+        if (!this.selectedCounter) throw 'selection should be defined '
+        return true
+
+    }
+
+    _checkIfclickedCounterOwnerIsSameAsPhaseOwner(counter,player){
+        //console.log(counter.owner,player)
+        return counter.owner == player
+    }
+//----------------------------- 27 02 2020 -----------------------------------
+    moveProcessing(point){
+
+        let movingCounter =  this.selectedCounter
+        let targetHex = this.map.getHexFromCoords(point)
+
+        console.log(targetHex)
+        console.log(targetHex)
+        let costToEnter = movingCounter.getCostToEnter(this.map.getHexType(targetHex)) 
+
+        let c = this.calculateNewCoordsToMove(targetHex)
+        let coords = {top:c.y,left:c.x}
+
+
+        if (JSON.stringify(movingCounter.ownHex) == JSON.stringify(targetHex)) {
+            console.log ('u try to move into the own Hex')
+            return
+        }
+        if (!this._checkIfHexIsInCoverArc(movingCounter,targetHex)) throw 'u try to move into Hex not in your Cover Arc'
+
+        let counterType = movingCounter.getType()
+        switch (counterType) {
+            case 'AFV' :
+                break;
+            case 'MMC' :
+
+                if (targetHex.owner!= undefined && targetHex.owner!= movingCounter.owner) throw 'u try to move into hex with the Enemy'
+
+                   // 'wood' - 2MF 'grain' - 1.5 'building' - 2 MF
+                let movementFactorLeft = movingCounter.getMFLeft()
+                
+                if (movementFactorLeft<costToEnter) {
+                    console.log ('cost to enter is higher then MF left')
+                    return
+                } //throw 'cost to enter is higher then MF left'
+
+                break;
+        }
+
+
+        movingCounter.subtractMF(costToEnter)
+        movingCounter.setHexPosition(targetHex)   // counters - tank can go to other , all check if it is enough MP or MF
+        if(movingCounter.getMFLeft() == 0) {
+            console.log('counter has spend all its Moving and get new status')
+            movingCounter.setNewStatus('ended moving')
+        }
+
+        let img = this.canvasObj.getImageByID(movingCounter.getImageID()) 
+        console.log(coords)
+        //img.animate()
+        this.canvasObj.animate(img,coords)
+        // switch off Mouse
+        // this.canvasObj.createPromiseAnimation(img,coords).then(()=>{
+
+        //     console.log('// switch on Mouse')
+        // })
+
+
+    }
+
+    calculateNewCoordsToMove(targetHex) {
+        if (this.map._checkIfHexIsOccupied(targetHex)) {
+            return this.map._calculateFreeCoords(targetHex)
+        }
+        console.log(this.map.getCenterCoordsObjFromHex(targetHex))
+        return this.map.getCenterCoordsObjFromHex(targetHex)
+    }
+
+    _checkIfSelectionHaveEndedItsMove() {
+         return (this.selectedCounter.getStatus()!='moving')
+    }
+
+    _checkIfHexIsInCoverArc(counter,hex){
+        return true
+    }
 
 }
 // -- let's mix canvas reaction into our class
