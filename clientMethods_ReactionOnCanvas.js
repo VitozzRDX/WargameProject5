@@ -47,136 +47,6 @@ let methods = {
         }
     },
 
-
-    // firstPlayerMovementPhase(options) {
-
-    //     if (options.target == null && !this._checkIfCounterSelectionOccuredBefore()) {
-    //         console.log('clicked on empty space in FPMPhase without Selected Counter. Choose one.')
-    //         return
-    //     }
-        
-    //     if (this._checkIfCounterSelectionOccuredBefore() && this._checkIfCounterIsNearTargetHex(options.absolutePointer) && !this._checkIfSelectionHaveEndedItsMove()) {
-    //         console.log('we clicked on legal hex , and it still got MP , so it must move ')
-    //         return
-    //     }
-
-    //     if (this._checkIfCounterSelectionOccuredBefore() && this._checkIfCounterIsNearTargetHex(options.absolutePointer) && this._checkIfSelectionHaveEndedItsMove()) {
-    //         console.log('we clicked on legal hex , but it got no MP , so nothing happens')
-    //         return
-    //     }
-
-    //     if (!this._checkIfclickedCounterOwnerIsSameAsPhaseOwner(options.target.counter,this.firstPlayer)){
-    //         console.log('u click not your counter')
-
-    //         return
-    //     }
-
-    //     if (!this._checkIfCounterSelectionOccuredBefore() && this._checkIfclickedCounterOwnerIsSameAsPhaseOwner(options.target.counter,this.firstPlayer)){
-    //         (console.log('u click on your"s counter and you got no counters that have been selected before . Now it is selected'))  //not ended its move
-    //         this.selectedCounter = options.target.counter
-
-    //         this.clearCounterInterface()
-    //         this.buildCUI(options.target.counter)
-    //         this._setCurrentCounterInterface(options.target.counter)
-
-    //         return
-    //     }
-
-
-    //     if (this._checkIfSelectionHaveEndedItsMove() && this._checkIfclickedCounterOwnerIsSameAsPhaseOwner(options.target.counter,this.firstPlayer) ){
-    //         (console.log('u click on your"s counter and you got no counters that have not ended its move . Now it is selected'))
-    //         this.selectedCounter = options.target.counter
-
-    //         this.clearCounterInterface()
-    //         this.buildCUI(options.target.counter)
-    //         this._setCurrentCounterInterface(options.target.counter)
-
-    //         return
-    //     }
-
-    //     if (this._checkIfCounterIsNearTargetHex(options.absolutePointer) ) {
-    //         console.log('we clicked on legal hex , and it must move ')
-    //         return
-    //     }
-
-    //     return
-    //     //let selectedCounter =  this.selectedCounter = options.target.counter
-        
-    // },
-
-    // firstPlayerMovementPhase(options){
-    //     switch (options.target) {
-
-    //         case null :
-    //             console.log('clicked on empty space')
-    //             if (!this._checkIfCounterSelectionOccuredBefore()) {
-    //                 console.log('No Selected Counter. Choose one.')
-    //                 return
-    //             }
-
-    //             let absolutePointer = options.absolutePointer
-
-    //             if (this._checkIfCounterIsNearTargetHex(absolutePointer) && this._checkIfSelectionHaveEndedItsMove() ) {
-    //                 console.log('we clicked on legal hex , but it got no MP , so nothing happens ')
-    //                 return
-    //             }
-
-    //             if (this._checkIfCounterIsNearTargetHex(absolutePointer) && !this._checkIfSelectionHaveEndedItsMove() ) {
-    //                 console.log('we clicked on legal hex , and it still got MP , so it must move ')
-
-    //                 this.moveProcessing(absolutePointer)
-
-    //                 return
-    //             }
-
-    //             break;
-
-    //         default :
-    //             console.log('clicked on some object')
-
-    //             let counter =  options.target.counter
-
-    //             if (!this._checkIfclickedCounterOwnerIsSameAsPhaseOwner(counter,this.firstPlayer)){
-    //                 console.log('u click not your counter')
-        
-    //                 return
-    //             }
-    //             if (!this._checkIfCounterSelectionOccuredBefore() && this._checkIfclickedCounterOwnerIsSameAsPhaseOwner(counter,this.firstPlayer)){
-    //                 (console.log('u click on your"s counter and you got no counters that have been selected before . Now it is selected'))  //not ended its move
-    //                 this.selectedCounter = counter
-        
-    //                 this.clearCounterInterface()
-    //                 this.buildCUI(counter)
-    //                 this._setCurrentCounterInterface(counter)
-        
-    //                 return
-    //             }
-        
-        
-    //             if (this._checkIfSelectionHaveEndedItsMove() && this._checkIfclickedCounterOwnerIsSameAsPhaseOwner(counter,this.firstPlayer) ){
-    //                 (console.log('u click on your"s counter and you got no counters that have not ended its move . Now it is selected'))
-    //                 this.selectedCounter = counter
-        
-    //                 this.clearCounterInterface()
-    //                 this.buildCUI(counter)
-    //                 this._setCurrentCounterInterface(counter)
-        
-    //                 return
-    //             }
-
-    //             if (this._checkIfclickedCounterOwnerIsSameAsPhaseOwner(counter,this.firstPlayer) && !this._checkIfSelectionHaveEndedItsMove()) {
-    //                 console.log('u click on your"s counter but previous one still got MP , so it must move  ')
-
-    //                 this.moveToOccupiedHexProcessing(counter)
-    //                 return
-    //             }
-
-    //             break;
-    //     }
-
-        
-    // },
-
     firstPlayerMovementPhase(options){
 
         let absolutePointer = options.absolutePointer
@@ -187,10 +57,22 @@ let methods = {
                     console.log('clicked on empty space. Select Counter')
                     return
                 }
+                if (options.target.type ==  "group") {
+                    console.log('clicked on Group - it already moved')
+                    return
+                }
+                //let counter = options.target.counter
+
                 if (!this._checkIfclickedCounterOwnerIsSameAsPhaseOwner(options.target.counter,this.firstPlayer)) {
                     console.log('u click not your counter')
                     return
                 }
+
+                if (options.target.counter.getStatus() == 'moved') {
+                    console.log('u try to select counter that is moved already')
+                    return
+                }
+
                 console.log('u click on your"s counter and you got no counters that have been selected before . Now it is selected')
                 this.selectedCounter = options.target.counter
         
@@ -198,30 +80,73 @@ let methods = {
                 this.buildCUI(options.target.counter)
                 this._setCurrentCounterInterface(options.target.counter)
 
+                //------------------- 28 20 2020 
+
+                //this.selectedCounter.setNewStatus('not moved yet')
+
+                let img = this.canvasObj.getImageByID(this.selectedCounter.getImageID())
+                
+                let p = {
+                    width:img.width,
+                    top:img.top,
+                    left:img.left,
+                }
+                let redBorder = this.canvasObj.createFiringBorder(p)
+
+                let group = this.canvasObj.createGroup(img,redBorder)
+
+                this.selectedCounter.group = group
+
+                this.canvasObj.drawGroup(group)
+
+                this.movingGroup.push(group)
+
                 break;
 
             default :
-                console.log('Selected Counter set')
+                console.log(options.target,'Selected Counter set')
 
                 if (options.target == null){
                     console.log('clicked on empty space. Move processing')
                     this.moveProcessing(absolutePointer)
                     return
                 }
-                if (!this._checkIfclickedCounterOwnerIsSameAsPhaseOwner(options.target.counter,this.firstPlayer)) {
+
+                if (options.target.type ==  "group") {
+                    console.log('clicked on Group - u already selected it')
+                    return
+                }
+
+                let counter = options.target.counter
+
+                // if (counter.getStatus() == 'moved') {
+                //     _checkIfCounterIsInTheSameHexAsSelectedOne(counter)
+                //     console.log('u try to select counter that is moved already')
+                //     return
+                // }
+
+                if (!this._checkIfclickedCounterOwnerIsSameAsPhaseOwner(counter,this.firstPlayer)) {
                     console.log('u click not your counter. Move Processing')
                     this.moveProcessing(absolutePointer)
                     return
                 }
 
-                if (this._checkIfSelectionHaveEndedItsMove()) {
-                    console.log('u click on your"s counter and Selected one has ended its move. New one is selected')
-                    this.selectedCounter = options.target.counter
+                // if (this._checkIfSelectionHaveEndedItsMove()) {
+                //     console.log('u click on your"s counter and Selected one has ended its move. New one is selected')   // or didn't started yet
+                //     this.selectedCounter = counter
         
-                    this.clearCounterInterface()
-                    this.buildCUI(options.target.counter)
-                    this._setCurrentCounterInterface(options.target.counter)
-                    return
+                //     this.clearCounterInterface()
+                //     this.buildCUI(counter)
+                //     this._setCurrentCounterInterface(counter)
+                //     return
+                // }
+//------------------- 28 20 2020 
+
+                if(this._checkIfCounterIsInTheSameHexAsSelectedOne(counter) && !this._checkIfCounterMoved(counter) && !this.selectionIsMoving() ) {
+                    console.log('u click on your"s counter , that is in the same hex as Selected one and it is not moved and Selected one is not moving right now')
+                    console.log('Add it to Moving group')
+
+                    this.movingGroup.push(counter)
                 }
 
                 console.log('u click on your"s counter but previous one still got MP. Move Processing')

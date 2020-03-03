@@ -23,20 +23,20 @@ let initialSettings = {
     startingSidePictureSrc: 'assets/turnphaseaxis.gif',
     otherSidePictureSrc: 'assets/turnphaseallied.gif',
 
-    mapSrc: 'assets/bdv.gif',
+    mapSrc: 'assets/628corrected3(a).svg',   //'assets/bdv.gif'  mapEndedV
 
     countersOptions: {
         squadType_propertiesHash: {
             'ruSquadE-0': {
-                src: 'assets/ru628S.gif',
-                otherSideSrc: 'assets/ruh7b.gif',
+                src: 'assets/628corrected3(a).svg',
+                otherSideSrc: 'assets/628.svg',//'assets/ruh7b.gif',
                 className: 'ManCounters',
                 owner:'Ally',
                 movementFactor:4
             },
 
             'geSquadE-0': {
-                src: 'assets/ge467S.gif',
+                src: 'assets/628corrected3(a).svg',   // 'assets/ge467S.gif',
                 otherSideSrc: 'assets/geh7b.gif',
                 className: 'ManCounters',
                 owner:'Nazi',
@@ -46,7 +46,7 @@ let initialSettings = {
 
         parametersOnCreationHash : {
             'ruSquadE-0':[{q:6,r:0,s:-6}],                                        // {top:100,left:100}
-            'geSquadE-0':[{q:9,r:0,s:-9},{q:9,r:1,s:-10}]
+            'geSquadE-0':[{q:9,r:0,s:-9},{q:9,r:0,s:-9}]
         },
 
         

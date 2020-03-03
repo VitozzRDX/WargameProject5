@@ -49,11 +49,14 @@ class Map {
         let h = JSON.stringify(hex)
         let o = this.hexOwnerAndNumberOfCountersHash[h]
 
-        let k = o.numberOfCounters
+        let k = o.numberOfCounters-1
+        console.log(k)
 
         let center = this.getCenterCoordsObjFromHex(hex)
 
-        return {x:center.x+5*k,y:center.x+5*k}
+        console.log (center)
+
+        return {x:center.x+5*k,y:center.y+5*k}
     }
 
 }

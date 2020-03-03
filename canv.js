@@ -1,6 +1,9 @@
 
 class Canv {
     constructor() {
+
+        window.fabric.Object.prototype.objectCaching = true
+
         this.canvas = new window.fabric.CanvasEx('canvas');
 
         this.canvas2 = new window.fabric.CanvasEx('canvas2');
@@ -234,7 +237,7 @@ this.ID_ImageHash = {}
         this.canvas.on('mouse:wheel', function (opt) {
             var delta = opt.e.deltaY;
             var zoom = self.canvas.getZoom();
-            zoom = zoom + delta / 200;
+            zoom = zoom + delta / 50;
             if (zoom > 20) zoom = 20;
             if (zoom < 0.01) zoom = 0.01;
             self.canvas.setZoom(zoom);
@@ -268,7 +271,7 @@ this.ID_ImageHash = {}
         let self= this
         let ops =  {                                                                // add-on
             onChange: self.canvas.requestRenderAll.bind(self.canvas),
-            duration: 300,
+            duration: 500,
             onComplete:()=>{
                 if (cb){
                 //console.log(cb)
@@ -282,6 +285,82 @@ this.ID_ImageHash = {}
     createPromiseAnimation(img,where){
 
         return  new Promise((resolve, reject) => { this.animate(img,where,resolve) })
+    }
+
+    //---------------------28 02 2020
+
+    createFiringBorder(param) {
+        self = this;
+        
+        let l = param.left
+        let t = param.top
+        let w = param.width
+
+		var rect = new fabric.Rect({
+            left: l,
+            top: t,
+
+            originX: 'center',
+            originY: 'center',
+            width: w + 2,
+            height: w + 2,
+            stroke: 'red',
+            strokeWidth: 4,
+            fill: '',
+            selectable: false,
+            evented : false
+        });
+		
+		return rect
+    }
+    
+    createPhaseTextBox(param, text) {
+        let l = param.left
+        let t = param.top
+        let w = param.width
+
+        var textbox = new fabric.Textbox(text, {
+            left: l - w / 2 - 12,
+            top: t + w / 2,
+
+            fill: '#880E4F',
+            strokeWidth: 0.1,
+            stroke: "red",
+            angle: -90,
+            fontSize: 9,
+            //backgroundColor: 'white',
+            selectable: false,
+            evented: false
+        });
+
+        return textbox
+    }
+
+
+    createGroup(...args) {
+        self = this
+		let g = new fabric.Group(args,{
+			// selectable: false,
+            // evented : false,
+            originX: 'center',
+            originY: 'center',
+        })
+
+        return g
+    }
+    
+    drawGroup(group) {
+        this.canvas.add(group)
+    }
+
+    loadSVGFromURL(url) {
+        let self = this
+        window.fabric.loadSVGFromURL(url,(objects, options)=>{
+            console.log(objects)
+            for (let  i of objects) {
+            self.canvas.add(i)
+            }
+        })
     }
 };
 
