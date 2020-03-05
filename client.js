@@ -5,7 +5,7 @@ import { Game } from './game.js'
 import { Map } from './map.js'
 
 import { methods } from './clientMethods_ReactionOnCanvas.js'
-import { Counter, ManCounters } from './counters.js'
+import { Counter, MultiManCounters , SingleManCounters } from './counters.js'
 
 class Client {
     constructor() {
@@ -53,14 +53,22 @@ class Client {
 
         this.counterTable = {
             'Counter': Counter,
-            'ManCounters': ManCounters
+            'MultiManCounters': MultiManCounters,
+            'SingleManCounters' : SingleManCounters
+
         }
 
         this.currentCounterInterface = undefined
 
         this.selectedCounter = undefined
 
-        this.movingGroup = [];
+        //this.movingGroup = [];
+
+        this.movingGroupHash = {
+            mgArray: [],
+            MMCnumber: 0,
+            SMCnumber: 0
+        }
     }
 
     setInterfaceScheme() {
@@ -166,7 +174,7 @@ class Client {
         // -------- Loading Creating and Drawing Background and Counters
 
         this.canvasObj.loadSVGFromURL(options.mapSrc)
-        
+
         let p = this.canvasObj.creatingPromise()    // options.mapSrc
         p.
             // then((img) => {
@@ -203,9 +211,9 @@ class Client {
                 let ops = countersOptions.squadType_propertiesHash[i] // { src: "assets/ge467S.gif", otherSideSrc: "assets/geh7b.gif", className: "ManCounters" }
 
                 let centerPoint = this.map.getCenterCoordsObjFromHex(obj)
-                console.log(centerPoint)
+                //console.log(centerPoint)
 
-                this.map.addCounterToHex(obj,ops.owner)
+                this.map.addCounterToHex(obj, ops.owner)
 
                 centerPoint = this.map._calculateFreeCoords(obj)
 
@@ -475,75 +483,142 @@ class Client {
     //----------------------------- 27 02 2020 -----------------------------------
     moveProcessing(point) {
 
-        let movingCounter = this.selectedCounter
-        let targetHex = this.map.getHexFromCoords(point)
+        //let movingCounter = this.selectedCounter
 
-        let costToEnter = movingCounter.getCostToEnter(this.map.getHexType(targetHex))
+        this.movingGroupHash.mgArray.forEach((movingCounter) => {
 
-        let c = this.calculateNewCoordsToMove(targetHex)
-        let coords = { top: c.y, left: c.x }
+            let targetHex = this.map.getHexFromCoords(point)
 
+            let costToEnter = movingCounter.getCostToEnter(this.map.getHexType(targetHex))
 
-        if (JSON.stringify(movingCounter.ownHex) == JSON.stringify(targetHex)) {
-            console.log('u try to move into the own Hex')
-            return
-        }
-        if (!this._checkIfHexIsInCoverArc(movingCounter, targetHex)) throw 'u try to move into Hex not in your Cover Arc'
-
-        switch (movingCounter.getType()) {
-            case 'AFV':
-                break;
-            case 'MMC':
-
-                if (targetHex.owner != undefined && targetHex.owner != movingCounter.owner) {
-                    console.log('u try to move into hex with the Enemy')
-                    return
-                }
-
-                if (movingCounter.getMFLeft()  < costToEnter) { // 'wood' - 2MF 'grain' - 1.5 'building' - 2 MF
-                    console.log('cost to enter is higher then MF left')
-                    return
-                }
-                break;
-        }
+            let c = this.calculateNewCoordsToMove(targetHex)
+            let coords = { top: c.y, left: c.x }
 
 
-        movingCounter.subtractMF(costToEnter)
-        movingCounter.setHexPosition(targetHex)   
-
-
-        let img = this.canvasObj.getImageByID(movingCounter.getImageID())
-// ----------------------------------------------------------------------------------------------------
-        if (movingCounter.group) {img = movingCounter.group}
-
-        //this.canvasObj.animate(img, coords)
-// ----------------------------------------------------------------------------------------------------
-        this.canvasObj.setOffMouseClickListener()
-
-        this.canvasObj.createPromiseAnimation(img,coords).then(()=>{
-
-            let p = this.game.getPhase()
-            let cb =this.allPhases_CallbacksHash[p]
-            this.canvasObj.setMouseClickListener(cb);
-            if (movingCounter.getMFLeft() == 0) {
-                console.log('counter has spend all its Moving and get new status')
-                movingCounter.setNewStatus('moved')
-    
-    
-                movingCounter.group._restoreObjectsState()
-    
-                this.canvasObj.canvas.remove(movingCounter.group)
-                
-                this.selectedCounter = undefined
+            if (JSON.stringify(movingCounter.ownHex) == JSON.stringify(targetHex)) {
+                console.log('u try to move into the own Hex')
+                return
             }
+            if (!this._checkIfHexIsInCoverArc(movingCounter, targetHex)) throw 'u try to move into Hex not in your Cover Arc'
+
+            switch (movingCounter.getType()) {
+                case 'AFV':
+                    break;
+                case 'MMC':
+
+                    if (targetHex.owner != undefined && targetHex.owner != movingCounter.owner) {
+                        console.log('u try to move into hex with the Enemy')
+                        return
+                    }
+
+                    if (movingCounter.getMFLeft() < costToEnter) { // 'wood' - 2MF 'grain' - 1.5 'building' - 2 MF
+                        console.log('cost to enter is higher then MF left')
+                        return
+                    }
+                    break;
+            }
+
+
+            movingCounter.subtractMF(costToEnter)
+            movingCounter.setHexPosition(targetHex)
+
+
+            let img = this.canvasObj.getImageByID(movingCounter.getImageID())
+            // ----------------------------------------------------------------------------------------------------
+            if (movingCounter.group) { img = movingCounter.group }
+
+            //this.canvasObj.animate(img, coords)
+            // ----------------------------------------------------------------------------------------------------
+            this.canvasObj.setOffMouseClickListener()
+
+            this.canvasObj.createPromiseAnimation(img, coords)
+                .then(() => {
+                    let p = this.game.getPhase()
+                    let cb = this.allPhases_CallbacksHash[p]
+                    this.canvasObj.setMouseClickListener(cb);
+                    if (movingCounter.getMFLeft() == 0) {
+                        console.log('counter has spend all its Moving and get new status')
+                        movingCounter.setNewStatus('moved')
+
+
+                        movingCounter.group._restoreObjectsState()
+
+                        this.canvasObj.canvas.remove(movingCounter.group)
+
+                        this.selectedCounter = undefined
+                    }
+                })
+
         })
+
+        //         let targetHex = this.map.getHexFromCoords(point)
+
+        //         let costToEnter = movingCounter.getCostToEnter(this.map.getHexType(targetHex))
+
+        //         let c = this.calculateNewCoordsToMove(targetHex)
+        //         let coords = { top: c.y, left: c.x }
+
+
+        //         if (JSON.stringify(movingCounter.ownHex) == JSON.stringify(targetHex)) {
+        //             console.log('u try to move into the own Hex')
+        //             return
+        //         }
+        //         if (!this._checkIfHexIsInCoverArc(movingCounter, targetHex)) throw 'u try to move into Hex not in your Cover Arc'
+
+        //         switch (movingCounter.getType()) {
+        //             case 'AFV':
+        //                 break;
+        //             case 'MMC':
+
+        //                 if (targetHex.owner != undefined && targetHex.owner != movingCounter.owner) {
+        //                     console.log('u try to move into hex with the Enemy')
+        //                     return
+        //                 }
+
+        //                 if (movingCounter.getMFLeft()  < costToEnter) { // 'wood' - 2MF 'grain' - 1.5 'building' - 2 MF
+        //                     console.log('cost to enter is higher then MF left')
+        //                     return
+        //                 }
+        //                 break;
+        //         }
+
+
+        //         movingCounter.subtractMF(costToEnter)
+        //         movingCounter.setHexPosition(targetHex)   
+
+
+        //         let img = this.canvasObj.getImageByID(movingCounter.getImageID())
+        // // ----------------------------------------------------------------------------------------------------
+        //         if (movingCounter.group) {img = movingCounter.group}
+
+        //         //this.canvasObj.animate(img, coords)
+        // // ----------------------------------------------------------------------------------------------------
+        //         this.canvasObj.setOffMouseClickListener()
+
+        //         this.canvasObj.createPromiseAnimation(img,coords)
+        //         .then(()=>{
+        //             let p = this.game.getPhase()
+        //             let cb =this.allPhases_CallbacksHash[p]
+        //             this.canvasObj.setMouseClickListener(cb);
+        //             if (movingCounter.getMFLeft() == 0) {
+        //                 console.log('counter has spend all its Moving and get new status')
+        //                 movingCounter.setNewStatus('moved')
+
+
+        //                 movingCounter.group._restoreObjectsState()
+
+        //                 this.canvasObj.canvas.remove(movingCounter.group)
+
+        //                 this.selectedCounter = undefined
+        //             }
+        //         })
     }
 
     calculateNewCoordsToMove(targetHex) {
         if (this.map._checkIfHexIsOccupied(targetHex)) {
             return this.map._calculateFreeCoords(targetHex)
         }
-        console.log(this.map.getCenterCoordsObjFromHex(targetHex))
+        //console.log(this.map.getCenterCoordsObjFromHex(targetHex))
         return this.map.getCenterCoordsObjFromHex(targetHex)
     }
 
@@ -557,7 +632,7 @@ class Client {
 
     //------------------ 28 02 2020-------------
 
-    _checkIfCounterIsInTheSameHexAsSelectedOne(counter){
+    _checkIfCounterIsInTheSameHexAsSelectedOne(counter) {
         if (!this.selectedCounter) throw 'selected Counter is undefined'
         return JSON.stringify(counter.ownHex) == JSON.stringify(this.selectedCounter.ownHex)
     }
@@ -569,6 +644,100 @@ class Client {
     selectionIsMoving() {
         return this.selectedCounter.getStatus() == 'moving'
     }
+    //-------------------- 04 03 2020 -------------
+
+    createAndDrawGroupOfImgAndBorder(counter) {
+        console.log(' ')
+        console.log('calling createAndDrawGroupOfImgAndBorder')
+        let img = this.canvasObj.getImageByID(counter.getImageID())
+
+        let p = {
+            width: img.width,
+            top: img.top,
+            left: img.left,
+        }
+        let redBorder = this.canvasObj.createFiringBorder(p)
+
+        let group = this.canvasObj.createGroup(img, redBorder)
+
+        counter.group = group
+
+        this.canvasObj.drawGroup(group)
+    }
+
+    addToMovingStack(counter) {
+
+        if (this.movingGroupHash.mgArray.length == 7) {
+            console.log(' there are already 7 counters in stack, cannot add more ')
+            return;
+        }
+
+
+        let counterType = counter.getType()
+
+        switch (counterType) {
+
+            case 'MMC':
+
+                if (this.movingGroupHash.MMCnumber == 3) {
+                    console.log(' there are already 3 MMC in stack, cannot add more ')
+                    return;
+                }
+
+                this.movingGroupHash.mgArray.push(counter)
+                this.movingGroupHash.MMCnumber += 1
+
+                break;
+
+            case 'SMC':
+
+                if (this.movingGroupHash.SMCnumber == 4) {
+                    console.log(' there are already 4 MMC in stack, cannot add more ')
+                    return;
+                }
+
+                this.movingGroupHash.mgArray.forEach((counter)=>{
+                    try {
+                        counter.getReadyToMoveUnderSMCcommand()
+                    }
+                    catch(e) {
+                        console.log(e)
+                    }
+                    
+                })
+
+                this.movingGroupHash.mgArray.push(counter)
+                this.movingGroupHash.SMCnumber += 1
+
+
+
+                break;
+
+        }
+
+    }
+
+    clearMovingGroupHash() {
+        this.movingGroupHash = {
+            mgArray: [],
+            MMCnumber: 0,
+            SMCnumber: 0
+        }
+    }
+
+    // addMMCtoStack(counter) {
+
+    //     if (counter.getType() != 'MMC') throw 'wrong type'
+
+    //     if (this.movingGroupHash.MMCnumber == 3) {
+    //         console.log(' there are already 3 MMC in stack, cannot add more ')
+    //         return;
+    //     }
+
+    //     this.movingGroupHash.mgArray.push(counter)
+    //     this.movingGroupHash.MMCnumber += 1
+
+    // }
 }
 // -- let's mix canvas reaction into our class
 Object.assign(Client.prototype, methods)

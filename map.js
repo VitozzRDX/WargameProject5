@@ -50,13 +50,13 @@ class Map {
         let o = this.hexOwnerAndNumberOfCountersHash[h]
 
         let k = o.numberOfCounters-1
-        console.log(k)
+        //console.log(k)
 
         let center = this.getCenterCoordsObjFromHex(hex)
 
-        console.log (center)
+        //console.log (center)
 
-        return {x:center.x+5*k,y:center.y+5*k}
+        return {x:center.x+10*k,y:center.y+10*k}
     }
 
 }

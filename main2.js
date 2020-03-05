@@ -23,30 +23,40 @@ let initialSettings = {
     startingSidePictureSrc: 'assets/turnphaseaxis.gif',
     otherSidePictureSrc: 'assets/turnphaseallied.gif',
 
-    mapSrc: 'assets/628corrected3(a).svg',   //'assets/bdv.gif'  mapEndedV
+    mapSrc: 'assets/mapEndedV.svg',   //'assets/bdv.gif'  mapEndedV.svg
 
     countersOptions: {
         squadType_propertiesHash: {
             'ruSquadE-0': {
                 src: 'assets/628corrected3(a).svg',
                 otherSideSrc: 'assets/628.svg',//'assets/ruh7b.gif',
-                className: 'ManCounters',
+                className: 'MultiManCounters', 
                 owner:'Ally',
                 movementFactor:4
             },
 
             'geSquadE-0': {
-                src: 'assets/628corrected3(a).svg',   // 'assets/ge467S.gif',
+                src: 'assets/ge467S.gif',   // 'assets/ge467S.gif',
                 otherSideSrc: 'assets/geh7b.gif',
-                className: 'ManCounters',
+                className: 'MultiManCounters',
                 owner:'Nazi',
                 movementFactor:4
             },
+
+            'geSMC9-1' : {
+                src: 'assets/geL91.gif',   // 'assets/ge467S.gif',
+                otherSideSrc: 'assets/geL91b.gif',
+                className: 'SingleManCounters', 
+                owner:'Nazi',
+                movementFactor:6
+            }
+
         },
 
         parametersOnCreationHash : {
             'ruSquadE-0':[{q:6,r:0,s:-6}],                                        // {top:100,left:100}
-            'geSquadE-0':[{q:9,r:0,s:-9},{q:9,r:0,s:-9}]
+            'geSquadE-0':[{q:9,r:0,s:-9},{q:9,r:0,s:-9}],
+            'geSMC9-1':[{q:9,r:0,s:-9}]
         },
 
         

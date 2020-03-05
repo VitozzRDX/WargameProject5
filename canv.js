@@ -305,7 +305,7 @@ this.ID_ImageHash = {}
             width: w + 2,
             height: w + 2,
             stroke: 'red',
-            strokeWidth: 4,
+            strokeWidth: 2,
             fill: '',
             selectable: false,
             evented : false
@@ -355,11 +355,13 @@ this.ID_ImageHash = {}
 
     loadSVGFromURL(url) {
         let self = this
+
         window.fabric.loadSVGFromURL(url,(objects, options)=>{
-            console.log(objects)
-            for (let  i of objects) {
-            self.canvas.add(i)
-            }
+            var obj = fabric.util.groupSVGElements(objects, options);
+            console.log(obj)
+            self.canvas.add(obj)
+            // for (let  i of objects) {
+
         })
     }
 };
