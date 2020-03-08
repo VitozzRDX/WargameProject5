@@ -5,7 +5,7 @@ import { Game } from './game.js'
 import { Map } from './map.js'
 
 import { methods } from './clientMethods_ReactionOnCanvas.js'
-import { Counter, MultiManCounters , SingleManCounters } from './counters.js'
+import { Counter, MultiManCounters, SingleManCounters } from './counters.js'
 
 class Client {
     constructor() {
@@ -54,7 +54,7 @@ class Client {
         this.counterTable = {
             'Counter': Counter,
             'MultiManCounters': MultiManCounters,
-            'SingleManCounters' : SingleManCounters
+            'SingleManCounters': SingleManCounters
 
         }
 
@@ -64,11 +64,9 @@ class Client {
 
         //this.movingGroup = [];
 
-        this.movingGroupHash = {
-            mgArray: [],
-            MMCnumber: 0,
-            SMCnumber: 0
-        }
+        this.movingGroupHash = undefined
+
+        this.countersFromBrokenMovingStackArray = undefined
     }
 
     setInterfaceScheme() {
@@ -123,6 +121,22 @@ class Client {
                 'name': 'Rally'
             },
 
+            'Assault Move': {
+                'callback': this.assaultMoveCallback.bind(this),
+                'class': 'AssaultMove',
+                'name': 'Assault Move'
+            },
+            'Double Time': {
+                'callback': this.doubleTimeCallback.bind(this),
+                'class': 'DoubleTime',
+                'name': 'Double Time'
+            },
+            'Break Stack': {
+                'callback': this.breakStackCallback.bind(this),
+                'class': 'BreakStack',
+                'name': 'Break Stack'
+            },
+
         };
 
     }
@@ -173,14 +187,14 @@ class Client {
 
         // -------- Loading Creating and Drawing Background and Counters
 
-        this.canvasObj.loadSVGFromURL(options.mapSrc)
+        //this.canvasObj.loadSVGFromURL(options.mapSrc)
 
-        let p = this.canvasObj.creatingPromise()    // options.mapSrc
+        let p = this.canvasObj.creatingPromise(options.mapSrc)    // options.mapSrc
         p.
-            // then((img) => {
-            //     this.canvasObj.draw(p, { top: 0, left: 0, evented: false, selectable: false, }, () => { this.canvasObj.canvas.sendToBack(img) })//this.canvas.sendToBack(img) 
+            then((img) => {
+                this.canvasObj.draw(p, { top: 0, left: 0, evented: false, selectable: false, }, () => { this.canvasObj.canvas.sendToBack(img) })//this.canvas.sendToBack(img) 
 
-            // }).
+            }).
             then(() => {
                 this._createAndDrawCounters(options.countersOptions)
             })
@@ -190,7 +204,7 @@ class Client {
 
         // ----------- 25 02 20 20 ------------------------------
 
-        let polyCorners = this.map.getPolyCorners({ q: 5, r: 0, s: -5 })
+        let polyCorners = this.map.getPolyCorners({ q: 15, r: 0, s: -15 })
         this.canvasObj.drawPoly(polyCorners, 'red')
 
     };
@@ -210,12 +224,12 @@ class Client {
 
                 let ops = countersOptions.squadType_propertiesHash[i] // { src: "assets/ge467S.gif", otherSideSrc: "assets/geh7b.gif", className: "ManCounters" }
 
-                let centerPoint = this.map.getCenterCoordsObjFromHex(obj)
+                //let centerPoint = this.map.getCenterCoordsObjFromHex(obj)
                 //console.log(centerPoint)
 
                 this.map.addCounterToHex(obj, ops.owner)
 
-                centerPoint = this.map._calculateFreeCoords(obj)
+                let centerPoint = this.map._calculateFreeCoords(obj)
 
                 ops.options = { top: centerPoint.y, left: centerPoint.x }       // {q:6,r:0,s:-6}
                 ops.ownHex = obj
@@ -404,7 +418,7 @@ class Client {
         console.log(button)
     }
 
-    clearCounterInterface() {
+    clearCounterInterface() {                                   // change name to clearCurrentCounterInterface
         console.log('clearing clearCounterInterface')
         let currentCounterInterface = this.currentCounterInterface
         // ---- is any counter already selected ?
@@ -455,26 +469,26 @@ class Client {
 
     }
     // --------------------- added 26 02 2020
-    _checkIfCounterSelectionOccuredBefore() {
-        //console.log(this.selectedCounter)
-        if (this.selectedCounter) {
-            return true
-        }
-        return false
-    }
+    // _checkIfCounterSelectionOccuredBefore() {
+    //     //console.log(this.selectedCounter)
+    //     if (this.selectedCounter) {
+    //         return true
+    //     }
+    //     return false
+    // }
 
-    _checkIfSelectionHaveEndedItsMove() {
-        if (!this.selectedCounter) throw 'selection should be defined '
+    // _checkIfSelectionHaveEndedItsMove() {
+    //     if (!this.selectedCounter) throw 'selection should be defined '
 
-        return false
-    }
+    //     return false
+    // }
 
-    _checkIfCounterIsNearTargetHex(coordsObj) {
+    // _checkIfCounterIsNearTargetHex(coordsObj) {
 
-        if (!this.selectedCounter) throw 'selection should be defined '
-        return true
+    //     if (!this.selectedCounter) throw 'selection should be defined '
+    //     return true
 
-    }
+    // }
 
     _checkIfclickedCounterOwnerIsSameAsPhaseOwner(counter, player) {
         //console.log(counter.owner,player)
@@ -483,16 +497,16 @@ class Client {
     //----------------------------- 27 02 2020 -----------------------------------
     moveProcessing(point) {
 
-        //let movingCounter = this.selectedCounter
-
+        // if (this.countersFromBrokenMovingStackArray) {
+        //     console.log(there is a broken stack remnants. Because we moving they should be cleared)
+        // }
         this.movingGroupHash.mgArray.forEach((movingCounter) => {
 
             let targetHex = this.map.getHexFromCoords(point)
-
             let costToEnter = movingCounter.getCostToEnter(this.map.getHexType(targetHex))
 
-            let c = this.calculateNewCoordsToMove(targetHex)
-            let coords = { top: c.y, left: c.x }
+            //let c = this.calculateNewCoordsToMove(targetHex)
+            //let coords = { top: c.y, left: c.x }
 
 
             if (JSON.stringify(movingCounter.ownHex) == JSON.stringify(targetHex)) {
@@ -518,100 +532,55 @@ class Client {
                     break;
             }
 
-
             movingCounter.subtractMF(costToEnter)
             movingCounter.setHexPosition(targetHex)
+            
+            this.map.addCounterToHex(targetHex,movingCounter.owner)
+            let c = this.map._calculateFreeCoords(targetHex)
+
+            let coords = { top: c.y, left: c.x }
+            
 
 
+            // -------------------Move Animation------------------------------------------------------------
             let img = this.canvasObj.getImageByID(movingCounter.getImageID())
-            // ----------------------------------------------------------------------------------------------------
+
             if (movingCounter.group) { img = movingCounter.group }
 
             //this.canvasObj.animate(img, coords)
-            // ----------------------------------------------------------------------------------------------------
             this.canvasObj.setOffMouseClickListener()
 
             this.canvasObj.createPromiseAnimation(img, coords)
                 .then(() => {
-                    let p = this.game.getPhase()
-                    let cb = this.allPhases_CallbacksHash[p]
-                    this.canvasObj.setMouseClickListener(cb);
+
+                    this.setMouseClickListenerAccordingToCurrentPhase()
+
                     if (movingCounter.getMFLeft() == 0) {
+
                         console.log('counter has spend all its Moving and get new status')
                         movingCounter.setNewStatus('moved')
 
-
+                    // -------------------------------------
                         movingCounter.group._restoreObjectsState()
 
+                        this.canvasObj.getImageByID(movingCounter.getImageID()).set({
+                            selectable: true,
+                            evented: true
+                        })
+                        
                         this.canvasObj.canvas.remove(movingCounter.group)
+                    // -------------------------------------
 
-                        this.selectedCounter = undefined
+                        this.removeCounterFromMovingGroupArray(movingCounter)
+
+                        if (this.getMovingGroupArrayLength() == 0) {    
+                            console.log('all untis from MG have ended its move ')
+                            this.clearMovingGroupHash()
+                        }
                     }
                 })
-
+            // ----------------------------------------------------------------------------------------------------
         })
-
-        //         let targetHex = this.map.getHexFromCoords(point)
-
-        //         let costToEnter = movingCounter.getCostToEnter(this.map.getHexType(targetHex))
-
-        //         let c = this.calculateNewCoordsToMove(targetHex)
-        //         let coords = { top: c.y, left: c.x }
-
-
-        //         if (JSON.stringify(movingCounter.ownHex) == JSON.stringify(targetHex)) {
-        //             console.log('u try to move into the own Hex')
-        //             return
-        //         }
-        //         if (!this._checkIfHexIsInCoverArc(movingCounter, targetHex)) throw 'u try to move into Hex not in your Cover Arc'
-
-        //         switch (movingCounter.getType()) {
-        //             case 'AFV':
-        //                 break;
-        //             case 'MMC':
-
-        //                 if (targetHex.owner != undefined && targetHex.owner != movingCounter.owner) {
-        //                     console.log('u try to move into hex with the Enemy')
-        //                     return
-        //                 }
-
-        //                 if (movingCounter.getMFLeft()  < costToEnter) { // 'wood' - 2MF 'grain' - 1.5 'building' - 2 MF
-        //                     console.log('cost to enter is higher then MF left')
-        //                     return
-        //                 }
-        //                 break;
-        //         }
-
-
-        //         movingCounter.subtractMF(costToEnter)
-        //         movingCounter.setHexPosition(targetHex)   
-
-
-        //         let img = this.canvasObj.getImageByID(movingCounter.getImageID())
-        // // ----------------------------------------------------------------------------------------------------
-        //         if (movingCounter.group) {img = movingCounter.group}
-
-        //         //this.canvasObj.animate(img, coords)
-        // // ----------------------------------------------------------------------------------------------------
-        //         this.canvasObj.setOffMouseClickListener()
-
-        //         this.canvasObj.createPromiseAnimation(img,coords)
-        //         .then(()=>{
-        //             let p = this.game.getPhase()
-        //             let cb =this.allPhases_CallbacksHash[p]
-        //             this.canvasObj.setMouseClickListener(cb);
-        //             if (movingCounter.getMFLeft() == 0) {
-        //                 console.log('counter has spend all its Moving and get new status')
-        //                 movingCounter.setNewStatus('moved')
-
-
-        //                 movingCounter.group._restoreObjectsState()
-
-        //                 this.canvasObj.canvas.remove(movingCounter.group)
-
-        //                 this.selectedCounter = undefined
-        //             }
-        //         })
     }
 
     calculateNewCoordsToMove(targetHex) {
@@ -622,9 +591,9 @@ class Client {
         return this.map.getCenterCoordsObjFromHex(targetHex)
     }
 
-    _checkIfSelectionHaveEndedItsMove() {
-        return (this.selectedCounter.getStatus() != 'moving')
-    }
+    // _checkIfSelectionHaveEndedItsMove() {
+    //     return (this.selectedCounter.getStatus() != 'moving')
+    // }
 
     _checkIfHexIsInCoverArc(counter, hex) {
         return true
@@ -632,25 +601,30 @@ class Client {
 
     //------------------ 28 02 2020-------------
 
-    _checkIfCounterIsInTheSameHexAsSelectedOne(counter) {
-        if (!this.selectedCounter) throw 'selected Counter is undefined'
-        return JSON.stringify(counter.ownHex) == JSON.stringify(this.selectedCounter.ownHex)
-    }
+    // _checkIfCounterIsInTheSameHexAsSelectedOne(counter) {
+    //     if (!this.selectedCounter) throw 'selected Counter is undefined'
+    //     return JSON.stringify(counter.ownHex) == JSON.stringify(this.selectedCounter.ownHex)
+    // }
 
     _checkIfCounterMoved(counter) {
         return counter.getStatus() == 'moved'
     }
 
-    selectionIsMoving() {
-        return this.selectedCounter.getStatus() == 'moving'
-    }
+    // selectionIsMoving() {
+    //     return this.selectedCounter.getStatus() == 'moving'
+    // }
     //-------------------- 04 03 2020 -------------
 
     createAndDrawGroupOfImgAndBorder(counter) {
         console.log(' ')
         console.log('calling createAndDrawGroupOfImgAndBorder')
         let img = this.canvasObj.getImageByID(counter.getImageID())
-
+        // -------------------------------------
+        img.set({
+            selectable: false,
+            evented: false
+        })
+        // -------------------------------------
         let p = {
             width: img.width,
             top: img.top,
@@ -661,83 +635,197 @@ class Client {
         let group = this.canvasObj.createGroup(img, redBorder)
 
         counter.group = group
+        counter.colorBorder = redBorder
 
         this.canvasObj.drawGroup(group)
     }
 
-    addToMovingStack(counter) {
+    addToMovingStack(counter) { // change name to fill MovingStack Hash
+
+        if (!this.movingGroupHash) throw 'Moving Group is not exist'
 
         if (this.movingGroupHash.mgArray.length == 7) {
             console.log(' there are already 7 counters in stack, cannot add more ')
             return;
         }
 
-
         let counterType = counter.getType()
 
         switch (counterType) {
 
             case 'MMC':
-
                 if (this.movingGroupHash.MMCnumber == 3) {
                     console.log(' there are already 3 MMC in stack, cannot add more ')
                     return;
                 }
-
                 this.movingGroupHash.mgArray.push(counter)
                 this.movingGroupHash.MMCnumber += 1
 
                 break;
 
             case 'SMC':
-
                 if (this.movingGroupHash.SMCnumber == 4) {
                     console.log(' there are already 4 MMC in stack, cannot add more ')
                     return;
                 }
-
-                this.movingGroupHash.mgArray.forEach((counter)=>{
+                this.movingGroupHash.mgArray.forEach((counter) => {
                     try {
                         counter.getReadyToMoveUnderSMCcommand()
                     }
-                    catch(e) {
+                    catch (e) {
                         console.log(e)
                     }
-                    
                 })
-
                 this.movingGroupHash.mgArray.push(counter)
                 this.movingGroupHash.SMCnumber += 1
 
-
-
                 break;
 
+            default:
+                throw 'unexpected counter type adding to Moving Group. Should be MMC or SMC'
         }
-
     }
 
     clearMovingGroupHash() {
-        this.movingGroupHash = {
-            mgArray: [],
-            MMCnumber: 0,
-            SMCnumber: 0
+        this.movingGroupHash = undefined
+    }
+
+
+
+    // -------------- 05 03 2020 ---------------------------
+    getMovingGroupArrayLength() {
+        return this.movingGroupHash.mgArray.length
+    }
+
+    getMovingStackArray() {
+        return this.movingGroupHash.mgArray
+    }
+
+    getMovingStackUIScheme() {
+        return this.movingGroupHash.schemeObj
+    }
+
+    setOwnHexForMovingStack(counterOwnHex) {
+        this.movingGroupHash.ownHex = counterOwnHex
+    }
+
+    getOwnHexOfMovingGroup() {
+        return this.movingGroupHash.ownHex
+    }
+
+    setMovingStackUIButtonsCondition(buttonName, bool) {
+        let scheme = this.getMovingStackUIScheme() // {'R':true}
+
+        scheme[buttonName] = bool
+    }
+    buildMGUI() {
+
+        for (let buttonName in this.getMovingStackUIScheme()) {
+
+            //console.log(buttonName)
+            let obj = this.interfaceScheme[buttonName]
+            let bool = this.movingGroupHash.schemeObj[buttonName]
+
+            this.interface.buildButton(obj, bool)
         }
     }
 
-    // addMMCtoStack(counter) {
+    setMovingGroupStatus(status) {
+        let statusArr = ['moved', 'moving','broken']
+        if (!status in statusArr) throw `there is no such status as ${status} in possible statuses for Moving Groups`
 
-    //     if (counter.getType() != 'MMC') throw 'wrong type'
+        this.movingGroupHash.status = status
+    }
 
-    //     if (this.movingGroupHash.MMCnumber == 3) {
-    //         console.log(' there are already 3 MMC in stack, cannot add more ')
-    //         return;
-    //     }
+    getMovigGroupStatus() {
+        return this.movingGroupHash.status
+    }
 
-    //     this.movingGroupHash.mgArray.push(counter)
-    //     this.movingGroupHash.MMCnumber += 1
+    _checkIfCounterIsInTheSameHexAsGroupToMove(counter) {
 
-    // }
+        if (this.getMovingGroupArrayLength() == 0) throw `there is nobody in Moving Group`
+
+        let hex = this.getOwnHexOfMovingGroup()
+
+        return JSON.stringify(hex) == JSON.stringify(counter.ownHex)
+    }
+
+    createNewMovingStack(param) {
+        if (this.movingGroupHash) throw 'u try to create new MG when there is already one'
+
+        this.movingGroupHash = {
+            mgArray: [],
+            MMCnumber: 0,
+            SMCnumber: 0,
+            status:undefined,
+            schemeObj: {
+                'Assault Move': true,
+                'Double Time': true,
+                'Break Stack': true,
+            }
+        }
+
+        if (param) {
+            Object.assign(this.movingGroupHash, param)
+        }
+        return this.movingGroupHash
+
+    }
+
+    getMovigGroup() {
+        return this.movingGroupHash
+    }
+
+    removeCounterFromMovingGroupArray(counter) {
+
+        let arr = this.getMovingStackArray()
+
+        if (arr.length == 0) throw 'u tryin to remove counter from empty MGarray'
+
+        let ind  = arr.indexOf(counter)
+        if ( ind == -1) throw 'u tryin to remove already removed counter from MGarray'
+
+        this.movingGroupHash.mgArray.splice(ind, 1)
+
+    }
+
+
+    setMouseClickListenerAccordingToCurrentPhase(){
+        let p = this.game.getPhase()
+        let cb = this.allPhases_CallbacksHash[p]
+        this.canvasObj.setMouseClickListener(cb);
+    }
+
+    assaultMoveCallback(button) {
+        console.log('Next Move will be last. Set state ? Show "Assaulting!" table . Disable Double Time bttn (redraw MGUI ?) ')
+    }
+
+    doubleTimeCallback(button) {
+        console.log('set all C in MG except that of exausted, +2 MF to temp, set statuses - exosted ')
+    }
+
+    breakStackCallback(button) {
+        console.log('breakStack pressed')
+        if (this.countersFromBrokenMovingStackArray) throw 'array with Broken Stack counters is full'
+
+        this.countersFromBrokenMovingStackArray = this.movingGroupHash.mgArray
+        this.movingGroupHash.mgArray.forEach((counter)=>{
+
+            this.canvasObj.changeColorOfBorder(counter.colorBorder,"yellow")
+
+            
+            //this.setMovingGroupStatus('broken')
+            this.clearMovingGroupHash()
+        })
+    }
+
+    setAllMGUIDisabled(){
+        this.movingGroupHash.schemeObj = {
+            'Assault Move': false,
+            'Double Time': false,
+            'Break Stack': false,
+        }
+    }
 }
 // -- let's mix canvas reaction into our class
 Object.assign(Client.prototype, methods)

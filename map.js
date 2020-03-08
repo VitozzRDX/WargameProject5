@@ -22,6 +22,10 @@ class Map {
     // ------------ 27 02 2020-----------------------------------------------------
 
     addCounterToHex(hex,owner) {
+
+        //console.log(!hex.q,!hex.r,!hex.s)
+        //if(!hex.q || !hex.r || !hex.s) throw ' wrong format of hex '
+
         let h = JSON.stringify(hex)
         if (this.hexOwnerAndNumberOfCountersHash[h]) {
             console.log('somebody here', h)

@@ -16,7 +16,9 @@ class Counter {
 
         this.imageID = undefined;
 
-        this.status = undefined
+        this.status = undefined;
+
+        this.colorBorder = undefined
 
     };
 

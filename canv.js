@@ -36,13 +36,13 @@ this.ID_ImageHash = {}
 
     setOffMouseClickListener(callback) {
         this.canvas.off(
-            'mouse:down', callback
+            'mouse:up', callback
         )
     };
 
     setMouseClickListener(callback) {
         this.canvas.on({
-            'mouse:down': callback
+            'mouse:up': callback
         })
     };
 
@@ -363,6 +363,15 @@ this.ID_ImageHash = {}
             // for (let  i of objects) {
 
         })
+    }
+
+    //------------ 06 03 2020 -----------------------
+
+    changeColorOfBorder(border,color) {
+        border.set({
+            stroke: color
+        })
+        this.canvas.renderAll()
     }
 };
 

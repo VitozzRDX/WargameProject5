@@ -273,3 +273,53 @@ body {
     background: linear-gradient(to bottom, #cccccc 1%,#bbbbbb 73%, #ffffff 100%);
     color: #5a5a5a;
 }
+
+/*------------- added 06 03 2020 ---------------*/
+
+#UIContainer .AssaultMove {
+    background: linear-gradient(to bottom, #ffffff 1%, #85b166 73%, red 100%);
+    width: 118px;
+    height: 50px;
+    position:absolute;
+        left: 15%;/*1145px;*/
+          top: 300px;
+    color: rgb(0, 0, 0);
+    font-size:1rem;
+    font-weight: bold;
+    outline: 0;
+    border-radius: 10px;
+    border: 4px solid #000000;
+    text-transform: uppercase;
+}
+
+#UIContainer .DoubleTime {
+    background: linear-gradient(to bottom, #ffffff 1%, #85b166 73%, red 100%);
+    width: 118px;
+    height: 50px;
+    position:absolute;
+        left: 15%;/*1145px;*/
+          top: 375px;
+    color: rgb(0, 0, 0);
+    font-size:1rem;
+    font-weight: bold;
+    outline: 0;
+    border-radius: 10px;
+    border: 4px solid #000000;
+    text-transform: uppercase;
+}
+
+#UIContainer .BreakStack {
+    background: linear-gradient(to bottom, #ffffff 1%, #85b166 73%, red 100%);
+    width: 118px;
+    height: 50px;
+    position:absolute;
+        left: 15%;/*1145px;*/
+          top: 450px;
+    color: rgb(0, 0, 0);
+    font-size:1rem;
+    font-weight: bold;
+    outline: 0;
+    border-radius: 10px;
+    border: 4px solid #000000;
+    text-transform: uppercase;
+}
