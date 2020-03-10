@@ -323,3 +323,31 @@ body {
     border: 4px solid #000000;
     text-transform: uppercase;
 }
+
+#UIContainer  .BreakStack:active { 
+    background: linear-gradient(to bottom, #cccccc 1%,#bbbbbb 73%, #ffffff 100%);
+    color: #5a5a5a;
+}
+#UIContainer  .DoubleTime:active { 
+    background: linear-gradient(to bottom, #cccccc 1%,#bbbbbb 73%, #ffffff 100%);
+    color: #5a5a5a;
+}
+#UIContainer  .AssaultMove:active { 
+    background: linear-gradient(to bottom, #cccccc 1%,#bbbbbb 73%, #ffffff 100%);
+    color: #5a5a5a;
+}
+
+#UIContainer  .BreakStack:disabled {
+    background: linear-gradient(to bottom, #cccccc 1%,#bbbbbb 73%, #ffffff 100%);
+    color: #5a5a5a;
+}
+
+#UIContainer  .DoubleTime:disabled {
+    background: linear-gradient(to bottom, #cccccc 1%,#bbbbbb 73%, #ffffff 100%);
+    color: #5a5a5a;
+}
+
+#UIContainer  .AssaultMove:disabled {
+    background: linear-gradient(to bottom, #cccccc 1%,#bbbbbb 73%, #ffffff 100%);
+    color: #5a5a5a;
+}

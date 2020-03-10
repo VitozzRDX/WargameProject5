@@ -64,7 +64,7 @@ class Client {
 
         //this.movingGroup = [];
 
-        this.movingGroupHash = undefined
+        this.movingGroupHash = {status:'uncreated'}
 
         this.countersFromBrokenMovingStackArray = undefined
     }
@@ -540,7 +540,7 @@ class Client {
 
             let coords = { top: c.y, left: c.x }
             
-
+            
 
             // -------------------Move Animation------------------------------------------------------------
             let img = this.canvasObj.getImageByID(movingCounter.getImageID())
@@ -573,14 +573,17 @@ class Client {
 
                         this.removeCounterFromMovingGroupArray(movingCounter)
 
-                        if (this.getMovingGroupArrayLength() == 0) {    
+                        if (this.getMovingGroupArrayLength() == 0) {        //  && getMovingStackStatus() == 'filledWithBrokenStackRemnants'
                             console.log('all untis from MG have ended its move ')
-                            this.clearMovingGroupHash()
+                            this.clearMovingGroupHash('uncreated')
                         }
                     }
                 })
             // ----------------------------------------------------------------------------------------------------
         })
+
+        this.setMovingStackStatus('moving')
+
     }
 
     calculateNewCoordsToMove(targetHex) {
@@ -635,6 +638,7 @@ class Client {
         let group = this.canvasObj.createGroup(img, redBorder)
 
         counter.group = group
+        group.counter = counter
         counter.colorBorder = redBorder
 
         this.canvasObj.drawGroup(group)
@@ -686,8 +690,18 @@ class Client {
         }
     }
 
-    clearMovingGroupHash() {
-        this.movingGroupHash = undefined
+    clearMovingGroupHash(stat) {
+        this.movingGroupHash = {
+            mgArray: [],
+            MMCnumber: 0,
+            SMCnumber: 0,
+            status:stat,
+            schemeObj: {
+                'Assault Move': true,
+                'Double Time': true,
+                'Break Stack': true,
+            }
+        }
     }
 
 
@@ -730,14 +744,14 @@ class Client {
         }
     }
 
-    setMovingGroupStatus(status) {
-        let statusArr = ['moved', 'moving','broken']
-        if (!status in statusArr) throw `there is no such status as ${status} in possible statuses for Moving Groups`
+    setMovingStackStatus(status) {
+        let statusArr = ['uncreated', 'filledWithCounters','filledWithBrokenStackRemnants','moving']
+        //if (!status in statusArr) throw `there is no such status as ${status} in possible statuses for Moving Groups`
 
         this.movingGroupHash.status = status
     }
 
-    getMovigGroupStatus() {
+    getMovingStackStatus() {
         return this.movingGroupHash.status
     }
 
@@ -751,7 +765,7 @@ class Client {
     }
 
     createNewMovingStack(param) {
-        if (this.movingGroupHash) throw 'u try to create new MG when there is already one'
+        //if (this.movingGroupHash) throw 'u try to create new MG when there is already one'
 
         this.movingGroupHash = {
             mgArray: [],
@@ -806,17 +820,24 @@ class Client {
 
     breakStackCallback(button) {
         console.log('breakStack pressed')
+        
         if (this.countersFromBrokenMovingStackArray) throw 'array with Broken Stack counters is full'
 
         this.countersFromBrokenMovingStackArray = this.movingGroupHash.mgArray
+
         this.movingGroupHash.mgArray.forEach((counter)=>{
 
             this.canvasObj.changeColorOfBorder(counter.colorBorder,"yellow")
 
-            
+            counter.setMovingStatus('brokenStackRemnant')
             //this.setMovingGroupStatus('broken')
-            this.clearMovingGroupHash()
+            //this.clearMovingGroupHash()
+
         })
+        this.setMovingStackStatus('uncreated')
+        this.setAllMGUIDisabled()
+        this.buildMGUI()
+
     }
 
     setAllMGUIDisabled(){
@@ -825,6 +846,16 @@ class Client {
             'Double Time': false,
             'Break Stack': false,
         }
+    }
+
+    _checkIfCounterIsAlreadyInMovingGroup(counter) {
+        let arr = this.getMovingStackArray()
+        if(arr.indexOf(counter) != -1) {
+            return true
+        }
+    }
+    clearCountersFromBrokenMovingStackArray() {
+        this.countersFromBrokenMovingStackArray = undefined
     }
 }
 // -- let's mix canvas reaction into our class

@@ -28,7 +28,7 @@ class Map {
 
         let h = JSON.stringify(hex)
         if (this.hexOwnerAndNumberOfCountersHash[h]) {
-            console.log('somebody here', h)
+            //console.log('somebody here', h)
             let previousOwner = this.hexOwnerAndNumberOfCountersHash[h].owner
             if (owner == previousOwner){
                 this.hexOwnerAndNumberOfCountersHash[h].numberOfCounters +=1

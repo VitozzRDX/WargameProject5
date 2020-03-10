@@ -46,7 +46,7 @@ class Counter {
 class SelfMovingCounters extends Counter {
     constructor(param) {
         super(param)
-
+        this.movingStatus = undefined
     }
 
     getCostToEnter(type) {
@@ -55,7 +55,21 @@ class SelfMovingCounters extends Counter {
 
     //------------- 04 03 2020 ------------------
 
+    getMovingStatus(){
+        //console.log(this.movingStatus)
+        return this.movingStatus 
+    }
 
+    setMovingStatus(status) {
+        
+        let arr = ['moving','moved','brokenStackRemnant']
+
+        if (arr.indexOf( status ) != -1 ) {
+            this.movingStatus = status
+        }else{
+            throw `there is no sucj status as ${status} in possible to set for counter`
+        }
+    }
 
 }
 
@@ -85,6 +99,10 @@ class ManCounters extends SelfMovingCounters {
         this.temporaryMF = this.temporaryMF - mf
     }
 
+    getReadyToMoveUnderSMCcommand() {
+        return
+    }
+
 }
 
 class MultiManCounters extends ManCounters {
@@ -98,7 +116,6 @@ class MultiManCounters extends ManCounters {
 
     getReadyToMoveUnderSMCcommand() {
         this.temporaryMF += 1
-
     }
 }
 
