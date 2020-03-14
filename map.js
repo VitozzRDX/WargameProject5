@@ -5,6 +5,8 @@ class Map {
 
         this.flat =this.Layout(this.layout_flat(), this.Point(37.5, 37.5), this.Point(-1, 30));//(-112,-33)); // refactor . We should get orient,size and orig from consttructor
         this.hexOwnerAndNumberOfCountersHash = {}
+
+        this.hex_counterIDHash = {}
     }
 
     getPolyCorners(hex) {
@@ -63,6 +65,53 @@ class Map {
         return {x:center.x+10*k,y:center.y+10*k}
     }
 
+    _calculateFreeCoords(hex,size){
+        let h = JSON.stringify(hex)
+        let o = this.hexOwnerAndNumberOfCountersHash[h]
+        let center = this.getCenterCoordsObjFromHex(hex)
+        let k = o.numberOfCounters - 1
+
+       if(k == 0) {
+           //console.log('ff')
+        return {x:center.x,y:center.y}
+       }
+
+       //console.log({x:center.x+k*size*0.25,y:center.y+k*size*0.25 })
+       return {x:center.x+k*size*0.25,y:center.y+k*size*0.25 }
+
+    }
+
+    addHexTohex_counterIDHash(hex){
+        let h = JSON.stringify(hex)
+        if(this.hex_counterIDHash[h]) {
+            console.log('this hex is already in hex_counterIDHash')
+            return
+        }
+        this.hex_counterIDHash[h] = []
+    }
+
+    fillhex_counterIDHash(hex,counterID){
+        let h = JSON.stringify(hex)
+        this.hex_counterIDHash[h].push(counterID)
+    }
+    getCountersIDinHexArray(hex){
+        // console.log(hex)
+        // console.log(this.hex_counterIDHash)
+        let h = JSON.stringify(hex)
+        //console.log(this.hex_counterIDHash)
+        return this.hex_counterIDHash[h]
+    }
+    //------------------------------------------------------------------------------
+    removeIDFromHex_counterIDHash(hex,ID){
+        console.log('removeIDFromHex_counterIDHash')
+        let h = JSON.stringify(hex)
+        let ind = this.hex_counterIDHash[h].indexOf(ID)
+
+        this.hex_counterIDHash[h].splice(ind,1)
+
+        //console.log(this.hex_counterIDHash)
+
+    }
 }
 
 Object.assign(Map.prototype, hexFunctions)

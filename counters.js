@@ -20,6 +20,11 @@ class Counter {
 
         this.colorBorder = undefined
 
+        this.weightHex = 1
+
+        this.ID = (Math.random() + 1).toString(36).slice(2, 18);
+
+
     };
 
     getImageID() {
@@ -41,6 +46,34 @@ class Counter {
     getStatus() {
         return this.status
     }
+
+    setWeightHex(num) {
+        this.weightHex = num
+    }
+    getWeightHex(){
+        return this.weightHex
+    }
+
+    getID () {
+        return this.ID
+    }
+    
+}
+
+class Weapon extends Counter {
+    constructor(param){
+        super (param)
+
+        this.currentInterfaceElements = {
+            'firstPlayerRallyPhase': { 'Attach': true },
+        }
+
+    }
+
+    
+
+
+    
 }
 
 class SelfMovingCounters extends Counter {
@@ -170,5 +203,6 @@ class SingleManCounters extends ManCounters {
 export {
     Counter,
     MultiManCounters,
-    SingleManCounters
+    SingleManCounters,
+    Weapon
 }

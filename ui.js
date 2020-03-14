@@ -31,7 +31,7 @@ class Interface {
     }
 
     remove(name) {
-console.log(name)
+
         this.buttonsHash[name].remove()
     }
 
