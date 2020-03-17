@@ -3,7 +3,9 @@ class Canv {
     constructor() {
 
         window.fabric.Object.prototype.objectCaching = true
-
+        window.fabric.Object.prototype.hasControls = false
+        window.fabric.Object.prototype.hasBorders = false
+        
         this.canvas = new window.fabric.CanvasEx('canvas');
 
         this.canvas2 = new window.fabric.CanvasEx('canvas2');
@@ -289,30 +291,30 @@ this.ID_ImageHash = {}
 
     //---------------------28 02 2020
 
-    createFiringBorder(param) {
-        self = this;
+    // createFiringBorder(param) {
+    //     self = this;
         
-        let l = param.left
-        let t = param.top
-        let w = param.width
+    //     let l = param.left
+    //     let t = param.top
+    //     let w = param.width
 
-		var rect = new fabric.Rect({
-            left: l,
-            top: t,
+	// 	var rect = new fabric.Rect({
+    //         left: l,
+    //         top: t,
 
-            originX: 'center',
-            originY: 'center',
-            width: w + 2,
-            height: w + 2,
-            stroke: 'red',
-            strokeWidth: 2,
-            fill: '',
-            selectable: false,
-            evented : false
-        });
+    //         originX: 'center',
+    //         originY: 'center',
+    //         width: w + 2,
+    //         height: w + 2,
+    //         stroke: 'red',
+    //         strokeWidth: 2,
+    //         fill: '',
+    //         selectable: false,
+    //         evented : false
+    //     });
 		
-		return rect
-    }
+	// 	return rect
+    // }
     
     createPhaseTextBox(param, text) {
         let l = param.left

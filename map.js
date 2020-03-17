@@ -25,12 +25,9 @@ class Map {
 
     addCounterToHex(hex,owner) {
 
-        //console.log(!hex.q,!hex.r,!hex.s)
-        //if(!hex.q || !hex.r || !hex.s) throw ' wrong format of hex '
-
         let h = JSON.stringify(hex)
         if (this.hexOwnerAndNumberOfCountersHash[h]) {
-            //console.log('somebody here', h)
+
             let previousOwner = this.hexOwnerAndNumberOfCountersHash[h].owner
             if (owner == previousOwner){
                 this.hexOwnerAndNumberOfCountersHash[h].numberOfCounters +=1
@@ -38,10 +35,13 @@ class Map {
             }
             this.hexOwnerAndNumberOfCountersHash[h].numberOfCounters +=1
             this.hexOwnerAndNumberOfCountersHash[h].owner = 'disputed'
+            // error ! need return here !
+            return
+
         }
+        // INitialization of hexOwnerAndNumberOfCountersHash :
         this.hexOwnerAndNumberOfCountersHash[h] = {owner: owner,numberOfCounters:1}
     }
-
 
     getHexType(hex){
         return 'plain'
@@ -51,34 +51,32 @@ class Map {
         return false
     }
 
-    _calculateFreeCoords(hex){
-        let h = JSON.stringify(hex)
-        let o = this.hexOwnerAndNumberOfCountersHash[h]
+    // _calculateFreeCoords(hex){
+    //     let h = JSON.stringify(hex)
+    //     let o = this.hexOwnerAndNumberOfCountersHash[h]
 
-        let k = o.numberOfCounters-1
-        //console.log(k)
+    //     let k = o.numberOfCounters-1
+    //     //console.log(k)
 
-        let center = this.getCenterCoordsObjFromHex(hex)
+    //     let center = this.getCenterCoordsObjFromHex(hex)
 
-        //console.log (center)
+    //     //console.log (center)
 
-        return {x:center.x+10*k,y:center.y+10*k}
-    }
+    //     return {x:center.x+10*k,y:center.y+10*k}
+    // }
 
     _calculateFreeCoords(hex,size){
         let h = JSON.stringify(hex)
         let o = this.hexOwnerAndNumberOfCountersHash[h]
+        console.log(o)
         let center = this.getCenterCoordsObjFromHex(hex)
         let k = o.numberOfCounters - 1
 
        if(k == 0) {
-           //console.log('ff')
         return {x:center.x,y:center.y}
        }
 
-       //console.log({x:center.x+k*size*0.25,y:center.y+k*size*0.25 })
        return {x:center.x+k*size*0.25,y:center.y+k*size*0.25 }
-
     }
 
     addHexTohex_counterIDHash(hex){
@@ -95,10 +93,7 @@ class Map {
         this.hex_counterIDHash[h].push(counterID)
     }
     getCountersIDinHexArray(hex){
-        // console.log(hex)
-        // console.log(this.hex_counterIDHash)
         let h = JSON.stringify(hex)
-        //console.log(this.hex_counterIDHash)
         return this.hex_counterIDHash[h]
     }
     //------------------------------------------------------------------------------
@@ -108,8 +103,6 @@ class Map {
         let ind = this.hex_counterIDHash[h].indexOf(ID)
 
         this.hex_counterIDHash[h].splice(ind,1)
-
-        //console.log(this.hex_counterIDHash)
 
     }
 }

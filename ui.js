@@ -28,6 +28,8 @@ class Interface {
 
         this.buttonsHash[obj.name] = button
 
+        return button
+
     }
 
     remove(name) {
@@ -39,6 +41,11 @@ class Interface {
         for (let i in this.buttonsHash) {
             this.buttonsHash[i].remove()
         }
+    }
+
+    clickOn(name) {
+        let event = new Event("click")
+        this.buttonsHash[name].dispatchEvent(event)
     }
 }
 

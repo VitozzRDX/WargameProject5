@@ -459,3 +459,87 @@ attachWeapon(weapon,counter) {
 Реаррендж при покидании гекса
 Реаррендж при Аттаче Пулемета
 Группы при выборе каунтера заменеы на stroke : 'red'
+
+--------------------- 14 03 2020 -----------------------------------------------------------------
+
+
+
+counterFactoryCreate(param) {
+    if param.class = 'Arty'
+    return (Object.create(protoArty)) .assign(param.options)
+}
+
+но в классе видно какие свойства будут назначены , а в фабрике нет
+
+https://habr.com/ru/company/ruvds/blog/351800/
+
+1 don't modify the input object
+2 arguments всегда содержит все аргументы функции — мы не можем получить их часть. А остаточные параметры(...arg) позволяют это сделать.
+https://learn.javascript.ru/rest-parameters-spread-operator
+Spread syntax позволяет расширить доступные для итерации элементы (например, массивы или строки) в местах
+
+    для функций: где ожидаемое количество аргументов для вызовов функций равно нулю или больше нуля
+    для элементов (литералов массива)
+    для выражений объектов: в местах, где количество пар "ключ-значение" должно быть равно нулю или больше (для объектных литералов)
+Копирование массива
+
+Encapsulate conditionals
+Avoid conditionals
+Makes adding validation simple when doing a set
+
+Use method chaining
+    // NOTE: Returning this for chaining
+    return this;
+
+You want to make global changes to derived classes by changing a base class. (Change the caloric expenditure of all animals when they move).
+
+return console.log(
+
+                    if (options.target.counter.getMovingStatus() == 'moved' || ... ||...) {
+                    
+                    return this.logWhyClickNotWorked(param)
+-------------------------------------------------------------------------------------------------------------------------------
+
+let movingStackStatus = this.getMovingStackStatus() - возвращает объект с свойствами , который отличаются в зависимости от того,
+какой именно это объект ( при создании группы Фабрикой мы можем создать один из троих состояний ?)
+stack.reactionOnclick(options.target)
+
+Реализовать : 
+this.getMovingStackStatus() проверяет как на наличие группы вообще , так и на статус анкреейтед . в обоих случаях возвращает 'uncreated'
+Группа может быть классом от которого три класса мувинг , файринг , ...
+Убрали рамкb выбора 
+
+countersManipulator:
+
+createCounter(param) - factory 
+addToCountersTray(counter)
+createStack(status) - factory 
+addCounterToStack(counter)
+
+attachWeaponToCounter(weapon,counter)
+stackSettings
+
+
+Баг - командир ушел из гекса с каунтерами , пришел , опять ушел - пришел - сдвиг неправильный 
+баг - сделали стак с командиром , разбили собрали вновь - ходят с бонусом
+Баг - собрали(первй ком-р), прошли, разбили, собрали(первый солдир) - пошли дальше отличается от другого порядка сбора(ком-р снва первый)
+Баг - проявляется в зависмиости от того кого первым выбирают
+
+
+
+Идея - избавиться от this )) - все ф-ии в формате fight: () => {
+
+
+     заменить на 
+    this.setMovingStatus(counter,status) {
+        counter.setMovingStatus('moved')
+    }
+
+    this.countersManipulator.getMovingGroup().addCounter(counter)
+
+Идея - танк наследует от weapon - MG - LMG - HMG
+                                - Arty - Tank
+        или люди тоже от weapon (все могут вести огонь)
+=======================================================================================================
+
+Рефакторим - убираем LMG , меняем систему расчета слотов в новом Гексе , выносим button cb, создаем фабрики в каунтерах , чешем MoveProcess

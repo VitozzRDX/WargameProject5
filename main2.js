@@ -19,7 +19,8 @@ Main.client = new Client();
 let initialSettings = {
     firstPlayer: 'Nazi',
     secondPlayer: 'Ally',
-    startingPhase: 'firstPlayerRallyPhase',
+    //-------------------- 17 03 2020 Phase Switching ---------------------------------
+    startingPhase:'firstPlayerMovementPhase',//'firstPlayerRallyPhase',
     startingSidePictureSrc: 'assets/turnphaseaxis.gif',
     otherSidePictureSrc: 'assets/turnphaseallied.gif',
 
@@ -40,7 +41,17 @@ let initialSettings = {
                 otherSideSrc: 'assets/geh7b.gif',
                 className: 'MultiManCounters',
                 owner:'Nazi',
-                movementFactor:4
+                movementFactor:4,
+                name:'geSquadE-0'
+            },
+
+            'geSquadE-1': {
+                src: 'assets/ge468S.gif',   
+                otherSideSrc: 'assets/geh7b.gif',
+                className: 'MultiManCounters',
+                owner:'Nazi',
+                movementFactor:4,
+                name:'geSquadE-1'
             },
 
             'geSMC9-1' : {
@@ -48,14 +59,16 @@ let initialSettings = {
                 otherSideSrc: 'assets/geL91b.gif',
                 className: 'SingleManCounters', 
                 owner:'Nazi',
-                movementFactor:6
+                movementFactor:6,
+                name:'geSMC9-1'
             }
 
         },
 
         parametersOnCreationHash : {
             'ruSquadE-0':[{q:6,r:0,s:-6}],                                        // {top:100,left:100}
-            'geSquadE-0':[{q:9,r:0,s:-9},{q:9,r:0,s:-9}],
+            'geSquadE-0':[{q:9,r:0,s:-9}],
+            'geSquadE-1':[{q:9,r:0,s:-9}],
             'geSMC9-1':[{q:9,r:0,s:-9}]
         },
 

@@ -67,12 +67,12 @@ class Weapon extends Counter {
         this.currentInterfaceElements = {
             'firstPlayerRallyPhase': { 'Attach': true },
         }
-
     }
-
     
-
-
+    getMovingStatus(){
+        //console.log(this.movingStatus)
+        return 'moved' 
+    }
     
 }
 
@@ -89,12 +89,13 @@ class SelfMovingCounters extends Counter {
     //------------- 04 03 2020 ------------------
 
     getMovingStatus(){
-        //console.log(this.movingStatus)
         return this.movingStatus 
     }
 
     setMovingStatus(status) {
-        
+
+        if (!this.getMovingStatus) throw 'there is no possibility to set Moving status here'
+
         let arr = ['moving','moved','brokenStackRemnant']
 
         if (arr.indexOf( status ) != -1 ) {
@@ -162,43 +163,6 @@ class SingleManCounters extends ManCounters {
         return 'SMC'
     }
 }
-
-// class ManCounters extends SelfMovingCounters {
-//     constructor(param) {
-//         super(param)
-
-//         this.temporaryMF = this.movementFactor = param.movementFactor
-//         //this.morale = param.morale
-
-//         this.currentInterfaceElements = {
-//             'firstPlayerRallyPhase': { 'Rally': false },
-//         }
-
-//         this.otherSideSrc = param.otherSideSrc;
-
-//         this.costToEnterHash = {
-//             'plain':1
-//         }
-
-//     }
-//     getType() {
-//         return 'MMC'
-//     }
-
-//     getMFLeft(){
-//         return this.temporaryMF
-//     }
-
-//     subtractMF(mf){
-//         this.temporaryMF = this.temporaryMF - mf
-//     }
-
-//     getReadyToMoveUnderSMCcommand(){
-//         throw 'errrrrrrr'
-
-//     }
-
-// }
 
 export {
     Counter,

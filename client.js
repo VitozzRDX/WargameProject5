@@ -72,6 +72,10 @@ class Client {
         this.image = undefined
 
         this.counterTrayHash = {}
+//-------------------- 17 03 2020 Phase Switching ---------------------------------
+        this.ge467 = undefined
+        this.ge468 = undefined
+        this.ge91 = undefined
     }
 
     setInterfaceScheme() {
@@ -177,7 +181,7 @@ class Client {
 
         // then let's build appropriate UI to control Phase switching
 
-        this._buildMenuInterface(startingPhaseTitle)
+        //this._buildMenuInterface(startingPhaseTitle)
 
         // our Interface's module buildMenuButton(x,y,...,z) should get those things :
         // where to place , how to look , what to do and be disabled or not
@@ -209,15 +213,25 @@ class Client {
             }).
             then(() => {
                 this._createAndDrawCounters(options.countersOptions)
+            }). 
+            then(()=>{
+                this._buildMenuInterface(startingPhaseTitle)
+
+                //-------------------- 17 03 2020 Phase Switching ---------------------------------
+                // this.interface.clickOn(`End ${this.firstPlayer}'s Phase`)
+                // this.interface.clickOn(`End ${this.secondPlayer}'s Rally`)
+                // //this.interface.clickOn(`End ${this.firstPlayer}'s Phase`)
+                // setTimeout(()=>{
+                //     this.interface.clickOn(`End ${this.firstPlayer}'s Phase`)
+                // },1000)
+                this.canvasObj.getRondelPicture().animate('angle', '-=90',{
+                    onChange: this.canvasObj.canvas2.requestRenderAll.bind(this.canvasObj.canvas2),
+                })
+                
             })
 
         //--------------------------------------------------------
         this.canvasObj.setZoomListener()
-
-        // ----------- 25 02 20 20 ------------------------------
-
-        let polyCorners = this.map.getPolyCorners({ q: 15, r: 0, s: -15 })
-        this.canvasObj.drawPoly(polyCorners, 'red')
 
     };
 
@@ -239,13 +253,20 @@ class Client {
                 this.map.addCounterToHex(obj, ops.owner)
 
 
-                let centerPoint = this.map._calculateFreeCoords(obj,48)
+                let centerPoint = this.map._calculateFreeCoords(obj, 48)
 
                 ops.options = { top: centerPoint.y, left: centerPoint.x }       // {q:6,r:0,s:-6}
                 ops.ownHex = obj
                 let className = ops['className']
 
                 let c = this.createCounterObject(className, ops) //{ src: src, options: options, otherSideSrc: otherSideSrc }
+
+
+//-------------------- 17 03 2020 Phase Switching ---------------------------------
+                if (ops.name == 'geSquadE-1'){this.ge468 = c}
+                if (ops.name == 'geSquadE-0'){this.ge467  = c}
+                if (ops.name == 'geSMC9-1'){this.ge91 = c}
+
 
                 //------------- 12 03 Weights --------------------------------------------------------------------------
                 this.map.addHexTohex_counterIDHash(obj)
@@ -275,6 +296,8 @@ class Client {
 
         let c = this.createCounterObject(className, o)
 
+
+
         this.map.addHexTohex_counterIDHash(o.ownHex)
         this.map.fillhex_counterIDHash(o.ownHex, c.ID)
         this.fillCounterTrayHash(c.ID, c)
@@ -300,6 +323,7 @@ class Client {
         Object.assign(ops, {
             originX: 'center',
             originY: 'center',
+            //selectable: false
         })
         let cb = (i) => {
             c.imageID = i.id;
@@ -308,20 +332,6 @@ class Client {
         let prom = this.canvasObj.creatingPromise(ref)
 
         this.canvasObj.draw(prom, ops, cb)
-        // let p = { 
-        //     top: ops.top,
-        //     left : ops.left,
-        //     width:50,
-        //     originX: 'center',
-        //     originY: 'center',
-        //     }
-
-        // let border = this.canvasObj.createFiringBorder(p)
-        // console.log(border)
-        // border.set({ 
-
-        //     opacity: 1 })
-        // this.canvasObj.canvas.add(border)
     }
 
 
@@ -448,12 +458,13 @@ class Client {
 
         for (let buttonName in schemeObj) {
 
-            console.log(buttonName)
             let obj = this.interfaceScheme[buttonName]
             let bool = schemeObj[buttonName]
 
             this.interface.buildButton(obj, bool, counter)
         }
+
+        return this
     };
 
     rallyCallback(button) {
@@ -467,10 +478,11 @@ class Client {
         //console.log(currentCounterInterface)
         if (currentCounterInterface) {
             for (let name in currentCounterInterface) {
-                console.log(name)
                 this.interface.remove(name)
             }
         }
+        // NOTE: Returning this for chaining
+        return this
     };
 
     _setCurrentCounterInterface(counter) {
@@ -511,27 +523,6 @@ class Client {
 
     }
     // --------------------- added 26 02 2020
-    // _checkIfCounterSelectionOccuredBefore() {
-    //     //console.log(this.selectedCounter)
-    //     if (this.selectedCounter) {
-    //         return true
-    //     }
-    //     return false
-    // }
-
-    // _checkIfSelectionHaveEndedItsMove() {
-    //     if (!this.selectedCounter) throw 'selection should be defined '
-
-    //     return false
-    // }
-
-    // _checkIfCounterIsNearTargetHex(coordsObj) {
-
-    //     if (!this.selectedCounter) throw 'selection should be defined '
-    //     return true
-
-    // }
-
     _checkIfclickedCounterOwnerIsSameAsPhaseOwner(counter, player) {
         return counter.owner == player
     }
@@ -543,15 +534,12 @@ class Client {
             let targetHex = this.map.getHexFromCoords(point)
             let costToEnter = movingCounter.getCostToEnter(this.map.getHexType(targetHex))
 
-            //let c = this.calculateNewCoordsToMove(targetHex)
-            //let coords = { top: c.y, left: c.x }
-
-
             if (JSON.stringify(movingCounter.ownHex) == JSON.stringify(targetHex)) {
-                console.log('u try to move into the own Hex')
-                return
+                return console.log('u try to move into the own Hex')
             }
-            if (!this._checkIfHexIsInCoverArc(movingCounter, targetHex)) throw 'u try to move into Hex not in your Cover Arc'
+            if (!this._checkIfHexIsInCoverArc(movingCounter, targetHex)) {
+                return console.log('u try to move into Hex not in your Cover Arc')
+            }
 
             switch (movingCounter.getType()) {
                 case 'AFV':
@@ -582,18 +570,17 @@ class Client {
             this.map.fillhex_counterIDHash(targetHex, movingCounter.ID)
 
             //------------------------------------------------------------------------------------------
-            this.map.addCounterToHex(targetHex, movingCounter.owner)
 
+            this.map.addCounterToHex(targetHex, movingCounter.owner)
 
             // -------------------Move Animation------------------------------------------------------------
             let img = this.canvasObj.getImageByID(movingCounter.getImageID())
 
             if (movingCounter.group) { img = movingCounter.group }
 
-            let c = this.map._calculateFreeCoords(targetHex,img.width)
+            let c = this.map._calculateFreeCoords(targetHex, img.width)
             let coords = { top: c.y, left: c.x }
 
-            //this.canvasObj.animate(img, coords)
             this.canvasObj.setOffMouseClickListener()
 
             this.canvasObj.createPromiseAnimation(img, coords)
@@ -604,16 +591,6 @@ class Client {
                     if (movingCounter.getMFLeft() == 0) {
                         console.log('counter has spend all its Moving and get new status')
                         movingCounter.setMovingStatus('moved')
-
-                        // -------------------------------------
-                        // movingCounter.group._restoreObjectsState()
-
-                        // this.canvasObj.getImageByID(movingCounter.getImageID()).set({
-                        //     selectable: true,
-                        //     evented: true
-                        // })
-
-                        // this.canvasObj.canvas.remove(movingCounter.group)
 
                         this.canvasObj.getImageByID(movingCounter.getImageID()).set({
                             stroke: null
@@ -631,69 +608,21 @@ class Client {
             // ----------------------------------------------------------------------------------------------------
         })
         this.setMovingStackStatus('moving')
-
     }
-
-    calculateNewCoordsToMove(targetHex) {
-        if (this.map._checkIfHexIsOccupied(targetHex)) {
-            return this.map._calculateFreeCoords(targetHex)
-        }
-        //console.log(this.map.getCenterCoordsObjFromHex(targetHex))
-        return this.map.getCenterCoordsObjFromHex(targetHex)
-    }
-
-    // _checkIfSelectionHaveEndedItsMove() {
-    //     return (this.selectedCounter.getStatus() != 'moving')
-    // }
 
     _checkIfHexIsInCoverArc(counter, hex) {
         return true
     }
 
-    //------------------ 28 02 2020-------------
-
-    // _checkIfCounterIsInTheSameHexAsSelectedOne(counter) {
-    //     if (!this.selectedCounter) throw 'selected Counter is undefined'
-    //     return JSON.stringify(counter.ownHex) == JSON.stringify(this.selectedCounter.ownHex)
-    // }
-
-    _checkIfCounterMoved(counter) {
-        return counter.getStatus() == 'moved'
-    }
-
-    // selectionIsMoving() {
-    //     return this.selectedCounter.getStatus() == 'moving'
-    // }
     //-------------------- 04 03 2020 -------------
 
-    createAndDrawGroupOfImgAndBorder(counter) {
-        console.log('calling createAndDrawGroupOfImgAndBorder')
-        let img = this.canvasObj.getImageByID(counter.getImageID())
-        // // -------------------------------------
-        // img.set({
-        //     selectable: false,
-        //     evented: false
-        // })
-        // // -------------------------------------
-        // let p = {
-        //     width: img.width,
-        //     top: img.top,
-        //     left: img.left,
-        // }
-        // let redBorder = this.canvasObj.createFiringBorder(p)
+    // createAndDrawGroupOfImgAndBorder(counter) {
 
-        // let group = this.canvasObj.createGroup(img, redBorder)
-
-        // counter.group = group
-        // group.counter = counter
-        // counter.colorBorder = redBorder
-
-        // this.canvasObj.drawGroup(group)
-
-        img.set('stroke', '#f00')
-        img.set('strokeWidth', 3)
-        this.canvasObj.canvas.renderAll()
-    }
+    //     let img = this.canvasObj.getImageByID(counter.getImageID())
+    //     img.set('stroke', '#f00')
+    //     img.set('strokeWidth', 3)
+    //     this.canvasObj.canvas.renderAll()
+    // }
 
     addToMovingStack(counter) { // change name to fill MovingStack Hash
 
@@ -756,7 +685,6 @@ class Client {
     }
 
 
-
     // -------------- 05 03 2020 ---------------------------
     getMovingGroupArrayLength() {
         return this.movingGroupHash.mgArray.length
@@ -783,22 +711,16 @@ class Client {
 
         scheme[buttonName] = bool
     }
+
     buildMGUI() {
-
         for (let buttonName in this.getMovingStackUIScheme()) {
-
-            //console.log(buttonName)
             let obj = this.interfaceScheme[buttonName]
             let bool = this.movingGroupHash.schemeObj[buttonName]
-
             this.interface.buildButton(obj, bool)
         }
     }
 
     setMovingStackStatus(status) {
-        let statusArr = ['uncreated', 'filledWithCounters', 'filledWithBrokenStackRemnants', 'moving']
-        //if (!status in statusArr) throw `there is no such status as ${status} in possible statuses for Moving Groups`
-
         this.movingGroupHash.status = status
     }
 
@@ -910,10 +832,12 @@ class Client {
 
     attachCallback(button, counter) {
 
-        let img = this.canvasObj.getImageByID(counter.getImageID())
-        img.set('stroke', '#f00')
-        img.set('strokeWidth', 3)
-        this.canvasObj.canvas.renderAll()
+        // let img = this.canvasObj.getImageByID(counter.getImageID())
+        // img.set('stroke', '#f00')
+        // img.set('strokeWidth', 3)
+        // this.canvasObj.canvas.renderAll()
+
+        this.changeColorOfBorder(counter,'red')
 
         let newCallback = (options) => {
 
@@ -963,41 +887,6 @@ class Client {
         this._removeAllCallbacksOffCanvasAndSetNew(newCallback)
 
     }
-    // rearrangeCountersPositionInHex(hex) {
-
-    //     let center = this.map.getCenterCoordsObjFromHex(hex)
-
-    //     let countersInHexArray = this.map.getCountersIDinHexArray(hex) // [conterID,...]
-
-    //     let img
-    //     let weight = 0
-    //     // weight = - countersInHexArray.length/2
-
-    //     countersInHexArray.forEach((counterID,index,arr) => {
-
-    //         let counter = this.getCounterByItsID(counterID)
-
-    //         if (counter.weightHex > 0) {
-
-    //             if (counter.group) {
-    //                 console.log('group :',counter.group)
-    //                 img = counter.group
-    //             } else {
-    //                 img = this.canvasObj.getImageByID(counter.getImageID())
-    //                 console.log('not group :',img)
-    //             }
-
-
-    //             img.set({left:center.x+10*weight,top:center.y+10*weight})
-
-    //             this.canvasObj.canvas.add(img)
-
-    //             weight = weight + counter.weightHex  // search for Weights in description
-    //         }
-
-    //     })
-
-    //}
 
     rearrangeCountersPositionInHex(hex) {
 
@@ -1005,19 +894,13 @@ class Client {
         let countersInHexArray = this.map.getCountersIDinHexArray(hex) // [conterID,...]
         let img
         let c = { x: 0, y: 0 }
-        // weight = 0
-        // weight = - countersInHexArray.length/2
 
         countersInHexArray.forEach((counterID, index, arr) => {
             let counter = this.getCounterByItsID(counterID)
 
-            if (counter.weightHex > 0) {
+            if (counter.weightHex > 0) {    // if counter.weightHex == 0 then it is weapon attached with some C-r. Itis a group twice size, so weapon size is there
 
-                if (counter.group) {
-                    img = counter.group
-                } else {
-                    img = this.canvasObj.getImageByID(counter.getImageID())
-                }
+                img = counter.group || this.canvasObj.getImageByID(counter.getImageID())
 
                 if (index == 0) {    // we set for first counter coords equal to centercoordz
                     c.x = center.x   // we can take countersInHexArray.length and set c.x = ctnter.x  - Math.floor(length/2) * 10
@@ -1028,9 +911,8 @@ class Client {
                 }
 
                 img.set({ left: c.x, top: c.y })
-                //img.set({left:center.x+10*weight,top:center.y+10*weight})
+
                 this.canvasObj.canvas.add(img)
-                // weight = weight + counter.weightHex  // search for Weights in description
             }
         })
     }
@@ -1044,22 +926,60 @@ class Client {
     }
 
     changeColorOfBorder(counter, color) {
-
         this.canvasObj.getImageByID(counter.getImageID()).set({
             stroke: color,
             strokeWidth: 3
         })
-
         this.canvasObj.canvas.renderAll()
     }
+    // -------------- Refactor 17 03 2020 ------------------------------------------------
 
-    createCoefficientsForRearrangingHexArray(lengthOfArrayOfCountersInHex) {
-        let l = lengthOfArrayOfCountersInHex
-        let arr = [0, 1, -1, 2, -2, 3, -3, 4, -4]
 
-        arr.length = l
-
+    _checkForMovingStatus(status, counter) {
+        if (counter.getMovingState) {
+            return counter.getMovingState() == status
+        }
+        console.log('counter got no Moving state')
+        return false
     }
+
+    endEachCounterMove(arr) {
+        if (arr) {
+            arr.forEach((counter) => {
+                this.changeColorOfBorder(counter, null)
+                counter.setMovingStatus('moved')
+            })
+        }
+        console.log('there is no conters not finished its move')
+        return this
+    }
+
+    _check_ForNullTarget_ForOwner_ForMovingStatus(target) {
+
+        if (target == null) {
+            console.log('clicked on empty space. Select Counter')
+            return true
+        }
+        if (!this._checkIfclickedCounterOwnerIsSameAsPhaseOwner(target.counter, this.firstPlayer)) {
+            console.log('u click not your counter')
+            return true
+        }
+        if (target.counter.getMovingStatus() == 'moved') {
+            console.log('u try to select counter that is moved already')
+            return true
+        }
+    }
+
+    createNewStack_setStatus_addCounter_setOwnHex(status,counter){
+        this.createNewMovingStack()
+        this.setMovingStackStatus(status)
+        this.addToMovingStack(counter)
+        this.setOwnHexForMovingStack(counter.ownHex)
+        this.changeColorOfBorder(counter, "red")
+    }
+
+
+
 }
 // -- let's mix canvas reaction into our class
 Object.assign(Client.prototype, methods)
