@@ -7,6 +7,8 @@ class Map {
         this.hexOwnerAndNumberOfCountersHash = {}
 
         this.hex_counterIDHash = {}
+        this.hex_ownerHash = {}
+        this.hex_lastCounterCoordinates = {}
     }
 
     getPolyCorners(hex) {
@@ -23,25 +25,42 @@ class Map {
 
     // ------------ 27 02 2020-----------------------------------------------------
 
-    addCounterToHex(hex,owner) {
-
-        let h = JSON.stringify(hex)
-        if (this.hexOwnerAndNumberOfCountersHash[h]) {
-
-            let previousOwner = this.hexOwnerAndNumberOfCountersHash[h].owner
-            if (owner == previousOwner){
-                this.hexOwnerAndNumberOfCountersHash[h].numberOfCounters +=1
-                return
-            }
-            this.hexOwnerAndNumberOfCountersHash[h].numberOfCounters +=1
-            this.hexOwnerAndNumberOfCountersHash[h].owner = 'disputed'
-            // error ! need return here !
-            return
-
-        }
-        // INitialization of hexOwnerAndNumberOfCountersHash :
-        this.hexOwnerAndNumberOfCountersHash[h] = {owner: owner,numberOfCounters:1}
+    getHex_HexOwnerAndNumberOfCountersHash(){
+        return this.hexOwnerAndNumberOfCountersHash
     }
+    getOwnerAndNumberOfCountersInHex(hex){
+        let h = JSON.stringify(hex)
+        let o = this.getHex_HexOwnerAndNumberOfCountersHash(h)
+          return o[h]
+    }
+    getOwnerOfHex(hex){
+
+        if (!this.getOwnerAndNumberOfCountersInHex(hex)) return undefined
+        return this.getOwnerAndNumberOfCountersInHex(hex).owner
+    }
+    getNumberOfCountersInHex(hex){
+        return this.getOwnerAndNumberOfCountersInHex(hex).numberOfCounters
+    }
+
+    // addCounterToHex(hex,owner) {
+
+    //     let h = JSON.stringify(hex)
+    //     if (this.hexOwnerAndNumberOfCountersHash[h]) {
+
+    //         let previousOwner = this.hexOwnerAndNumberOfCountersHash[h].owner
+    //         if (owner == previousOwner){
+    //             this.hexOwnerAndNumberOfCountersHash[h].numberOfCounters +=1
+    //             return
+    //         }
+    //         this.hexOwnerAndNumberOfCountersHash[h].numberOfCounters +=1
+    //         this.hexOwnerAndNumberOfCountersHash[h].owner = 'disputed'
+    //         // error ! need return here !
+    //         return
+
+    //     }
+    //     // INitialization of hexOwnerAndNumberOfCountersHash :
+    //     this.hexOwnerAndNumberOfCountersHash[h] = {owner: owner,numberOfCounters:1}
+    // }
 
     getHexType(hex){
         return 'plain'
@@ -65,19 +84,33 @@ class Map {
     //     return {x:center.x+10*k,y:center.y+10*k}
     // }
 
-    _calculateFreeCoords(hex,size){
-        let h = JSON.stringify(hex)
-        let o = this.hexOwnerAndNumberOfCountersHash[h]
-        console.log(o)
-        let center = this.getCenterCoordsObjFromHex(hex)
-        let k = o.numberOfCounters - 1
+    // _calculateFreeCoords(hex,size){
+    //     let h = JSON.stringify(hex)
+    //     let o = this.hexOwnerAndNumberOfCountersHash[h]
 
-       if(k == 0) {
-        return {x:center.x,y:center.y}
-       }
+    //     let center = this.getCenterCoordsObjFromHex(hex)
+    //     let k = o.numberOfCounters - 1
 
-       return {x:center.x+k*size*0.25,y:center.y+k*size*0.25 }
-    }
+    //    if(k == 0) {
+    //     return {x:center.x,y:center.y}
+    //    }
+
+    //    return {x:center.x+k*size*0.25,y:center.y+k*size*0.25 }
+    // }
+
+    // _calculateFreeCoords(hex,size){
+    //     let h = JSON.stringify(hex)
+    //     let o = this.hexOwnerAndNumberOfCountersHash[h]
+
+    //     let center = this.getCenterCoordsObjFromHex(hex)
+    //     let k = o.numberOfCounters - 1
+
+    //    if(k == 0) {
+    //     return {x:center.x,y:center.y}
+    //    }
+
+    //    return {x:center.x+k*size*0.25,y:center.y+k*size*0.25 }
+    // }
 
     addHexTohex_counterIDHash(hex){
         let h = JSON.stringify(hex)
@@ -90,6 +123,10 @@ class Map {
 
     fillhex_counterIDHash(hex,counterID){
         let h = JSON.stringify(hex)
+
+        // if (!this.hex_counterIDHash[h]){
+        //     console.log('in this ')
+        // }
         this.hex_counterIDHash[h].push(counterID)
     }
     getCountersIDinHexArray(hex){
@@ -104,6 +141,31 @@ class Map {
 
         this.hex_counterIDHash[h].splice(ind,1)
 
+    }
+
+    // getHex_lastCounterCoordinates() {
+    //     return this.hex_lastCounterCoordinates
+    // }
+
+    // getCoordinatesOfLastCounterInHex(hex){
+    //     let h = JSON.stringify(hex)
+    //     return this.hex_lastCounterCoordinates[h]
+    // }
+
+    // setCoordinatesOfLastCounter(coords,hex){
+    //     this.hex_lastCounterCoordinates[hex] = coords
+    // }
+
+    _calculateFreeCoords(hex,size){
+        let center = this.getCenterCoordsObjFromHex(hex)
+        let arr = this.getCountersIDinHexArray(hex)||[]
+
+        console.log(arr)
+        if (arr.length == 0 ) return {x:center.x,y:center.y}
+        let num = arr.length
+        
+
+        return {x:center.x+num*size*0.25,y:center.y+num*size*0.25 }
     }
 }
 
