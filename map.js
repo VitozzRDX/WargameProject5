@@ -25,22 +25,36 @@ class Map {
 
     // ------------ 27 02 2020-----------------------------------------------------
 
-    getHex_HexOwnerAndNumberOfCountersHash(){
-        return this.hexOwnerAndNumberOfCountersHash
-    }
-    getOwnerAndNumberOfCountersInHex(hex){
-        let h = JSON.stringify(hex)
-        let o = this.getHex_HexOwnerAndNumberOfCountersHash(h)
-          return o[h]
-    }
-    getOwnerOfHex(hex){
+    // getHex_HexOwnerAndNumberOfCountersHash(){
+    //     return this.hexOwnerAndNumberOfCountersHash
+    // }
+    // getOwnerAndNumberOfCountersInHex(hex){
+    //     let h = JSON.stringify(hex)
+    //     console.log(this.getHex_HexOwnerAndNumberOfCountersHash(h))
+    //     let o = this.getHex_HexOwnerAndNumberOfCountersHash(h)
+    //       return o[h]
+    // }
+    // getOwnerOfHex(hex){
 
-        if (!this.getOwnerAndNumberOfCountersInHex(hex)) return undefined
-        return this.getOwnerAndNumberOfCountersInHex(hex).owner
+    //     if (!this.getOwnerAndNumberOfCountersInHex(hex)) return undefined
+    //     return this.getOwnerAndNumberOfCountersInHex(hex).owner
+    // }
+
+    getOwnerOfHex(hex){
+        console.log(this.hex_ownerHash)
+        let h = JSON.stringify(hex)
+        return this.hex_ownerHash[h]
+
     }
-    getNumberOfCountersInHex(hex){
-        return this.getOwnerAndNumberOfCountersInHex(hex).numberOfCounters
+
+    setOwnerOfHex(hex,owner){
+        let h = JSON.stringify(hex)
+        this.hex_ownerHash[h]= owner // owner can be 'disputed'
     }
+
+    // getNumberOfCountersInHex(hex){
+    //     return this.getOwnerAndNumberOfCountersInHex(hex).numberOfCounters
+    // }
 
     // addCounterToHex(hex,owner) {
 
@@ -70,48 +84,6 @@ class Map {
         return false
     }
 
-    // _calculateFreeCoords(hex){
-    //     let h = JSON.stringify(hex)
-    //     let o = this.hexOwnerAndNumberOfCountersHash[h]
-
-    //     let k = o.numberOfCounters-1
-    //     //console.log(k)
-
-    //     let center = this.getCenterCoordsObjFromHex(hex)
-
-    //     //console.log (center)
-
-    //     return {x:center.x+10*k,y:center.y+10*k}
-    // }
-
-    // _calculateFreeCoords(hex,size){
-    //     let h = JSON.stringify(hex)
-    //     let o = this.hexOwnerAndNumberOfCountersHash[h]
-
-    //     let center = this.getCenterCoordsObjFromHex(hex)
-    //     let k = o.numberOfCounters - 1
-
-    //    if(k == 0) {
-    //     return {x:center.x,y:center.y}
-    //    }
-
-    //    return {x:center.x+k*size*0.25,y:center.y+k*size*0.25 }
-    // }
-
-    // _calculateFreeCoords(hex,size){
-    //     let h = JSON.stringify(hex)
-    //     let o = this.hexOwnerAndNumberOfCountersHash[h]
-
-    //     let center = this.getCenterCoordsObjFromHex(hex)
-    //     let k = o.numberOfCounters - 1
-
-    //    if(k == 0) {
-    //     return {x:center.x,y:center.y}
-    //    }
-
-    //    return {x:center.x+k*size*0.25,y:center.y+k*size*0.25 }
-    // }
-
     addHexTohex_counterIDHash(hex){
         let h = JSON.stringify(hex)
         if(this.hex_counterIDHash[h]) {
@@ -123,12 +95,9 @@ class Map {
 
     fillhex_counterIDHash(hex,counterID){
         let h = JSON.stringify(hex)
-
-        // if (!this.hex_counterIDHash[h]){
-        //     console.log('in this ')
-        // }
         this.hex_counterIDHash[h].push(counterID)
     }
+
     getCountersIDinHexArray(hex){
         let h = JSON.stringify(hex)
         return this.hex_counterIDHash[h]
@@ -142,19 +111,6 @@ class Map {
         this.hex_counterIDHash[h].splice(ind,1)
 
     }
-
-    // getHex_lastCounterCoordinates() {
-    //     return this.hex_lastCounterCoordinates
-    // }
-
-    // getCoordinatesOfLastCounterInHex(hex){
-    //     let h = JSON.stringify(hex)
-    //     return this.hex_lastCounterCoordinates[h]
-    // }
-
-    // setCoordinatesOfLastCounter(coords,hex){
-    //     this.hex_lastCounterCoordinates[hex] = coords
-    // }
 
     _calculateFreeCoords(hex,size){
         let center = this.getCenterCoordsObjFromHex(hex)

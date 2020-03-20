@@ -1,3 +1,80 @@
 идея
 InfantryMoveProcessing
 VehicleMoveProcessing
+===============================================================================================================================
+идея
+
+this.canvasObj.setOffMouseClickListener()
+
+this.canvasObj.createPromiseAnimation(img, coords)
+    .then(() => {
+        this.setMouseClickListenerAccordingToCurrentPhase()
+        callback()
+    })
+
+вынести в отдельную ф-ию 
+animation(what,where,callback,param)
+
+все анимации будут через нее , напр
+
+this.canvasObj.setOffMouseClickListener()
+
+this.canvasObj.createPromiseAnimation(img, coords)
+    .then(() => {
+        this.setMouseClickListenerAccordingToCurrentPhase()
+        this.rearrangeCountersPositionInHex(previousHex)
+
+        if (this._checkIfMovementPointsEnded(movingCounter)) {
+
+            this.setMOVEDstatus_NullBorderColor_RemoveFromStack(movingCounter, img)
+        }
+
+
+        if (this.getMovingGroupArrayLength() == 0) {        //  && getMovingStackStatus() == 'filledWithBrokenStackRemnants'
+
+            this.clearMovingGroupHash('uncreated')
+            return console.log('all untis from MG have ended its move ')
+        }
+    })
+
+===============================================================================================================================
+
+поменять все _checkIf... на _is 
+например
+
+_checkIfHexIsInCoverArc = _isHexIsInCoverArc
+_isAnEnemyInHex
+
+===========================================================================================================================
+        //-------------------- 17 03 2020 Phase Switching ---------------------------------
+        this.ge467 = undefined
+        this.ge468 = undefined
+        this.ge91 = undefined
+
+//-------------------- 17 03 2020 Phase Switching ---------------------------------
+// this.interface.clickOn(`End ${this.firstPlayer}'s Phase`)
+// this.interface.clickOn(`End ${this.secondPlayer}'s Rally`)
+// //this.interface.clickOn(`End ${this.firstPlayer}'s Phase`)
+// setTimeout(()=>{
+//     this.interface.clickOn(`End ${this.firstPlayer}'s Phase`)
+// },1000)
+
+
+===========================================================================================================================
+разделить _createAndDrawCounters :
+
+        for (let i in parametersOnCreationHash) {
+
+            let arrayOfCoords = parametersOnCreationHash[i]
+
+            arrayOfCoords.forEach((obj) => {
+
+                let c = this.createCounterObject(className, ops) //{ src: src, options: options, otherSideSrc: otherSideSrc }
+
+                this.fillCounterTrayHash(c.ID, c)
+            })
+        }
+затем
+
+        CounterTray.forEach(
+            this.drawCounter(c)

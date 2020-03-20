@@ -63,8 +63,6 @@ class Client {
 
         this.selectedCounter = undefined
 
-        //this.movingGroup = [];
-
         this.movingGroupHash = { status: 'uncreated' }
 
         this.countersFromBrokenMovingStackArray = undefined
@@ -72,10 +70,7 @@ class Client {
         this.image = undefined
 
         this.counterTrayHash = {}
-        //-------------------- 17 03 2020 Phase Switching ---------------------------------
-        this.ge467 = undefined
-        this.ge468 = undefined
-        this.ge91 = undefined
+
     }
 
     setInterfaceScheme() {
@@ -217,17 +212,10 @@ class Client {
             then(() => {
                 this._buildMenuInterface(startingPhaseTitle)
 
-                //-------------------- 17 03 2020 Phase Switching ---------------------------------
-                // this.interface.clickOn(`End ${this.firstPlayer}'s Phase`)
-                // this.interface.clickOn(`End ${this.secondPlayer}'s Rally`)
-                // //this.interface.clickOn(`End ${this.firstPlayer}'s Phase`)
-                // setTimeout(()=>{
-                //     this.interface.clickOn(`End ${this.firstPlayer}'s Phase`)
-                // },1000)
+
                 this.canvasObj.getRondelPicture().animate('angle', '-=90', {
                     onChange: this.canvasObj.canvas2.requestRenderAll.bind(this.canvasObj.canvas2),
                 })
-
             })
 
         //--------------------------------------------------------
@@ -250,61 +238,24 @@ class Client {
 
                 let ops = countersOptions.squadType_propertiesHash[i] // { src: "assets/ge467S.gif", otherSideSrc: "assets/geh7b.gif", className: "ManCounters" }
 
-                this.map.addCounterToHex(obj, ops.owner)
-
-
                 let centerPoint = this.map._calculateFreeCoords(obj, 48)
 
                 ops.options = { top: centerPoint.y, left: centerPoint.x }       // {q:6,r:0,s:-6}
                 ops.ownHex = obj
+                
                 let className = ops['className']
 
                 let c = this.createCounterObject(className, ops) //{ src: src, options: options, otherSideSrc: otherSideSrc }
 
-
-                //-------------------- 17 03 2020 Phase Switching ---------------------------------
-                // if (ops.name == 'geSquadE-1') { this.ge468 = c }
-                // if (ops.name == 'geSquadE-0') { this.ge467 = c }
-                // if (ops.name == 'geSMC9-1') { this.ge91 = c }
-
-
-                //------------- 12 03 Weights --------------------------------------------------------------------------
                 this.map.addHexTohex_counterIDHash(obj)
                 this.map.fillhex_counterIDHash(obj, c.ID)
+                this.map.setOwnerOfHex(obj,c.owner)
+
                 this.fillCounterTrayHash(c.ID, c)
-                //------------------------------------------------------------------------------------------------------
 
                 this.drawCounter(c)
-                //this.addToCounterTray(c)
             })
         }
-        //----------------------- 10 03 Weapon ------------------------------------------
-
-        // let o = {
-        //     src: "assets/geHMG.gif",
-        //     className: "Weapon",
-        //     owner: 'Nazi',
-        // }
-
-        // this.map.addCounterToHex({ q: 11, r: 0, s: -11 }, 'Nazi')
-        // let centerPoint = this.map._calculateFreeCoords({ q: 11, r: 0, s: -11 })
-
-        // o.options = { top: centerPoint.y, left: centerPoint.x }
-
-        // o.ownHex = { q: 11, r: 0, s: -11 }
-        // let className = o['className']
-
-        // let c = this.createCounterObject(className, o)
-
-
-
-        // this.map.addHexTohex_counterIDHash(o.ownHex)
-        // this.map.fillhex_counterIDHash(o.ownHex, c.ID)
-        // this.fillCounterTrayHash(c.ID, c)
-        // console.log(c)
-        // this.drawCounter(c)
-
-        //----------------------------------------------------------------------------------
     };
 
     createCounterObject(className, ops) {
@@ -421,7 +372,6 @@ class Client {
     endOppsRallyCallback(button) {
 
         console.log('pressed End Opp"s Rally button')
-
         // at this moment we need just to launch Next Phase same as in End Phase Callback
 
         this.endPhaseCallback(button)
@@ -435,7 +385,6 @@ class Client {
     endOppsDFPhCallback(button) {
 
         console.log('pressed End Opp"s DF button')
-
         // at this moment we need just to launch Next Phase same as in End Phase Callback
 
         this.endPhaseCallback(button)
@@ -444,14 +393,12 @@ class Client {
     endOppsRoutCallback(button) {
 
         console.log('pressed End Opp"s Rout button')
-
         // at this moment we need just to launch Next Phase same as in End Phase Callback
 
         this.endPhaseCallback(button)
     }
 
     // ----------- added 22 02 2020
-
     buildCUI(counter) {
         let phase = this.game.getPhase()
         let schemeObj = counter.getScheme(phase)  // {'phase':{'Do Something':false,...]} - we get {'Do Something': false,...}
@@ -527,21 +474,10 @@ class Client {
         return counter.owner == player
     }
     //----------------------------- 27 02 2020 -----------------------------------
-
-
     _checkIfHexIsInCoverArc(counter, hex) {
         return true
     }
 
-    //-------------------- 04 03 2020 -------------
-
-    // createAndDrawGroupOfImgAndBorder(counter) {
-
-    //     let img = this.canvasObj.getImageByID(counter.getImageID())
-    //     img.set('stroke', '#f00')
-    //     img.set('strokeWidth', 3)
-    //     this.canvasObj.canvas.renderAll()
-    // }
 
     addToMovingStack(counter) { // change name to fill MovingStack Hash
 
@@ -751,11 +687,6 @@ class Client {
 
     attachCallback(button, counter) {
 
-        // let img = this.canvasObj.getImageByID(counter.getImageID())
-        // img.set('stroke', '#f00')
-        // img.set('strokeWidth', 3)
-        // this.canvasObj.canvas.renderAll()
-
         this.changeColorOfBorder(counter, 'red')
 
         let newCallback = (options) => {
@@ -898,6 +829,7 @@ class Client {
     }
 
     createNewStack_setStatus_addCounter_setOwnHex(status, counter) {
+
         this.createNewMovingStack()
         this.setMovingStackStatus(status)
         this.addToMovingStack(counter)
@@ -918,20 +850,7 @@ class Client {
             let targetHex = this.map.getHexFromCoords(point)
             let costToEnter = movingCounter.getCostToEnter(this.map.getHexType(targetHex))
 
-            if (this.isEqual(movingCounter.ownHex, targetHex)) {
-                return console.log('u try to move into the own Hex')
-            }
-            if (!this._checkIfHexIsInCoverArc(movingCounter, targetHex)) {
-                return console.log('u try to move into Hex not in your Cover Arc')
-            }
-
-            if (this._checkIfThereIsAnEnemyInHex(movingCounter, targetHex)) {  // case MMC true ? AFV false
-                return console.log('u try to move into Hex with an Enemy')
-            }
-
-            if (this._checkIfCostToEnterisHigherMFLeft(movingCounter, costToEnter)) {
-                return console.log('cost to enter is higher then MF left')
-            }
+            if(this._is_Click_NotInCoverArc_inOwnHex_onEnemy_EnterCostTooHigh(movingCounter,targetHex,costToEnter)) return
 
             let img = this.canvasObj.getImageByID(movingCounter.getImageID()) // movingCounter.group||this.canvasObj.getImageByID(movingCounter.getImageID())
             let coords = this.getFreeCoordsAsTopLeftObj(targetHex, img.width)
@@ -990,27 +909,27 @@ class Client {
 
             this.map.addHexTohex_counterIDHash(targetHex)
             this.map.fillhex_counterIDHash(targetHex, movingCounter.ID)
-
-            //let c = this.map._calculateFreeCoords(targetHex, img.width)
-
-            
-            // this.map.addCounterToHex(targetHex, movingCounter.owner)
-            // let c = this.map._calculateFreeCoords(targetHex, img.width)
-            // let coords = { top: c.y, left: c.x }
-
+            this.map.setOwnerOfHex(targetHex,movingCounter.owner)
 
             this.canvasObj.setOffMouseClickListener()
 
             this.canvasObj.createPromiseAnimation(img, coords)
-            .then(() => {
-                this.setMouseClickListenerAccordingToCurrentPhase()
-                this.rearrangeCountersPositionInHex(previousHex)
+                .then(() => {
+                    this.setMouseClickListenerAccordingToCurrentPhase()
+                    this.rearrangeCountersPositionInHex(previousHex)
 
-                if (this._checkIfMovementPointsEnded(movingCounter)) {
+                    if (this._checkIfMovementPointsEnded(movingCounter)) {
 
-                    this.setMOVEDstatus_NullBorderColor_RemoveFromStack(movingCounter, img)
-                }
-            })
+                        this.setMOVEDstatus_NullBorderColor_RemoveFromStack(movingCounter, img)
+                    }
+
+
+                    if (this.getMovingGroupArrayLength() == 0) {        //  && getMovingStackStatus() == 'filledWithBrokenStackRemnants'
+
+                        this.clearMovingGroupHash('uncreated')
+                        return console.log('all untis from MG have ended its move ')
+                    }
+                })
             // this.startMovingAnimation(img, coords).then(() => {
             //     this.rearrangeCountersPositionInHex(previousHex)
             // })
@@ -1028,18 +947,18 @@ class Client {
 
         })
 
-        if (this.getMovingGroupArrayLength() == 0) {        //  && getMovingStackStatus() == 'filledWithBrokenStackRemnants'
+        // if (this.getMovingGroupArrayLength() == 0) {        //  && getMovingStackStatus() == 'filledWithBrokenStackRemnants'
 
-            this.clearMovingGroupHash('uncreated')
-            return console.log('all untis from MG have ended its move ')
-        }
+        //     this.clearMovingGroupHash('uncreated')
+        //     return console.log('all untis from MG have ended its move ')
+        // }
 
         this.setMovingStackStatus('moving')
     }
 
-    getFreeCoordsAsTopLeftObj(hex,size){
-        let c = this.map._calculateFreeCoords(hex,size)
-        return  { top: c.y, left: c.x }
+    getFreeCoordsAsTopLeftObj(hex, size) {
+        let c = this.map._calculateFreeCoords(hex, size)
+        return { top: c.y, left: c.x }
     }
 
     _checkIfMovementPointsEnded(counter) {
@@ -1057,25 +976,12 @@ class Client {
         counter.setMovingStatus(status)
     }
 
-
-    // startMovingAnimation(img, coords, previousHex) {
-    //     this.canvasObj.createPromiseAnimation(img, coords)
-    //         .then(() => {
-    //             this.setMouseClickListenerAccordingToCurrentPhase()
-    //             this.rearrangeCountersPositionInHex(previousHex)
-
-    //             if (this._checkIfMovementPointsEnded(movingCounter)) {
-
-    //                 this.setMOVEDstatus_NullBorderColor_RemoveFromStack(movingCounter, img)
-    //             }
-    //         })
-    // }
-
     _checkIfThereIsAnEnemyInHex(movingCounter, targetHex) {
         switch (movingCounter.getType()) {
             case 'AFV':
                 return false;
             case 'MMC':
+                console.log(this.map.getOwnerOfHex(targetHex),movingCounter.owner)
                 if (this.map.getOwnerOfHex(targetHex) != undefined && this.map.getOwnerOfHex(targetHex) != movingCounter.owner) {
                     return true
                 }
@@ -1083,8 +989,29 @@ class Client {
         }
     }
 
-    _checkIfCostToEnterisHigherMFLeft(movingCounter, costToEnter) {
+    _isCostToEnterHigherMFLeft(movingCounter, costToEnter) {
         if (movingCounter.getMFLeft() < costToEnter) { // 'wood' - 2MF 'grain' - 1.5 'building' - 2 MF
+            console.log('cost to enter is higher then MF left')
+            return true
+        }
+    }
+
+    _is_Click_NotInCoverArc_inOwnHex_onEnemy_EnterCostTooHigh(movingCounter,targetHex,costToEnter){
+        if (this.isEqual(movingCounter.ownHex, targetHex)) {
+            console.log('u try to move into the own Hex')
+            return true
+        }
+        if (!this._checkIfHexIsInCoverArc(movingCounter, targetHex)) {
+            console.log('u try to move into Hex not in your Cover Arc')
+            return true
+        }
+
+        if (this._checkIfThereIsAnEnemyInHex(movingCounter, targetHex)) {  // case MMC true ? AFV false
+            console.log('u try to move into Hex with an Enemy')
+            return true
+        }
+
+        if (this._isCostToEnterHigherMFLeft(movingCounter, costToEnter)) {
             console.log('cost to enter is higher then MF left')
             return true
         }

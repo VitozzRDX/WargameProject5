@@ -554,4 +554,12 @@ stackSettings
 
 ----------------------------------------
 
-Убрать отовсюду addCounterToHex
+Убраkb отовсюду addCounterToHex
+почесали MoveProcess
+выделили  Bugz
+----------------------------------------
+
+меняем в MoveProcess метод forEach на some c прекращением лупа в момент выполнения какого-нибудь условия
+из _is_Click_NotInCoverArc_inOwnHex_onEnemy_EnterCostTooHigh
+затем можно при условии вылета из лупа не ставить группе статус мувинг (не менять его)
+https://ru.stackoverflow.com/questions/611546/%D0%9F%D1%80%D0%B5%D1%80%D0%B2%D0%B0%D1%82%D1%8C-%D1%86%D0%B8%D0%BA%D0%BB-foreach-javascript
