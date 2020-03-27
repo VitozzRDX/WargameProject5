@@ -3,9 +3,10 @@ let move = {
     firstPlayerMovementPhase(options) {
         let counter;
         let absolutePointer = options.absolutePointer
-        let movingStackStatus = this.getMovingStackStatus() // this.countersManipulator.getStack().getStackStatus
+        let stack = this.stack
+        let movingStackStatus = this.getStackStatus(stack) // this.countersManipulator.getStack().getStackStatus
 
-        console.log(movingStackStatus)
+        
         switch (movingStackStatus) {
 
             case 'uncreated':
@@ -17,8 +18,8 @@ let move = {
                 counter = options.target.counter
 
                 if (counter.getMovingStatus() == "brokenStackRemnant") {    //this._checkForMovingStatus(counter,"brokenStackRemnant")
-                    this.createNewStack_setStatus_addCounter_setOwnHex('filledWithBrokenStackRemnants',counter)
-                    this.buildMGUI()
+                    stack = this.stack = this.createNewStack_setStatus_addCounter_setOwnHex('filledWithBrokenStackRemnants',counter)
+                    this.buildStackUI(stack)
                     return
                 }
 
@@ -26,8 +27,8 @@ let move = {
 
                 this.endEachCounterMove(this.countersFromBrokenMovingStackArray).clearCountersFromBrokenMovingStackArray()
 
-                this.createNewStack_setStatus_addCounter_setOwnHex('filledWithCounters',counter)
-                this.buildMGUI()
+                stack = this.stack = this.createNewStack_setStatus_addCounter_setOwnHex('filledWithCounters',counter)
+                this.buildStackUI(stack)
 
                 break;
 
@@ -40,14 +41,14 @@ let move = {
 
                 counter = options.target.counter
 
-                if (this._checkIfCounterIsAlreadyInMovingGroup(counter)) {
+                if (this._isCounterInStack(counter,stack)) {
                     return console.log('selected counter is already in Moving Group')
                 }
 
-                if (this._checkIfCounterIsInTheSameHexAsGroupToMove(counter)) {
+                if (this._isCounterInSameHexAsStack(counter,stack)) {
 
                     this.changeColorOfBorder(counter, "red")
-                    this.addToMovingStack(counter)
+                    this.addCounterToStack(counter,stack)
                     return console.log('click on counter, that is in the same hex as MG, and that MG is nor moving. Add it to Moving Group')
                 }
 
@@ -63,13 +64,13 @@ let move = {
 
                 counter = options.target.counter
 
-                if (this._checkIfCounterIsAlreadyInMovingGroup(counter)) {
+                if (this._isCounterInStack(counter,stack)) {
                     return console.log('selected counter is already in Moving Group')
                 }
 
-                if (this._checkIfCounterIsInTheSameHexAsGroupToMove(counter) && counter.getMovingStatus() == "brokenStackRemnant") {
+                if (this._isCounterInSameHexAsStack(counter,stack) && counter.getMovingStatus() == "brokenStackRemnant") {
 
-                    this.addToMovingStack(counter)
+                    this.addCounterToStack(counter,stack)
                     this.changeColorOfBorder(counter, 'red')
                     return console.log('selected counter is in same hex as Moving Group and same Moving Status . Adding to MG ')
                 }

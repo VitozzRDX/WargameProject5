@@ -116,7 +116,7 @@ class Map {
         let center = this.getCenterCoordsObjFromHex(hex)
         let arr = this.getCountersIDinHexArray(hex)||[]
 
-        console.log(arr)
+        //console.log(arr)
         if (arr.length == 0 ) return {x:center.x,y:center.y}
         let num = arr.length
         

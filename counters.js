@@ -7,9 +7,6 @@ class Counter {
 
         this.options = param.options
 
-        //if (!param.ownHex) throw `ownHex is ${param.ownHex}`
-
-        //console.log(param.ownHex)
         this.ownHex = param.ownHex
 
         this.img = undefined;
@@ -23,7 +20,6 @@ class Counter {
         this.weightHex = 1
 
         this.ID = (Math.random() + 1).toString(36).slice(2, 18);
-
 
     };
 
@@ -145,7 +141,8 @@ class MultiManCounters extends ManCounters {
 
     }
     getType() {
-        return 'MMC'
+        //return 'MMC'
+        return this.constructor.name
     }
 
     getReadyToMoveUnderSMCcommand() {
@@ -160,7 +157,7 @@ class SingleManCounters extends ManCounters {
     }
 
     getType() {
-        return 'SMC'
+        return this.constructor.name
     }
 }
 

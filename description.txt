@@ -338,17 +338,6 @@ End Opp's DFPh
 Откуда брать остальные недоходившие ?
 Введем массив this.allMovingCountersArr и на момент разбиения запишем туда .mgArray (копию)
 
-сейчас в 
-
-            if (options.target.type == "group") {
-                console.log('clicked on Group - because there is no group it should be part of broken stack')
-                console.log('create new Moving group')
-                console.log(options.target)
-
-                this.createNewMovingStack()
-                this.setAllMGUIDisabled()
-                return
-            }
 
 ситуация :
 a) После разбиения стека (case this.getMovigGroup() == undefined ) сразу выбираешь не ходивший (без статуса мувед), не входящий в группу (без желтой рамки) , свой () , каунтер.
@@ -404,16 +393,6 @@ b) После разбиения стека выбрал кого-то из вх
 
 counter.weaponID = weapon.counterID
 
-attachWeapon(weapon,counter) {
-    if counter is not in same hex as weapon { throw error }
-
-        weapon.set(counter.center + 10)
-        g = canvas.creatGroup
-        g.getToFront()
-}
-
-
-сейчас в attachCallback
 
 -------------------------------- 11 03 2020 ---------------
 
@@ -563,3 +542,8 @@ stackSettings
 из _is_Click_NotInCoverArc_inOwnHex_onEnemy_EnterCostTooHigh
 затем можно при условии вылета из лупа не ставить группе статус мувинг (не менять его)
 https://ru.stackoverflow.com/questions/611546/%D0%9F%D1%80%D0%B5%D1%80%D0%B2%D0%B0%D1%82%D1%8C-%D1%86%D0%B8%D0%BA%D0%BB-foreach-javascript
+
+===================================================================================================
+
+Ввели фабрику стаков .
+Поменяли все вызовы ф-ий на вызовы свойств стаков
