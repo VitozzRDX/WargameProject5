@@ -20,7 +20,7 @@ let initialSettings = {
     firstPlayer: 'Nazi',
     secondPlayer: 'Ally',
     //-------------------- 17 03 2020 Phase Switching ---------------------------------
-    startingPhase: 'firstPlayerMovementPhase',//'firstPlayerRallyPhase',
+    startingPhase: 'firstPlayerRallyPhase',//'firstPlayerRallyPhase','firstPlayerMovementPhase'
     startingSidePictureSrc: 'assets/turnphaseaxis.gif',
     otherSidePictureSrc: 'assets/turnphaseallied.gif',
 

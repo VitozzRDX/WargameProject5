@@ -547,3 +547,73 @@ https://ru.stackoverflow.com/questions/611546/%D0%9F%D1%80%D0%B5%D1%80%D0%B2%D0%
 
 Ввели фабрику стаков .
 Поменяли все вызовы ф-ий на вызовы свойств стаков
+
+------------------------------- 29 03 2020 ----------------------------------------------------------------
+
+использовать Object.setPrototype(newStack.prototype,basicStack.prototype) и protoype : {} для Стэка
+использовать отдельные объекты для хранения каждого метода каунтеров . потом повторяющиеся объеденить
+
+Используя деструктуризацию, функция из нашего предыдущего примера будет выглядеть так:
+
+function findUsersByRule ({  rule,  withContactInfo,   includeInactive}) {
+//реализация поиска и возврата
+}
+
+findUsersByRule({  rule: 'finance',   withContactInfo: true,   includeInactive: true})
+
+
+Обратите внимание, что наша функция выглядит практически идентично, за исключением того, что мы поставили скобки вокруг наших параметров.
+ Вместо получения трех различных параметров наша функция теперь ожидает один объект со свойствами: rule, withContactInfo и includeInactive.
+
+ Проблему с обязательными параметрами также можно решить более элегантным способом.
+
+function requiredParam (param) { 
+ const requiredParamError = new Error( `Required parameter, "${param}" is missing.`  )
+}
+
+function findUsersByRule ({  rule = requiredParam('rule'),  withContactInfo,   includeInactive} = {}) {...}
+
+---------------------------------------------------------------------------------------------------------------------------------------
+
+
+var Foo = {
+	Foo: function(who) {
+		this.me = who;
+		return this;
+	},
+	identify: function() {
+		return "I am " + this.me;
+	}
+};
+
+var Bar = Object.create(Foo);
+
+Bar.Bar = function(who) {
+	// "constructors" (aka "initializers") are now in the `[[Prototype]]` chain,
+	// so `this.Foo(..)` works easily w/o any problems of relative-polymorphism
+	// or .call(this,..) awkwardness of the implicit "mixin" pattern
+	this.Foo("Bar:" + who);
+	return this;
+};
+
+
+------------------------------------------10 04 2020--------------------------------------------------------------------
+Добавил временные файлы counters3 , counters 4
+Заменил системы с классами на паттерн Делегирование Поведения часть 1.
+Конечные Изменения в файле counters4
+
+Надо менять проверку Статуса Движения в файле move ?
+нет добавим :
+_check_ForNullTarget_ForOwner_ForMovingStatus(t)
+
+            if (!target.counter.getMovingStatus()) {
+            console.log('u try  to select static counter')
+            return true
+        }
+и проверим работу
+
+    getReadyToMoveUnderSMCcommand() {
+
+
+Далее - подключаем counter4 к client и создаем каунтеры новым способом
+

@@ -130,7 +130,8 @@ export function createStack(type) {
         stack.mgArray.splice(ind, 1)
 
     }
-
+    //Object.create(Animal.prototype)
+    //prototype: {}
     switch (type) {
         case 'moving':
             Object.assign(stack, {
@@ -159,3 +160,157 @@ export function createStack(type) {
 
     return stack
 }
+
+// export function createCounter(param){
+//     let counter = {
+//         src: param.src,
+//         owner:param.owner,    
+//         options:param.options,    
+//         ownHex:param.ownHex,    
+//         img:undefined,    
+//         imageID:undefined,    
+//         status:undefined,    
+//         colorBorder:undefined,    
+//         weightHex : 1,
+//         ID:(Math.random() + 1).toString(36).slice(2, 18),
+//     }
+
+//     let counterMethods = {
+//         getImageID() {
+//             return counter.imageID
+//         },
+    
+//         getScheme(phase) {
+//             return counter.currentInterfaceElements[phase]
+//         },
+    
+//         setHexPosition(hex) {
+//             counter.ownHex = hex
+//         },
+    
+//         setNewStatus(status) {
+//             counter.status = status
+//         },
+    
+//         getStatus() {
+//             return counter.status
+//         },
+    
+//         setWeightHex(num) {
+//             counter.weightHex = num
+//         },
+//         getWeightHex(){
+//             return counter.weightHex
+//         },
+    
+//         getID () {
+//             return counter.ID
+//         },
+//     }
+
+//     //---------------------------
+
+//     let basicCounter = Object.create(counterMethods)
+//     Object.assign(basicCounter,counter)
+
+//     //---------------------------
+//     let movingCounterProperties = {
+
+//     }
+//     return counter
+// }
+
+
+export function createCounter(param){
+    let counter = {
+        src: param.src,
+        owner:param.owner,    
+        options:param.options,    
+        ownHex:param.ownHex,    
+        img:undefined,    
+        imageID:undefined,    
+        status:undefined,    
+        colorBorder:undefined,    
+        weightHex : 1,
+        ID:(Math.random() + 1).toString(36).slice(2, 18),
+    }
+
+    let counterProto = {
+        getImageID() {
+            return counter.imageID
+        },
+    
+        getScheme(phase) {
+            return counter.currentInterfaceElements[phase]
+        },
+    
+        setHexPosition(hex) {
+            counter.ownHex = hex
+        },
+    
+        setNewStatus(status) {
+            counter.status = status
+        },
+    
+        getStatus() {
+            return counter.status
+        },
+    
+        setWeightHex(num) {
+            counter.weightHex = num
+        },
+        getWeightHex(){
+            return counter.weightHex
+        },
+    
+        getID () {
+            return counter.ID
+        },
+    }
+
+    //---------------------------
+
+    let basicCounter = Object.create(counterProto)
+    Object.assign(basicCounter,counter)
+
+    //---------------------------
+    let movingCounterProto = Object.create(counterProto)
+    let movingMixins = {
+        getCostToEnter(type) {
+            return counter.costToEnterHash[type]
+        },
+    
+        getMovingStatus(){
+            return counter.movingStatus 
+        },
+    
+        setMovingStatus(status) {
+    
+            if (!counter.getMovingStatus) throw 'there is no possibility to set Moving status here'
+    
+            let arr = ['moving','moved','brokenStackRemnant']
+    
+            if (arr.indexOf( status ) != -1 ) {
+                counter.movingStatus = status
+            }else{
+                throw `there is no sucj status as ${status} in possible to set for counter`
+            }
+        }
+    }
+
+    Object.assign(movingCounterProto,movingMixins)
+
+
+    return counter
+}
+
+
+var MyClass = {
+    prototype: {
+      // prototypal members and methods
+    },
+    create: function(options){
+      // do stuff with options
+      return Object.create(MyClass.prototype, options);
+    }
+  };

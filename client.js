@@ -7,7 +7,7 @@ import { Map } from './map.js'
 import { methods } from './clientMethods_ReactionOnCanvas.js'
 import { Counter, MultiManCounters, SingleManCounters, Weapon } from './counters.js'
 //------------------------ 20 03 2020 ----------------------------------------------------------------
-import { createStack } from './counters2.js'
+import { createStack,createCounter } from './counters2.js'
 
 
 
@@ -161,9 +161,54 @@ class Client {
 
     init(options) {
 
+        // let o =  {}
+        // console.log(o.prototype)
+        // console.log(o.__proto__)
 
+        // let foo = function (){
+
+        // }
+
+        // let o2 = new foo()
+        // console.log(o2.__proto__)
+        let BasicCounter = {
+            init(param){
+                console.log('initiating',param)
+            },
+            methodA(){
+                console.log('methodA')
+            }
+        }
+        
+        let SquadMovable = {
+            methodB(){
+                console.log(this.mf)
+            }
+        }
+        
+        let ManCounter = {
+            setup(param){
+                this.init(param)
+                console.log('as ManCounter')
+                this.mf = param.mf
+            }
+        }
+        
+        Object.setPrototypeOf(ManCounter,BasicCounter)
+        Object.assign(ManCounter,SquadMovable)
+        
+        let par = {
+            mf:4
+        }
+        let counter = Object.create(ManCounter)
+        counter.setup(par)
+        counter.methodA()
+        counter.methodB()
+
+//console.log(createCounter())
         this.firstPlayer = options.firstPlayer
         this.secondPlayer = options.secondPlayer
+
 
         this.setInterfaceScheme()
         // let's set starting Phase . Because it is Single Player variant there will be all phases one by one
@@ -221,9 +266,9 @@ class Client {
                 this._buildMenuInterface(startingPhaseTitle)
 
 
-                this.canvasObj.getRondelPicture().animate('angle', '-=90', {
-                    onChange: this.canvasObj.canvas2.requestRenderAll.bind(this.canvasObj.canvas2),
-                })
+                // this.canvasObj.getRondelPicture().animate('angle', '-=90', {
+                //     onChange: this.canvasObj.canvas2.requestRenderAll.bind(this.canvasObj.canvas2),
+                // })
             })
 
         //--------------------------------------------------------
@@ -481,106 +526,17 @@ class Client {
     addCounterToStack(counter,stack) {
         stack.addToStack(counter)
     }
-    // addToMovingStack(counter) { // change name to fill MovingStack Hash
-
-    //     if (!this.stack) throw 'Moving Group is not exist'
-
-    //     if (this.stack.mgArray.length == 7) {
-    //         console.log(' there are already 7 counters in stack, cannot add more ')
-    //         return;
-    //     }
-
-    //     let counterType = counter.getType()
-
-    //     switch (counterType) {
-
-    //         case 'MMC':
-    //             if (this.stack.MMCnumber == 3) {
-    //                 console.log(' there are already 3 MMC in stack, cannot add more ')
-    //                 return;
-    //             }
-    //             this.stack.mgArray.push(counter)
-    //             this.stack.MMCnumber += 1
-
-    //             break;
-
-    //         case 'SMC':
-    //             if (this.stack.SMCnumber == 4) {
-    //                 console.log(' there are already 4 MMC in stack, cannot add more ')
-    //                 return;
-    //             }
-    //             this.stack.mgArray.forEach((counter) => {
-    //                 try {
-    //                     counter.getReadyToMoveUnderSMCcommand()
-    //                 }
-    //                 catch (e) {
-    //                     console.log(e)
-    //                 }
-    //             })
-    //             this.stack.mgArray.push(counter)
-    //             this.stack.SMCnumber += 1
-
-    //             break;
-
-    //         default:
-    //             throw 'unexpected counter type adding to Moving Group. Should be MMC or SMC'
-    //     }
-    // }
-
-    // clearMovingGroupHash(stat) {
-    //     this.stack = {
-    //         mgArray: [],
-    //         MMCnumber: 0,
-    //         SMCnumber: 0,
-    //         status: stat,
-    //         schemeObj: {
-    //             'Assault Move': true,
-    //             'Double Time': true,
-    //             'Break Stack': true,
-    //         }
-    //     }
-    // }
-
-
-    // -------------- 05 03 2020 ---------------------------
-    // getMovingGroupArrayLength() {
-    //     return this.stack.mgArray.length
-    // }
-
-    // getMovingStackArray() {
-    //     return this.stack.mgArray
-    // }
-
-    // getMovingStackUIScheme() {
-    //     return this.stack.schemeObj
-    // }
 
     getStackUIScheme(stack) {
-        console.log(stack)
+
         return stack.getUIScheme()
     }
-
-    // setOwnHex(counterOwnHex) {
-    //     this.stack.ownHex = counterOwnHex
-    // }
-
-    // getOwnHexOfMovingGroup() {
-    //     return this.stack.ownHex
-    // }
 
     setStackUIButtonsCondition(stack,buttonName, bool) {
         let scheme = this.getStackUIScheme(stack) // {'R':true}
 
         scheme[buttonName] = bool
     }
-
-    // buildMGUI(stack) {
-    //     for (let buttonName in this.getMovingStackUIScheme(stack)) {
-    //         let obj = this.interfaceScheme[buttonName]
-    //         let bool = this.stack.schemeObj[buttonName]
-    //         this.interface.buildButton(obj, bool)
-    //     }
-    // }
 
     buildStackUI(stack){
         for (let buttonName in this.getStackUIScheme(stack)) {
@@ -590,68 +546,16 @@ class Client {
         }
     }
 
-    // setStatus(status) {
-    //     this.stack.status = status
-    // }
-
     getStackStatus(stack) {
         return stack.status
     }
 
-    // _checkIfCounterIsInTheSameHexAsGroupToMove(counter) {
-
-    //     if (this.getMovingGroupArrayLength() == 0) throw `there is nobody in Moving Group`
-
-    //     let hex = this.getOwnHexOfMovingGroup()
-
-    //     return JSON.stringify(hex) == JSON.stringify(counter.ownHex)
-    // }
 
     _isCounterInSameHexAsStack(counter,stack){
 
         let hex = stack.getOwnHex()
         return JSON.stringify(hex) == JSON.stringify(counter.ownHex)
     }
-
-    // createNewMovingStack(param) {
-    //     //if (this.stack) throw 'u try to create new MG when there is already one'
-
-    //     this.stack = {
-    //         mgArray: [],
-    //         MMCnumber: 0,
-    //         SMCnumber: 0,
-    //         status: undefined,
-    //         schemeObj: {
-    //             'Assault Move': true,
-    //             'Double Time': true,
-    //             'Break Stack': true,
-    //         }
-    //     }
-
-    //     if (param) {
-    //         Object.assign(this.stack, param)
-    //     }
-    //     return this.stack
-
-    // }
-
-    // getMovigGroup() {
-    //     return this.stack
-    // }
-
-    // removeCounterFromMovingGroupArray(counter) {
-
-    //     let arr = this.getMovingStackArray()
-
-    //     if (arr.length == 0) throw 'u tryin to remove counter from empty MGarray'
-
-    //     let ind = arr.indexOf(counter)
-    //     if (ind == -1) throw 'u tryin to remove already removed counter from MGarray'
-
-    //     this.stack.mgArray.splice(ind, 1)
-
-    // }
-
 
     setMouseClickListenerAccordingToCurrentPhase() {
         let p = this.game.getPhase()
@@ -694,15 +598,7 @@ class Client {
         stack.setUIDisabled()
     }
 
-    // _checkIfCounterIsAlreadyInMovingGroup(counter) {
-    //     let arr = this.getMovingStackArray()
-    //     if (arr.indexOf(counter) != -1) {
-    //         return true
-    //     }
-    // }
-
     _isCounterInStack(counter,stack) {
-        console.log(stack)
         let arr = stack.getStackCountersArray()
         if (arr.indexOf(counter) != -1) {
             return true
@@ -715,7 +611,7 @@ class Client {
     //---------------- 10 03 Weapon -------------------------------------
 
     attachCallback(button, counter) {
-
+        let img = this.canvasObj.getImageByID(counter.getImageID())
         this.changeColorOfBorder(counter, 'red')
 
         let newCallback = (options) => {
@@ -731,6 +627,8 @@ class Client {
                 console.log('counter == counterToAttach')
                 return
             }
+
+            
             let i = this.canvasObj.getImageByID(counterToAttach.getImageID())
 
             this.canvasObj.canvas.discardActiveObject()
@@ -852,6 +750,10 @@ class Client {
             console.log('u click not your counter')
             return true
         }
+        // if (!target.counter.getMovingStatus()) {
+        //     console.log('u try  to select static counter')
+        //     return true
+        // }
         if (target.counter.getMovingStatus() == 'moved') {
             console.log('u try to select counter that is moved already')
             return true
@@ -861,7 +763,6 @@ class Client {
     createNewStack_setStatus_addCounter_setOwnHex(status, counter) {
 
         let stack = createStack('moving').addToStack(counter).setStatus(status).setOwnHex(counter.ownHex) 
-
         this.changeColorOfBorder(counter, "red")
 
         return stack
@@ -875,26 +776,18 @@ class Client {
 
         let targetHex = this.map.getHexFromCoords(point)
 
-        // if (this.stack.mgArray.some((movingCounter) => {
-        //     let costToEnter = movingCounter.getCostToEnter(this.map.getHexType(targetHex))
-
-        //     return this._is_Click_NotInCoverArc_inOwnHex_onEnemy_EnterCostTooHigh(movingCounter, targetHex, costToEnter)
-
-        // })) {
-        //     return
-        // }
-
         if (this._is_Click_NotInCoverArc_inOwnHex_onEnemy_EnterCostTooHigh(this.stack, targetHex)){
-            console.log(this._is_Click_NotInCoverArc_inOwnHex_onEnemy_EnterCostTooHigh(this.stack, targetHex))
             return
         }
         
-
         this.stack.mgArray.forEach((movingCounter) => {
 
             let previousHex = movingCounter.ownHex
             let costToEnter = movingCounter.getCostToEnter(this.map.getHexType(targetHex))
-            let img = this.canvasObj.getImageByID(movingCounter.getImageID()) // movingCounter.group||this.canvasObj.getImageByID(movingCounter.getImageID())
+            //let img = this.canvasObj.getImageByID(movingCounter.getImageID()) // movingCounter.group||this.canvasObj.getImageByID(movingCounter.getImageID())
+
+            let img = movingCounter.group||this.canvasObj.getImageByID(movingCounter.getImageID())
+            //if (movingCounter.group) { img = movingCounter.group }
             let coords = this.getFreeCoordsAsTopLeftObj(targetHex, img.width)
 
             movingCounter.subtractMF(costToEnter)
@@ -913,12 +806,11 @@ class Client {
 
                     if (this._checkIfMovementPointsEnded(movingCounter)) {
 
-                        this.setMOVEDstatus_NullBorderColor_RemoveFromStack(movingCounter, img,this.stack)
+                        this.setMOVEDstatus_NullBorderColor_RemoveFromStack(movingCounter,this.stack)
                     }
 
                     if (this._isStackEmpty(this.stack)) {        //  && getMovingStackStatus() == 'filledWithBrokenStackRemnants'
 
-                        //this.clearMovingGroupHash('uncreated')
                         this.setStackStatus(this.stack,'uncreated')
                         return console.log('all untis from MG have ended its move ')
                     }
@@ -937,17 +829,15 @@ class Client {
         return counter.getMFLeft() == 0
     }
 
-    setMOVEDstatus_NullBorderColor_RemoveFromStack(counter, img,stack) {
-
+    setMOVEDstatus_NullBorderColor_RemoveFromStack(counter,stack) {
+        let img = this.canvasObj.getImageByID(counter.getImageID())
         this.setMovingStatus(counter, 'moved')
         this.changeColorOfBorderImage(img, null)
         this.removeCounterFromStack(stack,counter)
     }
 
     removeCounterFromStack(stack,counter){
-
         stack.removeCounterFromArray(counter)
-
     }
 
     setMovingStatus(counter, status) {
@@ -955,14 +845,13 @@ class Client {
     }
 
     _checkIfThereIsAnEnemyInHex(movingCounter, targetHex) {
-        console.log(movingCounter.getType())
+
         switch (movingCounter.getType()) {
             case 'AFV':
                 return false;
             case 'MultiManCounters':
-                console.log(this.map.getOwnerOfHex(targetHex) != movingCounter.owner)
+
                 if (this.map.getOwnerOfHex(targetHex) != undefined && this.map.getOwnerOfHex(targetHex) != movingCounter.owner) {
-                    console.log('f')
                     return true
                 }
                 break;
@@ -976,26 +865,6 @@ class Client {
         }
     }
 
-    // _is_Click_NotInCoverArc_inOwnHex_onEnemy_EnterCostTooHigh(movingCounter, targetHex, costToEnter) {
-    //     if (this.isEqual(movingCounter.ownHex, targetHex)) {
-    //         console.log('u try to move into the own Hex')
-    //         return true
-    //     }
-    //     if (!this._checkIfHexIsInCoverArc(movingCounter, targetHex)) {
-    //         console.log('u try to move into Hex not in your Cover Arc')
-    //         return true
-    //     }
-
-    //     if (this._checkIfThereIsAnEnemyInHex(movingCounter, targetHex)) {  // case MMC true ? AFV false
-    //         console.log('u try to move into Hex with an Enemy')
-    //         return true
-    //     }
-
-    //     if (this._isCostToEnterHigherMFLeft(movingCounter, costToEnter)) {
-    //         console.log('cost to enter is higher then MF left')
-    //         return true
-    //     }
-    // }
 
     _is_Click_NotInCoverArc_inOwnHex_onEnemy_EnterCostTooHigh(stack, targetHex) {
 
@@ -1012,8 +881,6 @@ class Client {
             }
 
             if (this._checkIfThereIsAnEnemyInHex(movingCounter, targetHex)) {  // case MMC true ? AFV false
-
-
                 console.log('u try to move into Hex with an Enemy')
                 return true
             }
@@ -1033,9 +900,6 @@ class Client {
 
     //----------------------- 20 03 2020 --------------------------------------------------------------
 
-    // createNewMovingStack(param) {
-    //     this.stackFactory.createMovingStack()
-    // }
 
     _isStackEmpty(stack){
         return stack.getStackCountersArrLength() == 0

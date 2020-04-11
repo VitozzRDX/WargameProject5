@@ -2,90 +2,69 @@ class Counter {
     constructor(param) {
 
         this.src = param.src;
-
         this.owner = param.owner;
-
         this.options = param.options
-
         this.ownHex = param.ownHex
-
         this.img = undefined;
-
         this.imageID = undefined;
-
         this.status = undefined;
-
         this.colorBorder = undefined
-
         this.weightHex = 1
-
         this.ID = (Math.random() + 1).toString(36).slice(2, 18);
+        this.otherSideSrc = param.otherSideSrc;
 
     };
 
     getImageID() {
         return this.imageID
     }
-
     getScheme(phase) {
         return this.currentInterfaceElements[phase]
     }
-
     setHexPosition(hex) {
         this.ownHex = hex
     }
-
     setNewStatus(status) {
         this.status = status
     }
-
     getStatus() {
         return this.status
     }
-
     setWeightHex(num) {
         this.weightHex = num
     }
     getWeightHex(){
         return this.weightHex
     }
-
     getID () {
         return this.ID
     }
     getType() {
         return this.constructor.name
     }
-    
 }
 
-class Weapon extends Counter {
-    constructor(param){
-        super (param)
-
+class Attachable {
+    constructor() {
+        this.attachedTo = undefined
         this.currentInterfaceElements = {
             'firstPlayerRallyPhase': { 'Attach': true },
         }
     }
-    
-    getMovingStatus(){
-        //console.log(this.movingStatus)
-        return 'moved' 
+
+    attachTo(counter){
+        this.attachedTo = counter
     }
-    
 }
 
-class SelfMovingCounters extends Counter {
-    constructor(param) {
-        super(param)
+class Movable {
+    constructor() {
         this.movingStatus = undefined
     }
 
     getCostToEnter(type) {
         return this.costToEnterHash[type]
     }
-
-    //------------- 04 03 2020 ------------------
 
     getMovingStatus(){
         return this.movingStatus 
@@ -103,70 +82,37 @@ class SelfMovingCounters extends Counter {
             throw `there is no sucj status as ${status} in possible to set for counter`
         }
     }
-
 }
 
-class ManCounters extends SelfMovingCounters {
+class SquadMovable {
 
-    constructor(param) {
-        super(param)
+    constructor(param){
+        let moving = new Movable()
+        this.movingStatus = moving.movingStatus
+        this.temporaryMF =  param.movementFactor
+        this.movementFactor = param.movementFactor
 
-        this.temporaryMF = this.movementFactor = param.movementFactor
-        //this.morale = param.morale
-
-        this.currentInterfaceElements = {
-            'firstPlayerRallyPhase': { 'Rally': false },
-        }
-
-        this.otherSideSrc = param.otherSideSrc;
-
-        this.costToEnterHash = {
-            'plain': 1
-        }
+        // 
     }
     getMFLeft() {
         return this.temporaryMF
     }
-
     subtractMF(mf) {
         this.temporaryMF = this.temporaryMF - mf
     }
-
-    getReadyToMoveUnderSMCcommand() {
-        return
-    }
-
 }
 
-class MultiManCounters extends ManCounters {
-    constructor(param) {
-        super(param)
-
-    }
-    // getType() {
-    //     //return 'MMC'
-    //     return this.constructor.name
-    // }
+class Commandable {
 
     getReadyToMoveUnderSMCcommand() {
         this.temporaryMF += 1
     }
 }
 
-
-class SingleManCounters extends ManCounters {
+class MultiManCounter extends Counter {
     constructor(param) {
-        super(param)
+        this.moving = new SquadMovable(param)
+        
     }
-
-    // getType() {
-    //     return this.constructor.name
-    // }
 }
 
-export {
-    Counter,
-    MultiManCounters,
-    SingleManCounters,
-    Weapon
-}
