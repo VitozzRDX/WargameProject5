@@ -89,6 +89,8 @@ class SquadMovable {
     constructor(param){
         let moving = new Movable()
         this.movingStatus = moving.movingStatus
+
+        // 
         this.temporaryMF =  param.movementFactor
         this.movementFactor = param.movementFactor
 

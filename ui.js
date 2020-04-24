@@ -47,6 +47,21 @@ class Interface {
         let event = new Event("click")
         this.buttonsHash[name].dispatchEvent(event)
     }
+
+    disableButton(name){
+        this.buttonsHash[name].disabled = true
+    }
+
+    enableButton(name){
+        this.buttonsHash[name].disabled = false
+    }
+
+    clearUI(name) {
+        
+            this.buttonsHash[name].remove()
+
+    }
+
 }
 
 export { Interface };

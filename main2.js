@@ -33,7 +33,8 @@ let initialSettings = {
                 otherSideSrc: 'assets/628.svg',//'assets/ruh7b.gif',
                 className: 'MultiManCounters',
                 owner: 'Ally',
-                movementFactor: 4
+                movementFactor: 4,
+                type: 'MultiManCounter'
             },
 
             'geSquadE-0': {
@@ -42,7 +43,8 @@ let initialSettings = {
                 className: 'MultiManCounters',
                 owner: 'Nazi',
                 movementFactor: 4,
-                name: 'geSquadE-0'
+                name: 'geSquadE-0',
+                type: 'MultiManCounter'
             },
 
             'geSquadE-1': {
@@ -51,7 +53,8 @@ let initialSettings = {
                 className: 'MultiManCounters',
                 owner: 'Nazi',
                 movementFactor: 4,
-                name: 'geSquadE-1'
+                name: 'geSquadE-1',
+                type: 'MultiManCounter'
             },
 
             'geSMC9-1': {
@@ -60,13 +63,15 @@ let initialSettings = {
                 className: 'SingleManCounters',
                 owner: 'Nazi',
                 movementFactor: 6,
-                name: 'geSMC9-1'
+                name: 'geSMC9-1',
+                type: 'SingleManCounter'
             },
             'geHMG': {
                 src: "assets/geHMG.gif",
                 className: "Weapon",
                 owner: 'Nazi',
-                name: 'geHMG'
+                name: 'geHMG',
+                type: 'MashineGun'
             }
         },
 

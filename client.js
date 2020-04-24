@@ -5,9 +5,11 @@ import { Game } from './game.js'
 import { Map } from './map.js'
 
 import { methods } from './clientMethods_ReactionOnCanvas.js'
-import { Counter, MultiManCounters, SingleManCounters, Weapon } from './counters.js'
+// import { Counter, MultiManCounters, SingleManCounters, Weapon } from './counters.js'
 //------------------------ 20 03 2020 ----------------------------------------------------------------
-import { createStack,createCounter } from './counters2.js'
+import { createStack } from './stackFactory.js'
+
+import { createCounter } from './countersFinal.js'
 
 
 
@@ -55,20 +57,20 @@ class Client {
         this.game = new Game()
         this.map = new Map()
 
-        this.counterTable = {
-            'Counter': Counter,
-            'MultiManCounters': MultiManCounters,
-            'SingleManCounters': SingleManCounters,
-            'Weapon': Weapon
+        // this.counterTable = {
+        //     'Counter': Counter,
+        //     'MultiManCounters': MultiManCounters,
+        //     'SingleManCounters': SingleManCounters,
+        //     'Weapon': Weapon
 
-        }
+        // }
 
         this.currentCounterInterface = undefined
 
         this.selectedCounter = undefined
 
         this.stack = { status: 'uncreated' }
-        
+
         this.countersFromBrokenMovingStackArray = undefined
 
         this.image = undefined
@@ -153,7 +155,12 @@ class Client {
                 'callback': this.attachCallback.bind(this),
                 'class': 'Attach',
                 'name': 'Attach'
-            }
+            },
+            'End Movement': {
+                'callback': this.endMovementCallback.bind(this),
+                'class': 'EndMovement',
+                'name': 'End Movement'
+            },
 
         };
 
@@ -161,54 +168,10 @@ class Client {
 
     init(options) {
 
-        // let o =  {}
-        // console.log(o.prototype)
-        // console.log(o.__proto__)
+        this._createCounters(options.countersOptions)
 
-        // let foo = function (){
-
-        // }
-
-        // let o2 = new foo()
-        // console.log(o2.__proto__)
-        let BasicCounter = {
-            init(param){
-                console.log('initiating',param)
-            },
-            methodA(){
-                console.log('methodA')
-            }
-        }
-        
-        let SquadMovable = {
-            methodB(){
-                console.log(this.mf)
-            }
-        }
-        
-        let ManCounter = {
-            setup(param){
-                this.init(param)
-                console.log('as ManCounter')
-                this.mf = param.mf
-            }
-        }
-        
-        Object.setPrototypeOf(ManCounter,BasicCounter)
-        Object.assign(ManCounter,SquadMovable)
-        
-        let par = {
-            mf:4
-        }
-        let counter = Object.create(ManCounter)
-        counter.setup(par)
-        counter.methodA()
-        counter.methodB()
-
-//console.log(createCounter())
         this.firstPlayer = options.firstPlayer
         this.secondPlayer = options.secondPlayer
-
 
         this.setInterfaceScheme()
         // let's set starting Phase . Because it is Single Player variant there will be all phases one by one
@@ -260,7 +223,9 @@ class Client {
 
             }).
             then(() => {
-                this._createAndDrawCounters(options.countersOptions)
+                //this._createAndDrawCounters(options.countersOptions)
+                this._drawCounters()
+
             }).
             then(() => {
                 this._buildMenuInterface(startingPhaseTitle)
@@ -276,6 +241,35 @@ class Client {
 
     };
 
+    _createCounters(countersOptions) {
+        let parametersOnCreationHash = countersOptions.parametersOnCreationHash
+        for (let i in parametersOnCreationHash) {
+
+            let arrayOfCoords = parametersOnCreationHash[i]
+
+            arrayOfCoords.forEach((obj) => {
+                let ops = countersOptions.squadType_propertiesHash[i]
+
+                let centerPoint = this.map._calculateFreeCoords(obj, 48)
+
+                ops.options = { top: centerPoint.y, left: centerPoint.x }       // {q:6,r:0,s:-6}
+                ops.ownHex = obj
+                let c = createCounter(ops)
+
+                this.fillCounterTrayHash(c.ID, c)
+                this.fillHex_CounterID_setHexOwner(obj, c)
+
+            })
+
+        }
+    }
+
+    _drawCounters() {
+        for (let c in this.counterTrayHash) {
+
+            this.drawCounter(this.counterTrayHash[c])
+        }
+    }
     //-----------added 20 20 2020----------------------------------------------------------
 
     _createAndDrawCounters(countersOptions) {  //setOfOptionsforCounters
@@ -327,7 +321,7 @@ class Client {
             i.counter = c
         }
         let prom = this.canvasObj.creatingPromise(ref)
-        console.log('f')
+
         this.canvasObj.draw(prom, ops, cb)
     }
 
@@ -523,8 +517,9 @@ class Client {
         return true
     }
 
-    addCounterToStack(counter,stack) {
+    addCounterToStack(counter, stack) {
         stack.addToStack(counter)
+
     }
 
     getStackUIScheme(stack) {
@@ -532,13 +527,13 @@ class Client {
         return stack.getUIScheme()
     }
 
-    setStackUIButtonsCondition(stack,buttonName, bool) {
+    setStackUIButtonsCondition(stack, buttonName, bool) {
         let scheme = this.getStackUIScheme(stack) // {'R':true}
 
         scheme[buttonName] = bool
     }
 
-    buildStackUI(stack){
+    buildStackUI(stack) {
         for (let buttonName in this.getStackUIScheme(stack)) {
             let obj = this.interfaceScheme[buttonName]
             let bool = this.stack.schemeObj[buttonName]
@@ -551,7 +546,7 @@ class Client {
     }
 
 
-    _isCounterInSameHexAsStack(counter,stack){
+    _isCounterInSameHexAsStack(counter, stack) {
 
         let hex = stack.getOwnHex()
         return JSON.stringify(hex) == JSON.stringify(counter.ownHex)
@@ -563,13 +558,7 @@ class Client {
         this.canvasObj.setMouseClickListener(cb);
     }
 
-    assaultMoveCallback(button) {
-        console.log('Next Move will be last. Set state ? Show "Assaulting!" table . Disable Double Time bttn (redraw MGUI ?) ')
-    }
 
-    doubleTimeCallback(button) {
-        console.log('set all C in MG except that of exausted, +2 MF to temp, set statuses - exausted ')
-    }
 
     breakStackCallback(button) {
         console.log('breakStack pressed')
@@ -582,23 +571,29 @@ class Client {
 
             this.changeColorOfBorder(counter, "yellow")
             counter.setMovingStatus('brokenStackRemnant')
+
+            if (counter.isUnderCommand()) {
+                console.log('here')
+                counter.removeCommanderBonus()
+            }
+
         })
 
-        this.setStackStatus(this.stack,'uncreated')
+        this.setStackStatus(this.stack, 'uncreated')
         this.setStackUIDisabled(this.stack)
         this.buildStackUI(this.stack)
 
     }
 
-    setStackStatus(stack,status){
-       stack.setStatus(status)
+    setStackStatus(stack, status) {
+        stack.setStatus(status)
     }
 
     setStackUIDisabled(stack) {
         stack.setUIDisabled()
     }
 
-    _isCounterInStack(counter,stack) {
+    _isCounterInStack(counter, stack) {
         let arr = stack.getStackCountersArray()
         if (arr.indexOf(counter) != -1) {
             return true
@@ -628,7 +623,7 @@ class Client {
                 return
             }
 
-            
+
             let i = this.canvasObj.getImageByID(counterToAttach.getImageID())
 
             this.canvasObj.canvas.discardActiveObject()
@@ -750,10 +745,10 @@ class Client {
             console.log('u click not your counter')
             return true
         }
-        // if (!target.counter.getMovingStatus()) {
-        //     console.log('u try  to select static counter')
-        //     return true
-        // }
+        if (!target.counter.getMovingStatus) {
+            console.log('u try  to select static counter')
+            return true
+        }
         if (target.counter.getMovingStatus() == 'moved') {
             console.log('u try to select counter that is moved already')
             return true
@@ -762,7 +757,9 @@ class Client {
 
     createNewStack_setStatus_addCounter_setOwnHex(status, counter) {
 
-        let stack = createStack('moving').addToStack(counter).setStatus(status).setOwnHex(counter.ownHex) 
+        let stack = createStack('moving').addToStack(counter).setStatus(status).setOwnHex(counter.ownHex)
+        // if commander stack.getUnderCommand
+
         this.changeColorOfBorder(counter, "red")
 
         return stack
@@ -776,48 +773,63 @@ class Client {
 
         let targetHex = this.map.getHexFromCoords(point)
 
-        if (this._is_Click_NotInCoverArc_inOwnHex_onEnemy_EnterCostTooHigh(this.stack, targetHex)){
+        if (this._is_Click_NotInCoverArc_inOwnHex_onEnemy_EnterCostTooHigh(this.stack, targetHex)) {
             return
         }
-        
-        this.stack.mgArray.forEach((movingCounter) => {
 
+        this.stack.mgArray.forEach((movingCounter) => {
+            console.log(movingCounter)
             let previousHex = movingCounter.ownHex
             let costToEnter = movingCounter.getCostToEnter(this.map.getHexType(targetHex))
-            //let img = this.canvasObj.getImageByID(movingCounter.getImageID()) // movingCounter.group||this.canvasObj.getImageByID(movingCounter.getImageID())
-
-            let img = movingCounter.group||this.canvasObj.getImageByID(movingCounter.getImageID())
-            //if (movingCounter.group) { img = movingCounter.group }
+            let img = movingCounter.group || this.canvasObj.getImageByID(movingCounter.getImageID())
             let coords = this.getFreeCoordsAsTopLeftObj(targetHex, img.width)
 
             movingCounter.subtractMF(costToEnter)
             movingCounter.setHexPosition(targetHex)
 
             this.map.removeIDFromHex_counterIDHash(previousHex, movingCounter.ID)
-
             this.fillHex_CounterID_setHexOwner(targetHex, movingCounter)
 
             this.canvasObj.setOffMouseClickListener()
-
             this.canvasObj.createPromiseAnimation(img, coords)
                 .then(() => {
                     this.setMouseClickListenerAccordingToCurrentPhase()
+
                     this.rearrangeCountersPositionInHex(previousHex)
-
                     if (this._checkIfMovementPointsEnded(movingCounter)) {
-
-                        this.setMOVEDstatus_NullBorderColor_RemoveFromStack(movingCounter,this.stack)
+                        this.setMOVEDstatus_NullBorderColor_RemoveFromStack(movingCounter, this.stack)
                     }
-
                     if (this._isStackEmpty(this.stack)) {        //  && getMovingStackStatus() == 'filledWithBrokenStackRemnants'
-
-                        this.setStackStatus(this.stack,'uncreated')
+                        this.setStackStatus(this.stack, 'uncreated')
+                        this.clearStackUI(this.stack)
                         return console.log('all untis from MG have ended its move ')
                     }
+
+                    if (!this.stack.isEnabled('End Movement')) {
+                        this.stack.enableButton('End Movement')
+                        this.interface.enableButton('End Movement')
+                    }
+                    this.stack.disableButton('Assault Move')
+                    this.interface.disableButton('Assault Move')
+
+                    this.stack.disableButton('Double Time')
+                    this.interface.disableButton('Double Time')
+
                 })
         })
 
-        this.setStackStatus(this.stack,'moving')
+
+        // disable assault and double time buttons
+        // if Stop Movement disabled => enable it
+
+        // if (!this.stack.isEnabled('End Movement')) {
+        //     this.stack.enableButton('End Movement')
+        //             // now redrawIt
+        // this.interface.enableButton('End Movement')
+        // }
+
+
+        this.setStackStatus(this.stack, 'moving')
     }
 
     getFreeCoordsAsTopLeftObj(hex, size) {
@@ -829,14 +841,14 @@ class Client {
         return counter.getMFLeft() == 0
     }
 
-    setMOVEDstatus_NullBorderColor_RemoveFromStack(counter,stack) {
+    setMOVEDstatus_NullBorderColor_RemoveFromStack(counter, stack) {
         let img = this.canvasObj.getImageByID(counter.getImageID())
         this.setMovingStatus(counter, 'moved')
         this.changeColorOfBorderImage(img, null)
-        this.removeCounterFromStack(stack,counter)
+        this.removeCounterFromStack(stack, counter)
     }
 
-    removeCounterFromStack(stack,counter){
+    removeCounterFromStack(stack, counter) {
         stack.removeCounterFromArray(counter)
     }
 
@@ -849,7 +861,7 @@ class Client {
         switch (movingCounter.getType()) {
             case 'AFV':
                 return false;
-            case 'MultiManCounters':
+            case 'MultiManCounter':
 
                 if (this.map.getOwnerOfHex(targetHex) != undefined && this.map.getOwnerOfHex(targetHex) != movingCounter.owner) {
                     return true
@@ -868,8 +880,13 @@ class Client {
 
     _is_Click_NotInCoverArc_inOwnHex_onEnemy_EnterCostTooHigh(stack, targetHex) {
 
+
         return stack.mgArray.some((movingCounter) => {
-            let costToEnter = movingCounter.getCostToEnter(this.map.getHexType(targetHex))
+
+            if (this._checkIfMovementPointsEnded(movingCounter)) {
+                this.setMOVEDstatus_NullBorderColor_RemoveFromStack(movingCounter, this.stack)
+                return true
+            }
 
             if (this.isEqual(movingCounter.ownHex, targetHex)) {
                 console.log('u try to move into the own Hex')
@@ -884,6 +901,8 @@ class Client {
                 console.log('u try to move into Hex with an Enemy')
                 return true
             }
+
+            let costToEnter = movingCounter.getCostToEnter(this.map.getHexType(targetHex))
 
             if (this._isCostToEnterHigherMFLeft(movingCounter, costToEnter)) {
                 console.log('cost to enter is higher then MF left')
@@ -901,9 +920,95 @@ class Client {
     //----------------------- 20 03 2020 --------------------------------------------------------------
 
 
-    _isStackEmpty(stack){
+    _isStackEmpty(stack) {
         return stack.getStackCountersArrLength() == 0
     }
+
+    //--------------- 18 04 2020 ---------------------------------------------------------------------------
+
+    addCounterToStackProcessing(stack, counter) {
+
+        this.addCounterToStack(counter, stack)
+        this.changeColorOfBorder(counter, 'red')
+
+        //----------------------------------------------------------------------------------------------------------------------------------------------
+        if (stack.isUnderCommand()) {
+            try {
+                counter.getUnderCommand()
+                counter.getCommanderBonus()
+
+                return console.log('added squad to stack with Commander')
+            } catch (error) {
+                console.log(error, 'adding not Squad')
+            }
+        }
+
+        if (counter.getType() == 'SingleManCounter') {   // maybe we do not need this check cause it is always one of this
+            stack.getCommandBonus()
+            stack.getUnderCommand(counter)
+        }
+        //----------------------------------------------------------------------------------------------------------------------------------------------      
+    }
+
+    endMovementCallback(button) {
+
+        this.stack.mgArray.forEach((counter) => {
+            // console.log(movingCounter)
+            // this.setMOVEDstatus_NullBorderColor_RemoveFromStack(movingCounter, this.stack)
+
+            //let img = this.canvasObj.getImageByID(counter.getImageID())
+            this.setMovingStatus(counter, 'moved')
+            //this.changeColorOfBorderImage(img, null)
+
+            this.changeColorOfBorder(counter, null)
+            //this.removeCounterFromStack(stack, counter)
+        })
+
+        this.setStackStatus(this.stack, 'uncreated')
+
+        console.log('end')
+    }
+
+    clearStackUI(stack) {
+        for (let buttonName in this.getStackUIScheme(stack)) {
+
+            this.interface.clearUI(buttonName)
+        }
+    }
+
+
+    assaultMoveCallback(button) {
+        console.log('Next Move will be last. Set state ? Show "Assaulting!" table . Disable Double Time bttn (redraw MGUI ?) ')
+
+        // if (stack.status == 'moving') { return console.log('already started Move') }
+        this.stack.mgArray.forEach((counter) => {
+            // counter.setState('assaulting')
+            // 
+
+            counter.setMovingStatus('assaulting')
+        })
+    }
+
+    
+    doubleTimeCallback(button) {
+        console.log('set all C in MG except that of exausted, +2 MF to temp, set statuses - exausted ')
+        this.stack.mgArray.forEach((counter) => {
+            //console.log(counter)
+if(counter.status != 'exosted'){
+    counter.status = 'exosted'
+    counter.temporaryMF +=2
+}
+
+            //counter.setMovingStatus('assaulting')
+        })
+
+    }
+
+    // deleteAndRedrawButton(buttonName,bool) {
+    //     let obj = this.interfaceScheme[buttonName]
+    //     this.interface.buildButton(obj, bool)
+    // }
+
 }
 // -- let's mix canvas reaction into our class
 Object.assign(Client.prototype, methods)
