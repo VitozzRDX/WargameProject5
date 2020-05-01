@@ -571,11 +571,15 @@ class Client {
 
             this.changeColorOfBorder(counter, "yellow")
             counter.setMovingStatus('brokenStackRemnant')
-
-            if (counter.isUnderCommand()) {
-                console.log('here')
-                counter.removeCommanderBonus()
+            try {
+                if (counter.isUnderCommand()) {
+                    //console.log('here')
+                    counter.removeCommanderBonus()
+                }
+            } catch (error) {
+                console.log(error,'it should be a Commander')
             }
+
 
         })
 
@@ -758,7 +762,8 @@ class Client {
     createNewStack_setStatus_addCounter_setOwnHex(status, counter) {
 
         let stack = createStack('moving').addToStack(counter).setStatus(status).setOwnHex(counter.ownHex)
-        // if commander stack.getUnderCommand
+        // if ownHex == road - add Road Bonus
+
 
         this.changeColorOfBorder(counter, "red")
 
@@ -772,13 +777,74 @@ class Client {
     moveProcessing(point) {
 
         let targetHex = this.map.getHexFromCoords(point)
+        //=========================================================================================
+
+        // let targetHexType = this.map.getHexType(targetHex)
+        // let startOnTheRoadBonus = this.stack.getStartingRoadBonus() // == 0 or 1
+        // if (startOnTheRoadBonus) {
+        //     if (targetHexType == 'road'){
+        //         return
+        //     }
+        //     this.stack.setRoadBonus(0)
+        // }
+
+        //=========================================================================================
+        let targetHexType = this.map.getHexType(targetHex)
+        //let startOnTheRoadBonus = this.stack.getStartingRoadBonus()
+        //console.log(targetHexType,startOnTheRoadBonus)
+
+
+
+        //=========================================================================================
+        console.log(this.stack.isOnTheRoadFromStart)
+        if (targetHexType != 'road' && this.stack.isOnTheRoadFromStart){
+            console.log('hereee')
+            this.stack.isOnTheRoadFromStart = false
+
+            let result = this.stack.mgArray.some((movingCounter) => {
+                movingCounter.subtractMF(1)
+                let bool = this._checkIfMovementPointsEnded(movingCounter)
+                console.log(bool)
+                movingCounter.getRoadBonus()
+
+                return bool
+            })
+            console.log(result)
+
+            if (result) {
+                this.stack.isOnTheRoadFromStart = true
+                return console.log('u are tryin to get off road , but u do not have enough MF')
+            }
+
+            this.stack.mgArray.forEach((movingCounter) => {
+                movingCounter.subtractMF(1)
+            })
+
+        }
+
+        //=========================================================================================
+
+        // if (targetHexType != 'road'){
+        //     this.stack.isOnTheRoadFromStart = false
+        // }
 
         if (this._is_Click_NotInCoverArc_inOwnHex_onEnemy_EnterCostTooHigh(this.stack, targetHex)) {
             return
         }
 
+        //=========================================================================================
+        // if (targetHexType == 'road' && this.stack.isOnTheRoadFromStart && this.stack.gotNoRoadBonus){
+        //     //console.log('herr')
+        //     this.stack.mgArray.forEach((movingCounter) => {
+        //         movingCounter.getRoadBonus()
+        //     })
+        //     this.stack.gotNoRoadBonus = false
+        // }
+
+        //=========================================================================================
+
         this.stack.mgArray.forEach((movingCounter) => {
-            console.log(movingCounter)
+
             let previousHex = movingCounter.ownHex
             let costToEnter = movingCounter.getCostToEnter(this.map.getHexType(targetHex))
             let img = movingCounter.group || this.canvasObj.getImageByID(movingCounter.getImageID())
@@ -797,6 +863,7 @@ class Client {
 
                     this.rearrangeCountersPositionInHex(previousHex)
                     if (this._checkIfMovementPointsEnded(movingCounter)) {
+                        //console.log('h')
                         this.setMOVEDstatus_NullBorderColor_RemoveFromStack(movingCounter, this.stack)
                     }
                     if (this._isStackEmpty(this.stack)) {        //  && getMovingStackStatus() == 'filledWithBrokenStackRemnants'
@@ -838,6 +905,7 @@ class Client {
     }
 
     _checkIfMovementPointsEnded(counter) {
+        console.log(counter.getMFLeft())
         return counter.getMFLeft() == 0
     }
 
@@ -953,18 +1021,14 @@ class Client {
     endMovementCallback(button) {
 
         this.stack.mgArray.forEach((counter) => {
-            // console.log(movingCounter)
-            // this.setMOVEDstatus_NullBorderColor_RemoveFromStack(movingCounter, this.stack)
 
-            //let img = this.canvasObj.getImageByID(counter.getImageID())
             this.setMovingStatus(counter, 'moved')
-            //this.changeColorOfBorderImage(img, null)
-
             this.changeColorOfBorder(counter, null)
-            //this.removeCounterFromStack(stack, counter)
+
         })
 
         this.setStackStatus(this.stack, 'uncreated')
+        this.clearStackUI(this.stack)
 
         console.log('end')
     }
@@ -989,18 +1053,18 @@ class Client {
         })
     }
 
-    
+
     doubleTimeCallback(button) {
         console.log('set all C in MG except that of exausted, +2 MF to temp, set statuses - exausted ')
         this.stack.mgArray.forEach((counter) => {
-            //console.log(counter)
-if(counter.status != 'exosted'){
-    counter.status = 'exosted'
-    counter.temporaryMF +=2
-}
-
-            //counter.setMovingStatus('assaulting')
+            if (counter.status != 'exosted') {
+                counter.status = 'exosted'
+                counter.temporaryMF += 2
+            }
         })
+        this.stack.disableButton('Double Time')
+        this.interface.disableButton('Double Time')
+
 
     }
 

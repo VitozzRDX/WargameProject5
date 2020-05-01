@@ -129,6 +129,7 @@ class ManCounters extends SelfMovingCounters {
     }
 
     subtractMF(mf) {
+        console.log(mf)
         this.temporaryMF = this.temporaryMF - mf
     }
 
@@ -149,6 +150,7 @@ class MultiManCounters extends ManCounters {
     // }
 
     getReadyToMoveUnderSMCcommand() {
+        //console.log('f')
         this.temporaryMF += 1
     }
 }

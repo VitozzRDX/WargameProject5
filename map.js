@@ -9,7 +9,40 @@ class Map {
         this.hex_counterIDHash = {}
         this.hex_ownerHash = {}
         this.hex_lastCounterCoordinates = {}
+
+        this.hex_hexTypeHash = {
+            '{"q":8,"r":5,"s":-13}':'road',
+            '{"q":9,"r":4,"s":-13}':'road',
+            '{"q":10,"r":3,"s":-13}':'road',
+            '{"q":11,"r":2,"s":-13}':'road',
+            '{"q":12,"r":1,"s":-13}':'road',
+            '{"q":13,"r":1,"s":-14}':'road',
+            '{"q":14,"r":1,"s":-15}':'road',
+            '{"q":15,"r":1,"s":-16}':'road',
+            '{"q":16,"r":1,"s":-17}':'road',
+            '{"q":16,"r":0,"s":-16}':'road',
+            '{"q":16,"r":-1,"s":-15}':'road',
+            '{"q":16,"r":-2,"s":-14}':'road',
+            '{"q":17,"r":-3,"s":-14}':'road',
+            '{"q":18,"r":-4,"s":-14}':'road',
+            '{"q":19,"r":-5,"s":-14}':'road',
+            '{"q":20,"r":-6,"s":-14}':'road',
+            '{"q":21,"r":-7,"s":-14}':'road',
+            '{"q":22,"r":-8,"s":-14}':'road',
+            '{"q":23,"r":-9,"s":-14}':'road',
+            '{"q":24,"r":-9,"s":-15}':'road',
+            '{"q":25,"r":-9,"s":-16}':'road',
+            '{"q":26,"r":-9,"s":-17}':'road',
+            '{"q":27,"r":-9,"s":-18}':'road',
+            '{"q":28,"r":-9,"s":-19}':'road',
+            '{"q":29,"r":-10,"s":-19}':'road',
+            '{"q":30,"r":-11,"s":-19}':'road',
+            '{"q":24,"r":-10,"s":-14}':'road',
+            '{"q":24,"r":-11,"s":-13}':'road',
+            '{"q":24,"r":-12,"s":-12}':'road',
+        }
     }
+
 
     getPolyCorners(hex) {
         return this.polygon_corners(this.flat, { q: hex.q, r: hex.r, s: hex.s })    // refactor (this.flat, hex)
@@ -77,7 +110,8 @@ class Map {
     // }
 
     getHexType(hex){
-        return 'plain'
+        let h = JSON.stringify(hex)
+        return this.hex_hexTypeHash[h]||'plain'
     }
 
     _checkIfHexIsOccupied(hex){

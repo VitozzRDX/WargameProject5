@@ -25,7 +25,8 @@ function addSquadMoveProps(counter,param) {
     counter.movementFactor = param.movementFactor
     counter.temporaryMF = param.movementFactor
     counter.costToEnterHash = {
-        'plain': 1
+        'plain': 1,
+        'road' : 1
     }
 }
 
@@ -100,7 +101,12 @@ let SquadMovable = {
     },
 
     subtractMF(mf) {
+        console.log(mf)
         this.temporaryMF = this.temporaryMF - mf
+    },
+
+    getRoadBonus() {
+        this.temporaryMF += 1
     }
 }
 

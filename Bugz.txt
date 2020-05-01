@@ -17,3 +17,5 @@ this._is_Click_NotInCoverArc_inOwnHex_onEnemy_EnterCostTooHigh(this.stack, targe
 
 баг  - дабл стек - дабл тайм добавить . идем . брейк стак - осталось меньше ходов
 Вылечен
+
+баг - переполняется this.hex_ownerHash

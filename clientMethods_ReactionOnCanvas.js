@@ -2,7 +2,13 @@ import { move } from './move.js'
 
 let methods = {
     firstPlayerRallyPhase(options) {
+        // let absolutePointer = options.absolutePointer
+        // let targetHex = this.map.getHexFromCoords(absolutePointer)
+        // // let t = JSON.stringify(targetHex)
+        // // console.log(t)
+        // // console.log(this.map.hex_hexTypeHash[t])
 
+        // console.log(this.map.getHexType(targetHex))
         if (options.target == null) {
             return console.log('clicked on empty space in FPRPhase')
         }

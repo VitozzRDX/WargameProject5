@@ -47,6 +47,9 @@ export function createStack(type) {
         ownHex: undefined,
         schemeObj: undefined,
         commander: undefined,
+        startingRoadBonus: 0,
+        isOnTheRoadFromStart:undefined,
+        gotNoRoadBonus: true
     }
 
     let addToStack = (counter) => {
@@ -175,6 +178,31 @@ export function createStack(type) {
         stack.schemeObj[buttonName] = false
     }
 
+    function startOnRoad(){
+        stack.isOnTheRoadFromStart = true
+        //stack.gotNoRoadBonus = true
+    }
+
+    function addRoadBonus() {
+        
+            stack.mgArray.forEach((counter) => {
+                counter.getRoadBonus()
+            })
+
+    }
+
+    // function getStartingRoadBonus() {
+    //     return stack.startingRoadBonus
+    // }
+    // function setStartingRoadBonus() {
+    //     //console.log('gg')
+    //     stack.startingRoadBonus = 1
+    // }
+
+    // function isOnTheRoadFromStart(){
+    //     return stack.isOnTheRoadFromStart
+    // }
+
     //Object.create(Animal.prototype)
     //prototype: {}
     switch (type) {
@@ -201,6 +229,11 @@ export function createStack(type) {
                 isEnabled,
                 enableButton,
                 disableButton,
+                startOnRoad,
+                addRoadBonus,
+                // setStartingRoadBonus,
+                // getStartingRoadBonus,
+                //isOnTheRoadFromStart,
             })
 
             break;
