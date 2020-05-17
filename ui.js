@@ -4,7 +4,7 @@ class Interface {
     }
 
     buildButton(obj,bool,options) {
-
+        
         let button = document.createElement('button');
         //-------------------------------------------------------------
 
@@ -27,18 +27,23 @@ class Interface {
         m.appendChild(button)
 
         this.buttonsHash[obj.name] = button
-
+        console.log('g')
         return button
 
     }
 
     remove(name) {
-
+        //console.log(name)
+        if(!this.buttonsHash[name]) {
+            return console.log('There is no such button on screen as',name)
+        }
         this.buttonsHash[name].remove()
     }
 
     clearAllUI() {
+        console.log(this.buttonsHash)
         for (let i in this.buttonsHash) {
+            //console.log(i)
             this.buttonsHash[i].remove()
         }
     }
@@ -57,9 +62,15 @@ class Interface {
     }
 
     clearUI(name) {
+
+
         
             this.buttonsHash[name].remove()
 
+    }
+
+    isDisabled(name) {
+        return this.buttonsHash[name].disabled
     }
 
 }

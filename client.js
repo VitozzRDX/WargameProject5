@@ -11,6 +11,7 @@ import { createStack } from './stackFactory.js'
 
 import { createCounter } from './countersFinal.js'
 
+import {buttonsCallbacks} from './buttonsCallbacks.js'
 
 
 class Client {
@@ -29,6 +30,8 @@ class Client {
             'firstPlayerAdvancePhase': this.firstPlayerAdvancePhase.bind(this),
             'firstPlayerCloseCombatPhase': this.firstPlayerCloseCombatPhase.bind(this),
 
+            'defenciveFirstFirePhase' : this.defenciveFirstFirePhase.bind(this),
+
         };
 
         // Next hash table is used by _buildMenuInterface() to find what buttons appropriate Phase needs
@@ -39,13 +42,15 @@ class Client {
             'firstPlayerRallyPhase': { 'End Phase': true },
             'secondPlayerRallyPhase': { 'End Opp"s Rally': true, 'Waitng For Opponents Rally': true },
             'firstPlayerPrepFirePhase': { 'End Phase': true },
-            'firstPlayerMovementPhase': { 'End Phase': true },
+            'firstPlayerMovementPhase': { 'End Phase': true ,'Defencive Fire' : false}, //'Defencive Fire' : true
             'secondPlayerDefenciveFirePhase': { 'End Opp"s DFPh': true, 'Waitng For Opponents DF': true },
             'firstPlayerAdvFirePhase': { 'End Phase': true },
             'firstPlayerRoutPhase': { 'End Phase': true },
             'secondPlayerRoutPhase': { 'End Opp"s Rout': true, 'Waitng For Opponents Rout': true },
             'firstPlayerAdvancePhase': { 'End Phase': true },
             'firstPlayerCloseCombatPhase': { 'End Phase': true },
+
+            'defenciveFirstFirePhase': { 'End Opp"s Reaction Fire': true, },
 
         };
 
@@ -161,6 +166,16 @@ class Client {
                 'class': 'EndMovement',
                 'name': 'End Movement'
             },
+            'Defencive Fire' : {
+                'callback': this.defenciveFireCallback.bind(this),
+                'class': 'DefenciveFirstFire',
+                'name': 'Defencive Fire'
+            },
+            'End Opp"s Reaction Fire':{
+                'callback': this.endReactionFireCallback.bind(this),
+                'class': 'EndReactionFire',
+                'name': 'End Opp"s Reaction Fire'
+            }
 
         };
 
@@ -337,10 +352,10 @@ class Client {
     // interfaceScheme - what properties every buttons has (class,cb.name)
 
     _buildMenuInterface(phaseTitle) {
-
+        console.log(phaseTitle)
         // get  object 'sheme' from phaseInterfaceMenuTable like {End Phase:true,...}
         let scheme = this.phaseInterfaceMenuTable[phaseTitle]
-
+        console.log(scheme)
         // if there are several names in this object let's build a button for every one of them
         for (let name in scheme) {
             let result = scheme[name];
@@ -357,88 +372,9 @@ class Client {
         this.canvasObj.setOffMouseClickListener();
         this.canvasObj.setMouseClickListener(callback)
     };
-
-    //-----------this callback is called when clicking on End Phase button --------------------
-    endPhaseCallback(button) {
-
-        console.log('called End Phase ')
-
-        // 1 check what Phase now
-        this.game.switchToNextPhase()
-        let phase = this.game.getPhase()    // rename to newPhase
-
-        console.log('New phase :', phase)
-
-        let newPhaseCallback = this.allPhases_CallbacksHash[phase]
-
-        // --- does we get to opponent"s Half Turn ? ---------
-        if (phase == 'secondPlayerRallyPhaseHalfTurn' || phase == 'firstPlayerRallyPhase') {
-            this.switchPlayers()
-            this.setInterfaceScheme()
-            this.canvasObj._flipSidePicture()
-        }
-
-        // --- is new Phase 'secondPlayerRallyPhase' ? In single Player variant it is same Phase as FPRP,so no Rondel Rotation
-        if (phase == 'secondPlayerRallyPhase' || phase == 'secondPlayerRoutPhase' || phase == 'firstPlayerRallyPhaseHalfTurn'
-            || phase == 'firstPlayerRoutPhaseHalfTurn') {
-
-            this.canvasObj.setOffMouseClickListener()
-            this.canvasObj.setMouseClickListener(newPhaseCallback);
-
-            // ----  we don't need to Rotate Rondel , but  still need to  build new Menu
-            this.interface.clearAllUI()
-
-            // 3 Build appropriate MUI 
-            this._buildMenuInterface(phase)
-        }
-
-        // --- is the new Phase any other ? ...
-        else {
-            // ---- ... let'start asinchronous animation of Rondel Rotation
-            let p = this.canvasObj._rotateTurnRondel2(button);
-            // --- and after completion set apropriate cb and build appropriate MUI
-            p.then(() => {
-                this.canvasObj.setMouseClickListener(newPhaseCallback);
-                this.interface.clearAllUI()
-                this._buildMenuInterface(phase)
-            })
-        }
-
-
-    };
-
-
-    endOppsRallyCallback(button) {
-
-        console.log('pressed End Opp"s Rally button')
-        // at this moment we need just to launch Next Phase same as in End Phase Callback
-
-        this.endPhaseCallback(button)
-    }
-
-    waitngForOpponentsRallyCallback(button) {
-        console.log('DON"T TOUCH IT !!')
-    }
-
-    // --------------------- added 17 02 2020
-    endOppsDFPhCallback(button) {
-
-        console.log('pressed End Opp"s DF button')
-        // at this moment we need just to launch Next Phase same as in End Phase Callback
-
-        this.endPhaseCallback(button)
-    }
-
-    endOppsRoutCallback(button) {
-
-        console.log('pressed End Opp"s Rout button')
-        // at this moment we need just to launch Next Phase same as in End Phase Callback
-
-        this.endPhaseCallback(button)
-    }
-
     // ----------- added 22 02 2020
     buildCUI(counter) {
+        console.log('ggggg')
         let phase = this.game.getPhase()
         let schemeObj = counter.getScheme(phase)  // {'phase':{'Do Something':false,...]} - we get {'Do Something': false,...}
 
@@ -453,15 +389,10 @@ class Client {
         return this
     };
 
-    rallyCallback(button) {
-        console.log(button)
-    }
-
     clearCounterInterface() {                                   // change name to clearCurrentCounterInterface
         console.log('clearing clearCounterInterface')
         let currentCounterInterface = this.currentCounterInterface
         // ---- is any counter already selected ?
-        //console.log(currentCounterInterface)
         if (currentCounterInterface) {
             for (let name in currentCounterInterface) {
                 this.interface.remove(name)
@@ -509,7 +440,7 @@ class Client {
 
     }
     // --------------------- added 26 02 2020
-    _checkIfclickedCounterOwnerIsSameAsPhaseOwner(counter, player) {
+    _isClickedCounterOwnerIsSameAsPhaseOwner(counter, player) {
         return counter.owner == player
     }
     //----------------------------- 27 02 2020 -----------------------------------
@@ -534,6 +465,7 @@ class Client {
     }
 
     buildStackUI(stack) {
+        //console.log('buildStackUI')
         for (let buttonName in this.getStackUIScheme(stack)) {
             let obj = this.interfaceScheme[buttonName]
             let bool = this.stack.schemeObj[buttonName]
@@ -545,7 +477,6 @@ class Client {
         return stack.status
     }
 
-
     _isCounterInSameHexAsStack(counter, stack) {
 
         let hex = stack.getOwnHex()
@@ -556,37 +487,6 @@ class Client {
         let p = this.game.getPhase()
         let cb = this.allPhases_CallbacksHash[p]
         this.canvasObj.setMouseClickListener(cb);
-    }
-
-
-
-    breakStackCallback(button) {
-        console.log('breakStack pressed')
-
-        if (this.countersFromBrokenMovingStackArray) throw 'array with Broken Stack counters is full'
-
-        this.countersFromBrokenMovingStackArray = this.stack.mgArray
-
-        this.stack.mgArray.forEach((counter) => {
-
-            this.changeColorOfBorder(counter, "yellow")
-            counter.setMovingStatus('brokenStackRemnant')
-            try {
-                if (counter.isUnderCommand()) {
-                    //console.log('here')
-                    counter.removeCommanderBonus()
-                }
-            } catch (error) {
-                console.log(error,'it should be a Commander')
-            }
-
-
-        })
-
-        this.setStackStatus(this.stack, 'uncreated')
-        this.setStackUIDisabled(this.stack)
-        this.buildStackUI(this.stack)
-
     }
 
     setStackStatus(stack, status) {
@@ -603,66 +503,9 @@ class Client {
             return true
         }
     }
+
     clearCountersFromBrokenMovingStackArray() {
         this.countersFromBrokenMovingStackArray = undefined
-    }
-
-    //---------------- 10 03 Weapon -------------------------------------
-
-    attachCallback(button, counter) {
-        let img = this.canvasObj.getImageByID(counter.getImageID())
-        this.changeColorOfBorder(counter, 'red')
-
-        let newCallback = (options) => {
-
-            if (options.target == null) {
-                console.log('options.target == null')
-                return
-            }
-
-            let counterToAttach = options.target.counter
-
-            if (counter == counterToAttach) {
-                console.log('counter == counterToAttach')
-                return
-            }
-
-
-            let i = this.canvasObj.getImageByID(counterToAttach.getImageID())
-
-            this.canvasObj.canvas.discardActiveObject()
-
-            img.set({
-                top: i.top + 10,
-                left: i.left + 10,
-                stroke: null
-            })//.bringToFront()
-
-            this.canvasObj.canvas.add(img)
-
-            //-------------- group start---------------------------------------------------------------------------------------
-            let group = this.canvasObj.createGroup(i, img)
-
-            counterToAttach.group = group
-            group.counter = counterToAttach
-            group.weaponCounter = counter
-
-            this.canvasObj.drawGroup(group)
-            //-------------- group end---------------------------------------------------------------------------------------
-
-            counter.setWeightHex(0)
-            counterToAttach.setWeightHex(2)
-            //---------------------------------------------------------------------------------------------------------
-            this.map.fillhex_counterIDHash(counterToAttach.ownHex, counter.ID)
-            this.rearrangeCountersPositionInHex(counterToAttach.ownHex)
-            //---------------------------------------------------------------------------------------------------------
-            this.clearCounterInterface()
-
-            this._removeAllCallbacksOffCanvasAndSetNew(this.firstPlayerRallyPhase.bind(this))
-        }
-
-        this._removeAllCallbacksOffCanvasAndSetNew(newCallback)
-
     }
 
     rearrangeCountersPositionInHex(hex) {
@@ -745,7 +588,7 @@ class Client {
             console.log('clicked on empty space. Select Counter')
             return true
         }
-        if (!this._checkIfclickedCounterOwnerIsSameAsPhaseOwner(target.counter, this.firstPlayer)) {
+        if (!this._isClickedCounterOwnerIsSameAsPhaseOwner(target.counter, this.firstPlayer)) {
             console.log('u click not your counter')
             return true
         }
@@ -796,20 +639,19 @@ class Client {
 
 
         //=========================================================================================
-        console.log(this.stack.isOnTheRoadFromStart)
+
         if (targetHexType != 'road' && this.stack.isOnTheRoadFromStart){
-            console.log('hereee')
+
             this.stack.isOnTheRoadFromStart = false
 
             let result = this.stack.mgArray.some((movingCounter) => {
                 movingCounter.subtractMF(1)
                 let bool = this._checkIfMovementPointsEnded(movingCounter)
-                console.log(bool)
+
                 movingCounter.getRoadBonus()
 
                 return bool
             })
-            console.log(result)
 
             if (result) {
                 this.stack.isOnTheRoadFromStart = true
@@ -895,6 +737,9 @@ class Client {
         // this.interface.enableButton('End Movement')
         // }
 
+        if (this.interface.isDisabled('Defencive Fire')) {
+            this.interface.enableButton('Defencive Fire')
+        }
 
         this.setStackStatus(this.stack, 'moving')
     }
@@ -1018,62 +863,25 @@ class Client {
         //----------------------------------------------------------------------------------------------------------------------------------------------      
     }
 
-    endMovementCallback(button) {
+    // clearStackUI(stack) {
+    //     for (let buttonName in this.getStackUIScheme(stack)) {
 
-        this.stack.mgArray.forEach((counter) => {
-
-            this.setMovingStatus(counter, 'moved')
-            this.changeColorOfBorder(counter, null)
-
-        })
-
-        this.setStackStatus(this.stack, 'uncreated')
-        this.clearStackUI(this.stack)
-
-        console.log('end')
-    }
-
+    //         this.interface.clearUI(buttonName)
+    //     }
+    // }
+    
     clearStackUI(stack) {
         for (let buttonName in this.getStackUIScheme(stack)) {
-
-            this.interface.clearUI(buttonName)
+            this.interface.remove(buttonName)
         }
     }
 
 
-    assaultMoveCallback(button) {
-        console.log('Next Move will be last. Set state ? Show "Assaulting!" table . Disable Double Time bttn (redraw MGUI ?) ')
-
-        // if (stack.status == 'moving') { return console.log('already started Move') }
-        this.stack.mgArray.forEach((counter) => {
-            // counter.setState('assaulting')
-            // 
-
-            counter.setMovingStatus('assaulting')
-        })
-    }
-
-
-    doubleTimeCallback(button) {
-        console.log('set all C in MG except that of exausted, +2 MF to temp, set statuses - exausted ')
-        this.stack.mgArray.forEach((counter) => {
-            if (counter.status != 'exosted') {
-                counter.status = 'exosted'
-                counter.temporaryMF += 2
-            }
-        })
-        this.stack.disableButton('Double Time')
-        this.interface.disableButton('Double Time')
-
+    buildGUI(group){
 
     }
-
-    // deleteAndRedrawButton(buttonName,bool) {
-    //     let obj = this.interfaceScheme[buttonName]
-    //     this.interface.buildButton(obj, bool)
-    // }
-
 }
+
 // -- let's mix canvas reaction into our class
-Object.assign(Client.prototype, methods)
+Object.assign(Client.prototype, methods,buttonsCallbacks)
 export { Client };

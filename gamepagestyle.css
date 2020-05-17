@@ -39,6 +39,7 @@ body {
 
 #UIContainer .endPhase {
     background: linear-gradient(to bottom, #ffffff 1%, #85b166 73%, #398235 100%);
+    box-shadow: 0 0 10px rgba(0,0,0,0.5);
     width: 118px;
     height: 50px;
     position:absolute;
@@ -400,6 +401,85 @@ body {
 }
 
 #UIContainer  .EndMovement:disabled {
+    background: linear-gradient(to bottom, #cccccc 1%,#bbbbbb 73%, #ffffff 100%);
+    color: #5a5a5a;
+}
+
+#UIContainer .DefenciveFirstFire {
+    background: linear-gradient(to bottom, #ffffff 1%, #336b87 73%, #ff3300 100%);
+    width: 118px;
+    height: 50px;
+    position:absolute;
+        left: 75%;/*1145px;*/
+          top: 300px;
+    color: rgb(0, 0, 0);
+    font-size:1rem;
+    font-weight: bold;
+    outline: 0;
+    border-radius: 10px;
+    border: 4px solid #000000;
+    text-transform: uppercase;
+}
+
+#UIContainer  .DefenciveFirstFire:active { 
+    background: linear-gradient(to bottom, #cccccc 1%,#bbbbbb 73%, #ffffff 100%);
+    color: #5a5a5a;
+}
+
+#UIContainer  .DefenciveFirstFire:disabled {
+    background: linear-gradient(to bottom, #cccccc 1%,#bbbbbb 73%, #ffffff 100%);
+    color: #5a5a5a;
+}
+
+#UIContainer .EndReactionFire {
+    background: linear-gradient(to bottom, #ffffff 1%, #336b87 80%, #ff3300 100%);
+    width: 118px;
+    height: 75px;
+    position:absolute;
+        left: 75%;/*1145px;*/
+          top: 350px;
+    color: rgb(0, 0, 0);
+    font-size:1rem;
+    font-weight: bold;
+    outline: 0;
+    border-radius: 10px;
+    border: 4px solid #000000;
+    text-transform: uppercase;
+}
+
+#UIContainer  .EndReactionFire:active { 
+    background: linear-gradient(to bottom, #cccccc 1%,#bbbbbb 73%, #ffffff 100%);
+    color: #5a5a5a;
+}
+
+#UIContainer  .EndReactionFire:disabled {
+    background: linear-gradient(to bottom, #cccccc 1%,#bbbbbb 73%, #ffffff 100%);
+    color: #5a5a5a;
+}
+
+
+#UIContainer .AddSquadToFG {
+    background: linear-gradient(to bottom, #ffffff 1%, #336b87 93%);
+    box-shadow: 0 0 10px rgba(0,0,0,0.5);
+    width: 98px;
+    height: 40px;
+    position:absolute;
+
+    color: rgb(0, 0, 0);
+    font-size:0.6rem;
+    font-weight: bold;
+    outline: 0;
+    border-radius: 5px;
+    border: 3px solid #000000;
+    text-transform: uppercase;
+}
+
+#UIContainer  .AddSquadToFG:active { 
+    background: linear-gradient(to bottom, #cccccc 1%,#bbbbbb 73%, #ffffff 100%);
+    color: #5a5a5a;
+}
+
+#UIContainer  .AddSquadToFG:disabled {
     background: linear-gradient(to bottom, #cccccc 1%,#bbbbbb 73%, #ffffff 100%);
     color: #5a5a5a;
 }

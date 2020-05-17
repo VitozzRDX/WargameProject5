@@ -17,9 +17,14 @@ let move = {
 
                 counter = options.target.counter
 
+                if (counter.group){
+                    console.log('group',counter.group)
+                    counter.group._restoreObjectsState()
+
+                    this.canvasObj.canvas.remove(counter.group)
+                }
                 if (counter.getMovingStatus() == "brokenStackRemnant") {    //this._checkForMovingStatus(counter,"brokenStackRemnant")
 
-                    console.log(this.stack.isOnTheRoadFromStart)
                     stack = this.createNewStack_setStatus_addCounter_setOwnHex('filledWithBrokenStackRemnants', counter)
                     stack.isOnTheRoadFromStart = this.stack.isOnTheRoadFromStart
                     this.stack = stack
@@ -28,6 +33,8 @@ let move = {
                         stack.getUnderCommand(counter)
                     }
                     //----------------------------------------------------------------------------------------------------------------------------------------------
+                    //this.interface.clearAllUI()
+                    this.clearStackUI(stack)
                     this.buildStackUI(stack)
                     return
                 }
@@ -36,7 +43,8 @@ let move = {
 
                 this.endEachCounterMove(this.countersFromBrokenMovingStackArray).clearCountersFromBrokenMovingStackArray()
 
-                stack = this.stack = this.createNewStack_setStatus_addCounter_setOwnHex('filledWithCounters', counter)
+                stack = this.createNewStack_setStatus_addCounter_setOwnHex('filledWithCounters', counter)
+                this.stack = stack
                 //----------------------------------------------------------------------------------------------------------------------------------------------
 
                 if (this.map.getHexType(counter.ownHex) == 'road') { // && stack not got RoadBonus ?
@@ -49,7 +57,7 @@ let move = {
                     stack.getUnderCommand(counter)
                 }
                 //----------------------------------------------------------------------------------------------------------------------------------------------
-
+                this.clearStackUI(stack)
                 this.buildStackUI(stack)
 
                 break;
@@ -114,7 +122,7 @@ let move = {
                 counter = options.target.counter
 
                 if (this._isCounterInStack(counter, stack)) {
-                    return console.log('selected counter is already in Moving Group')
+                    return console.log('selected counter is already in Moving  ')
                 }
 
                 if (this._isCounterInSameHexAsStack(counter, stack) && counter.getMovingStatus() == "brokenStackRemnant") {
