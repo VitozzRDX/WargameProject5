@@ -64,7 +64,8 @@ let initialSettings = {
                 owner: 'Nazi',
                 movementFactor: 6,
                 name: 'geSMC9-1',
-                type: 'SingleManCounter'
+                type: 'SingleManCounter',
+                commandBonus:-1,
             },
             'geHMG': {
                 src: "assets/geHMG.gif",

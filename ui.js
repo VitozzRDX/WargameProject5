@@ -33,17 +33,17 @@ class Interface {
     }
 
     remove(name) {
-        //console.log(name)
+
         if(!this.buttonsHash[name]) {
-            return console.log('There is no such button on screen as',name)
+            return //console.log('There is no such button on screen as',name)
         }
         this.buttonsHash[name].remove()
     }
 
     clearAllUI() {
-        console.log(this.buttonsHash)
+
         for (let i in this.buttonsHash) {
-            //console.log(i)
+
             this.buttonsHash[i].remove()
         }
     }
@@ -62,8 +62,6 @@ class Interface {
     }
 
     clearUI(name) {
-
-
         
             this.buttonsHash[name].remove()
 

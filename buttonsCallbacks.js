@@ -153,12 +153,20 @@ let buttonsCallbacks = {
                 counterToAttach.group = group
                 group.counter = counterToAttach
                 group.weaponCounter = counter
-    
+                
+                group.uiScheme = {'Add Squad To Fire Group':true,'Add Weapon To Fire Group':true} 
+
+
+
                 this.canvasObj.drawGroup(group)
+
+
                 //-------------- group end---------------------------------------------------------------------------------------
     
                 counter.setWeightHex(0)
                 counterToAttach.setWeightHex(2)
+
+                counter.ownHex = counterToAttach.ownHex
                 //---------------------------------------------------------------------------------------------------------
                 this.map.fillhex_counterIDHash(counterToAttach.ownHex, counter.ID)
                 this.rearrangeCountersPositionInHex(counterToAttach.ownHex)
@@ -190,11 +198,9 @@ let buttonsCallbacks = {
         assaultMoveCallback(button) {
             console.log('Next Move will be last. Set state ? Show "Assaulting!" table . Disable Double Time bttn (redraw MGUI ?) ')
     
-            // if (stack.status == 'moving') { return console.log('already started Move') }
+            button.disabled = true;
             this.stack.mgArray.forEach((counter) => {
-                // counter.setState('assaulting')
-                // 
-    
+
                 counter.setMovingStatus('assaulting')
             })
         },
@@ -232,6 +238,29 @@ let buttonsCallbacks = {
             this.buildStackUI(this.stack)
         },
     
+        addSquadToFG(button, ops){
+            
+            button.disabled = true;
+            ops.group.uiScheme['Add Squad To Fire Group'] = false
+            this.changeColorOfBorder(ops.group.counter, 'red')
+
+            ops.stack.addToFiringStack(ops.group.counter)
+
+            console.log(ops.stack)
+        },
+
+        addWeaponToFG(button, ops){
+
+            button.disabled = true;
+            ops.group.uiScheme['Add Weapon To Fire Group'] = false
+            this.changeColorOfBorder(ops.group.weaponCounter, 'red')
+
+            ops.stack.addToFiringStack(ops.group.weaponCounter)
+
+            console.log(ops.stack)
+        },
+
+
 
 }
 

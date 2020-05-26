@@ -11,7 +11,7 @@ import { createStack } from './stackFactory.js'
 
 import { createCounter } from './countersFinal.js'
 
-import {buttonsCallbacks} from './buttonsCallbacks.js'
+import { buttonsCallbacks } from './buttonsCallbacks.js'
 
 
 class Client {
@@ -30,7 +30,7 @@ class Client {
             'firstPlayerAdvancePhase': this.firstPlayerAdvancePhase.bind(this),
             'firstPlayerCloseCombatPhase': this.firstPlayerCloseCombatPhase.bind(this),
 
-            'defenciveFirstFirePhase' : this.defenciveFirstFirePhase.bind(this),
+            'defenciveFirstFirePhase': this.defenciveFirstFirePhase.bind(this),
 
         };
 
@@ -42,7 +42,7 @@ class Client {
             'firstPlayerRallyPhase': { 'End Phase': true },
             'secondPlayerRallyPhase': { 'End Opp"s Rally': true, 'Waitng For Opponents Rally': true },
             'firstPlayerPrepFirePhase': { 'End Phase': true },
-            'firstPlayerMovementPhase': { 'End Phase': true ,'Defencive Fire' : false}, //'Defencive Fire' : true
+            'firstPlayerMovementPhase': { 'End Phase': true, 'Defencive Fire': false }, //'Defencive Fire' : true
             'secondPlayerDefenciveFirePhase': { 'End Opp"s DFPh': true, 'Waitng For Opponents DF': true },
             'firstPlayerAdvFirePhase': { 'End Phase': true },
             'firstPlayerRoutPhase': { 'End Phase': true },
@@ -75,6 +75,8 @@ class Client {
         this.selectedCounter = undefined
 
         this.stack = { status: 'uncreated' }
+
+        this.firingStack = { status: 'uncreated' }
 
         this.countersFromBrokenMovingStackArray = undefined
 
@@ -166,15 +168,25 @@ class Client {
                 'class': 'EndMovement',
                 'name': 'End Movement'
             },
-            'Defencive Fire' : {
+            'Defencive Fire': {
                 'callback': this.defenciveFireCallback.bind(this),
                 'class': 'DefenciveFirstFire',
                 'name': 'Defencive Fire'
             },
-            'End Opp"s Reaction Fire':{
+            'End Opp"s Reaction Fire': {
                 'callback': this.endReactionFireCallback.bind(this),
                 'class': 'EndReactionFire',
                 'name': 'End Opp"s Reaction Fire'
+            },
+            'Add Squad To Fire Group': {
+                'callback': this.addSquadToFG.bind(this),
+                'class': 'AddSquadToFG',
+                'name': 'Add Squad To Fire Group',
+            },
+            'Add Weapon To Fire Group': {
+                'callback': this.addWeaponToFG.bind(this),
+                'class': 'AddSquadToFG',
+                'name': 'Add Weapon To Fire Group',
             }
 
         };
@@ -352,10 +364,9 @@ class Client {
     // interfaceScheme - what properties every buttons has (class,cb.name)
 
     _buildMenuInterface(phaseTitle) {
-        console.log(phaseTitle)
         // get  object 'sheme' from phaseInterfaceMenuTable like {End Phase:true,...}
         let scheme = this.phaseInterfaceMenuTable[phaseTitle]
-        console.log(scheme)
+
         // if there are several names in this object let's build a button for every one of them
         for (let name in scheme) {
             let result = scheme[name];
@@ -640,7 +651,7 @@ class Client {
 
         //=========================================================================================
 
-        if (targetHexType != 'road' && this.stack.isOnTheRoadFromStart){
+        if (targetHexType != 'road' && this.stack.isOnTheRoadFromStart) {
 
             this.stack.isOnTheRoadFromStart = false
 
@@ -869,7 +880,7 @@ class Client {
     //         this.interface.clearUI(buttonName)
     //     }
     // }
-    
+
     clearStackUI(stack) {
         for (let buttonName in this.getStackUIScheme(stack)) {
             this.interface.remove(buttonName)
@@ -877,11 +888,179 @@ class Client {
     }
 
 
-    buildGUI(group){
+    buildGUI(group, stack) {
+
+        let scheme = group.uiScheme
+        let k = 0
+        for (let name in scheme) {
+
+            let bool = scheme[name];
+
+            if (!bool) {
+                return  // this counter already added
+            }
+
+            let btton = this.interface.buildButton(this.interfaceScheme[name], bool, { group: group, stack: stack })
+
+            btton.style.top = group.top - 100 + 'px';
+            btton.style.left = group.left - k + 'px';
+            k = 105
+        }
+    }
+
+    clearGroupUI() {
+
+        for (let buttonName in { 'Add Squad To Fire Group': true, 'Add Weapon To Fire Group': true }) {
+
+            this.interface.remove(buttonName)
+        }
+    }
+
+    // _isLegalTargetToAddToFiringStack(target){
+    //     if (target == null) {
+    //         console.log('clicked on empty space in FPPFPhase')
+
+    //         return false
+    //     }
+
+    //     return true
+    // }
+
+    createNewFStack(status) {
+
+        let stack = createStack('firing').setStatus(status)
+
+        return stack
+    }
+
+    addingToFireStack(counter, stack) {
+
+        if (counter.getType() == 'SingleManCounter' && stack._isHex_CountersArrayEmpty(hex)) {
+            return console.log('u cannot add SMC to FG without MMC or Weapon')
+        }
+        if (counter.getType() == 'SingleManCounter') {
+            stack.setHex_Bonus(counter.ownHex, counter.commandBonus)
+        }
+
+        stack.addToGeneralCountersArray(counter)
+        stack.setHex_countersArray(counter.ownHex, counter)
+
+        this.changeColorOfBorder(counter, "red")
+
+        this.clearGroupUI()
+    }
+
+    _isCounterNearStack(counter, stack) {
+        let arr = Object.values(stack['hex_countersArray'])
+        let result = arr.some((hex) => {
+            return this.map.isHexNear(counter.ownHex, hex)
+        })
+
+        if (result) {
+            console.log('counter is near or inside hexes with stack')
+            return true
+        }
+    }
+
+    fireProcessing(point, stack) {
+
+        stack.calculateCommanderBonus()
+        stack.setCommanderCover()
+
+        let targetHex = this.map.getHexFromCoords(point)
+        let countersIDsInHexArray = this.map.getCountersIDinHexArray(targetHex) // [conterID,...]
+
+        let firingHexesArr =  Object.values(stack['hex_countersArray'])
+
+        firingHexesArr.forEach((hex)=>{
+            let bool = this.map.isLoS(hex,targetHex)
+            if (!bool){
+                stack.setHex_LoS(hex,bool)
+            }
+            // hex - hexes in los
+            // for each += hind
+            // set hex_hind[hex] = hind
+            // get worst
+            
+
+
+        })
+
+        // also calc Hindrance stack.setHex_Hind - worst of all
+        // if Hind > 6 - this hex is not los
+
+        if (Object.values(stack['hex_los']).length > 0) {
+            // build button
+            return console.log('building buttons to choose stack firing')
+        }
+
+        //let diceRoll =  
+        let firePower = this.calculateFirePower(stack,targetHex,diceRoll)
+
+        countersIDsInHexArray.forEach((counterID, index, arr) => {
+            let counter = this.getCounterByItsID(counterID)
+        })
+        //get array counters in taret hex
+        // in  case DFF only moving C are targets
+        // stack got hex-array structure
+        // for each hex check los
+        // if no los found build buttons Fire as Separate FG + Fire From Every Hex
+        // for every counter in FG use firing consequence (leaderDRM)
+        // animate
+        // else calculate FP (leaderDRM)
+        // for every counter in target use FP
+        // animate
+
+
 
     }
+
+    calculateFirePower(stack,targetHex,diceRoll){
+
+        let sumOfAllCountersFP = 0
+        let cower = false
+
+        let fp 
+        let summaryDRM 
+
+        let hindranceDRM = stack.getHindranceDRM()
+        let commanderDRM = stack.getCommanderDRM()
+        let FFMOdrm = stack.getFFMOdrm()
+        let FFNAMdrm = stack.getFFNAMdrm()
+
+        if(diceRoll.red == diceRoll.white && !stack.underCommand) {
+            cower = true
+        }
+
+        for(let hex in stack['hex_countersArray']) {
+            stack['hex_countersArray'][hex].forEach((counter)=>{
+                
+                let fp = counter.firePower
+
+
+                if (this.map.isHexNear(counter.ownHex, targetHex)){
+                    fp = counter.firePower*2
+                }
+                else
+                if(this.map.getDistanceBetween(counter.ownHex, targetHex)>counter.getNormalRange()){
+                    fp = counter.firePower/2    // can have fractions
+                }
+                
+                sumOfAllCountersFP = sumOfAllCountersFP +  fp 
+
+            })
+        }
+
+        // round sumOfAllCountersFP !!
+
+        fp = this.game.approximateFP(sumOfAllCountersFP,cower,counter.experience)
+
+        return this.game.getIFT_FPresult(fp,dr)
+    }
+
+
 }
 
 // -- let's mix canvas reaction into our class
-Object.assign(Client.prototype, methods,buttonsCallbacks)
+Object.assign(Client.prototype, methods, buttonsCallbacks)
 export { Client };

@@ -1,42 +1,3 @@
-// const stackFactory = function (type) {
-
-//     //if(type!='moving'&&type !='firing') throw 'shoul be moving or firing' 
-// }
-
-// stackFactory.prototype = function createMovingStack() {
-
-// }
-//====================================================================================================================================
-
-// const stackFactory = function () {
-
-// }
-
-// stackFactory.createMovingStack = function () {
-//     return {
-//         mgArray: [],
-//         MMCnumber: 0,
-//         SMCnumber: 0,
-//         status: undefined,
-
-//         schemeObj: {
-//             'Assault Move': true,
-//             'Double Time': true,
-//             'Break Stack': true,
-//         }
-//     }
-// }
-
-// const counters_stack_Manipulator = {
-//     addToMovingStack: (stack, counter) => {
-
-//     }
-// }
-// export {
-//     countersFactory, stackFactory, counters_stack_Manipulator
-// }
-
-//====================================================================================================================================
 
 export function createStack(type) {
     let stack = {
@@ -48,12 +9,14 @@ export function createStack(type) {
         schemeObj: undefined,
         commander: undefined,
         startingRoadBonus: 0,
-        isOnTheRoadFromStart:undefined,
+        isOnTheRoadFromStart: undefined,
         gotNoRoadBonus: true
     }
 
+
+
     let addToStack = (counter) => {
-        //console.log(counter.getType())
+
         let counterType = counter.getType()
 
         switch (counterType) {
@@ -64,9 +27,6 @@ export function createStack(type) {
                     return;
                 }
 
-                // if (stack._isStackUnderCommand){
-                //     let commander = stack.commander
-                // }
                 stack.mgArray.push(counter)
                 stack.MMCnumber += 1
 
@@ -77,19 +37,6 @@ export function createStack(type) {
                     console.log(' there are already 4 MMC in stack, cannot add more ')
                     return;
                 }
-                // stack.mgArray.forEach((counter) => {
-
-                //     try {
-                //         counter.getReadyToMoveUnderSMCcommand()
-                //     }
-                //     catch (e) {
-                //         console.log(e)
-                //     }
-                // })
-                // if (!stack._isStackUnderCommand) {
-                //     stack._getUnderCommand(counter)
-                // }
-
 
                 stack.mgArray.push(counter)
                 stack.SMCnumber += 1
@@ -112,7 +59,7 @@ export function createStack(type) {
                     counter.getUnderCommand()
                 }
                 catch (e) {
-                    console.log(e,'cannot get C bonus')
+                    console.log(e, 'cannot get C bonus')
                 }
             })
         }
@@ -178,33 +125,118 @@ export function createStack(type) {
         stack.schemeObj[buttonName] = false
     }
 
-    function startOnRoad(){
+    function startOnRoad() {
         stack.isOnTheRoadFromStart = true
         //stack.gotNoRoadBonus = true
     }
 
     function addRoadBonus() {
-        
-            stack.mgArray.forEach((counter) => {
-                counter.getRoadBonus()
-            })
+
+        stack.mgArray.forEach((counter) => {
+            counter.getRoadBonus()
+        })
 
     }
 
-    // function getStartingRoadBonus() {
-    //     return stack.startingRoadBonus
-    // }
-    // function setStartingRoadBonus() {
-    //     //console.log('gg')
-    //     stack.startingRoadBonus = 1
+    // function addToFiringStack(counter) {
+
+    //     // let counterType = counter.getType()
+    //     // switch (counterType) {
+    //     //     case 'MultiManCounter':
+    //     //         if (stack.MMCnumber == 3) {
+    //     //             console.log(' there are already 3 MMC in stack, cannot add more ')
+    //     //             return;
+    //     //         }
+
+    //     //         stack.mgArray.push(counter)
+    //     //         stack.MMCnumber += 1
+
+    //     //         break;
+
+    //     //     case 'MultiManCounter':
+    //     //         if (stack.MMCnumber == 3) {
+    //     //             console.log(' there are already 3 MMC in stack, cannot add more ')
+    //     //             return;
+    //     //         }
+
+    //     //         stack.mgArray.push(counter)
+    //     //         stack.MMCnumber += 1
+
+    //     //         break;
+    //     // }
+    //     let hex = JSON.stringify(counter.ownHex)
+    //     stack.mgArray.push(counter)
+
+    //     if (stack[hex]) {
+    //         stack[hex].push(counter)
+
+    //         return stack
+    //     }
+
+    //     stack[hex] = [counter]
+
+    //     return stack
     // }
 
-    // function isOnTheRoadFromStart(){
-    //     return stack.isOnTheRoadFromStart
-    // }
+    function setHex_Bonus(hex, bonus) {
+        let hex = JSON.stringify(hex)
 
-    //Object.create(Animal.prototype)
-    //prototype: {}
+        if (stack['hex_bonus'][hex]) {
+            let bonus1 = stack[hex]
+            stack[hex] = Math.max(bonus1, bonus)
+            return
+        }
+
+        stack[hex] = bonus
+    }
+
+    function setHex_countersArray(hex, counter) {
+        let hex = JSON.stringify(hex)
+
+        if (stack['hex_countersArray'][hex]) {
+            stack['hex_countersArray'][hex].push(counter)
+            return
+        }
+
+        stack['hex_countersArray'][hex] = [counter]
+
+    }
+
+    function _isHex_CountersArrayEmpty(hex){
+        let hex = JSON.stringify(hex)
+
+        if (stack['hex_countersArray'][hex]) { 
+            return false
+        }
+
+        return true
+    }
+
+    function addToGeneralCountersArray(counter){
+        stack.mgArray.push(counter)
+    }
+    function calculateCommanderBonus(){
+        let arr  = Object.values(stack['hex_bonus'])
+        console.log(arr);
+
+        return Math.min(...arr)
+
+    }
+
+
+    function setCommanderCover(){
+        if (Object.values(stack['hex_bonus']).length < Object.values(stack['hex_countersArray'])){
+            stack.underCommand = false    // stack.underCommand = true
+            return
+        }
+        stack.underCommand = true
+    }
+
+    function setHex_LoS(hex, bool) {
+        let hex = JSON.stringify(hex)
+
+        stack['hex_los'][hex] = bool
+    }
     switch (type) {
         case 'moving':
             Object.assign(stack, {
@@ -212,7 +244,7 @@ export function createStack(type) {
                     'Assault Move': true,
                     'Double Time': true,
                     'Break Stack': true,
-                    'End Movement' : false,
+                    'End Movement': false,
                 },
                 addToStack,
                 setStatus,
@@ -231,13 +263,37 @@ export function createStack(type) {
                 disableButton,
                 startOnRoad,
                 addRoadBonus,
-                // setStartingRoadBonus,
-                // getStartingRoadBonus,
-                //isOnTheRoadFromStart,
             })
 
             break;
         case 'firing':
+            stack = {
+                commander: undefined,
+                status: undefined,
+                hindranceDRM:undefined,
+                mgArray: [],
+                hex_countersArray: {},
+                hex_bonus: {},
+                hex_los:{},
+                hex_hindrance:{},
+                //ownHexes:[],
+            }
+            Object.assign(stack, {
+                schemeObj: {
+                    'Cancel Fire': true,
+                },
+                //addToFiringStack,
+                setStatus,
+                getStackCountersArray,
+                setHex_Bonus,
+                setHex_countersArray,
+                _isHex_CountersArrayEmpty,
+                addToGeneralCountersArray,
+                calculateCommanderBonus,
+                setCommanderCover,
+                setHex_LoS
+            })
+
             break;
     }
 

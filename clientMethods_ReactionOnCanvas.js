@@ -1,15 +1,10 @@
 import { move } from './move.js'
 import { defenciveFF } from './defenciveFF.js'
 
+
 let methods = {
     firstPlayerRallyPhase(options) {
-        // let absolutePointer = options.absolutePointer
-        // let targetHex = this.map.getHexFromCoords(absolutePointer)
-        // // let t = JSON.stringify(targetHex)
-        // // console.log(t)
-        // // console.log(this.map.hex_hexTypeHash[t])
 
-        // console.log(this.map.getHexType(targetHex))
         if (options.target == null) {
             return console.log('clicked on empty space in FPRPhase')
         }
@@ -27,69 +22,103 @@ let methods = {
     },
 
     firstPlayerPrepFirePhase(options) {
-        console.log(options.target)
+
         if (options.target == null) {
             return console.log('clicked on empty space in FPPFPhase')
         }
 
+        // let counter = options.target.counter
 
+        // if (counter.group) { // && group.type == 'attachedWeapon'
 
-        if (options.target.counter.group) { // && group.type == 'attachedWeapon'
-            //console.log('group',options.target.counter.group)
+        //     let group = options.target.counter.group
 
-            // options.target.counter.group._restoreObjectsState()
+        //     this.buildGUI(group)
 
-            // this.canvasObj.canvas.remove(options.target.counter.group)
+        //     return
+        // }
 
-            // options.target.counter.group._restoreObjectsState()
+        // this.clearGroupUI()
+        //----------------------------------------------------------------------------------------------------------------
+        let absolutePointer = options.absolutePointer
 
-            // this.canvasObj.canvas.remove(options.target.counter.group)
+        let counter = options.target.counter
+        let stack = this.firingStack
+        let firingStackStatus = this.getStackStatus(stack) // this.countersManipulator.getStack().getStackStatus
 
-            // this.changeColorOfBorder(options.target.counter, 'red')
+        switch (firingStackStatus) {
 
-            // console.log(options.target)
+            case 'uncreated':
 
-            // let button = document.createElement('button');
-            // button.classList.add('AddSquadToFG')
-            // button.innerHTML = 'Add Squad To Fire Group'
-
-            // button.style.top = options.target.counter.group.top - 100 + 'px';
-            // button.style.left = options.target.counter.group.left - 105+ 'px';
-
-            // button.addEventListener('click', () => {    // for beauty we can take event from obj click or mousedown
-            //     button.disabled = true
-            //     this.changeColorOfBorder(options.target.counter, 'red')
-            // });
-
-            // document.getElementById('UIContainer').appendChild(button)
-
-            // let button2 = document.createElement('button');
-            // button2.classList.add('AddSquadToFG')
-            // button2.innerHTML = 'Add Weapon To Fire Group'
-
-            // button2.style.top = options.target.counter.group.top - 100 + 'px';
-            // button2.style.left = options.target.counter.group.left + 'px';
-
-            // document.getElementById('UIContainer').appendChild(button2)
-
-//---------------------------------------------------------------------------------------------------------------------------------------
-            let counter = options.target.counter
-            let group = options.target.counter.group
-            
-            this.buildGUI(group)
-
-            let scheme
-            let btton = this.interface.buildButton({
-                'class':'AddSquadToFG',
-                'name':'Add Squad To Fire Group',
-                'callback':()=>{
-                    btton.disabled = true
-                    this.changeColorOfBorder(options.target.counter, 'red')
+                if (!this._isClickedCounterOwnerIsSameAsPhaseOwner( options.target.counter, this.firstPlayer)) {
+                    return console.log('u click not your counter')
                 }
-            },true,counter)    //(obj,bool,options) 
 
-            btton.style.top = options.target.counter.group.top - 100 + 'px';
-            btton.style.left = options.target.counter.group.left - 105+ 'px';
+                stack = this.createNewFStack('readyToFire')
+                this.firingStack = stack
+
+                if (counter.group) { // && group.type == 'attachedWeapon'
+                    let group = options.target.counter.group
+                    this.buildGUI(group, stack)
+                    return
+                }
+
+                this.addingToFireStack(counter,stack)
+                //stack.addToFiringStack(counter)
+                // stack.addToGeneralCountersArray(counter)
+                // stack.setHex_countersArray(counter.ownHex,counter)
+
+                // this.changeColorOfBorder(counter, "red")
+
+                // this.clearGroupUI()
+
+                break;
+
+            case 'readyToFire':
+                
+                // if (!this._isLegalTargetToAddToFiringStack(options.target)) {   //already added
+                //     return
+                // }
+
+                if (!this._isClickedCounterOwnerIsSameAsPhaseOwner( options.target.counter, this.firstPlayer)) {
+                    // stack.calculateCommanderBonus()
+                    // stack.setCommanderCover()
+                    this.fireProcessing(absolutePointer,stack)
+                }
+
+                if (counter.group) { // && group.type == 'attachedWeapon'
+                this.clearGroupUI()
+                    let group = options.target.counter.group
+                    this.buildGUI(group, stack)
+                    return
+                }
+
+                if (this._isCounterInStack(counter,stack)){
+                    return console.log('selected counter is already in Moving Group')
+                }
+
+                if (!this._isCounterNearStack(counter,stack)){  
+                    return console.log('selected counter not near or in stack')
+                }
+
+                this.addingToFireStack(counter,stack)
+                // if (counter.getType() == 'SingleManCounter' && stack._isHex_CountersArrayEmpty(hex)){
+                //     return console.log('u cannot add SMC to FG without MMC or Weapon')
+                // }
+
+                // if (counter.getType() == 'SingleManCounter') {
+                //     stack.setHex_Bonus(counter.ownHex,counter.commandBonus)
+                // }
+
+                // stack.addToGeneralCountersArray(counter)
+                // stack.setHex_countersArray(counter.ownHex,counter)
+
+                // this.changeColorOfBorder(counter, "red")
+
+                // this.clearGroupUI()
+
+                // this.fireProcessing // fireSquadProcess
+                break;
         }
     },
 

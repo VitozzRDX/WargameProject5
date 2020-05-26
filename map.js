@@ -56,25 +56,8 @@ class Map {
         return this.hex_round(this.pixel_to_hex(this.flat,coords))
     }
 
-    // ------------ 27 02 2020-----------------------------------------------------
-
-    // getHex_HexOwnerAndNumberOfCountersHash(){
-    //     return this.hexOwnerAndNumberOfCountersHash
-    // }
-    // getOwnerAndNumberOfCountersInHex(hex){
-    //     let h = JSON.stringify(hex)
-    //     console.log(this.getHex_HexOwnerAndNumberOfCountersHash(h))
-    //     let o = this.getHex_HexOwnerAndNumberOfCountersHash(h)
-    //       return o[h]
-    // }
-    // getOwnerOfHex(hex){
-
-    //     if (!this.getOwnerAndNumberOfCountersInHex(hex)) return undefined
-    //     return this.getOwnerAndNumberOfCountersInHex(hex).owner
-    // }
-
     getOwnerOfHex(hex){
-        console.log(this.hex_ownerHash)
+        //console.log(this.hex_ownerHash)
         let h = JSON.stringify(hex)
         return this.hex_ownerHash[h]
 
@@ -84,30 +67,6 @@ class Map {
         let h = JSON.stringify(hex)
         this.hex_ownerHash[h]= owner // owner can be 'disputed'
     }
-
-    // getNumberOfCountersInHex(hex){
-    //     return this.getOwnerAndNumberOfCountersInHex(hex).numberOfCounters
-    // }
-
-    // addCounterToHex(hex,owner) {
-
-    //     let h = JSON.stringify(hex)
-    //     if (this.hexOwnerAndNumberOfCountersHash[h]) {
-
-    //         let previousOwner = this.hexOwnerAndNumberOfCountersHash[h].owner
-    //         if (owner == previousOwner){
-    //             this.hexOwnerAndNumberOfCountersHash[h].numberOfCounters +=1
-    //             return
-    //         }
-    //         this.hexOwnerAndNumberOfCountersHash[h].numberOfCounters +=1
-    //         this.hexOwnerAndNumberOfCountersHash[h].owner = 'disputed'
-    //         // error ! need return here !
-    //         return
-
-    //     }
-    //     // INitialization of hexOwnerAndNumberOfCountersHash :
-    //     this.hexOwnerAndNumberOfCountersHash[h] = {owner: owner,numberOfCounters:1}
-    // }
 
     getHexType(hex){
         let h = JSON.stringify(hex)
@@ -121,8 +80,7 @@ class Map {
     addHexTohex_counterIDHash(hex){
         let h = JSON.stringify(hex)
         if(this.hex_counterIDHash[h]) {
-            console.log('this hex is already in hex_counterIDHash')
-            return
+            return console.log('this hex is already in hex_counterIDHash')
         }
         this.hex_counterIDHash[h] = []
     }
@@ -136,7 +94,7 @@ class Map {
         let h = JSON.stringify(hex)
         return this.hex_counterIDHash[h]
     }
-    //------------------------------------------------------------------------------
+
     removeIDFromHex_counterIDHash(hex,ID){
         console.log('removeIDFromHex_counterIDHash')
         let h = JSON.stringify(hex)
@@ -150,12 +108,28 @@ class Map {
         let center = this.getCenterCoordsObjFromHex(hex)
         let arr = this.getCountersIDinHexArray(hex)||[]
 
-        //console.log(arr)
         if (arr.length == 0 ) return {x:center.x,y:center.y}
         let num = arr.length
         
 
         return {x:center.x+num*size*0.25,y:center.y+num*size*0.25 }
+    }
+
+    isHexNear(originHex, hexClicked){
+
+        if (Math.abs(hexClicked.q - originHex.q)>1){
+            return false
+        }
+
+        if (Math.abs(hexClicked.r - originHex.r)>1){
+            return false
+        }
+
+        if (Math.abs(hexClicked.s - originHex.s)>1){
+            return false
+        }
+        
+        return true
     }
 }
 

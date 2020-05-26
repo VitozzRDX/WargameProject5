@@ -30,8 +30,18 @@ function addSquadMoveProps(counter,param) {
     }
 }
 
-function addFireProps(counter) {
+function addFireProps(counter,param) {
+
+    if(!param.normalRange || !param.firePower) {
+        throw console.error(e);
+        
+    }
     counter.firingStatus = undefined
+    counter.firePower = param.firePower
+    counter.temporaryFirePower = param.firePower
+
+    counter.normalRange = param.normalRange
+
 }
 
 function addManInterface(counter){
@@ -54,6 +64,10 @@ function addCommandableProps(counter){
     counter.underCommand = false
 }
 
+function addCommanderProps(counter,param){
+    counter.commandBonus = param.commandBonus
+}
+
 
 let Fireable = {
     setFiringStatus(status) {
@@ -62,7 +76,12 @@ let Fireable = {
 
     fire(){
         console.log('fire')
+    },
+
+    getNormalRange(){
+        return this.normalRange
     }
+
 }
 
 let Movable = {
@@ -178,7 +197,7 @@ export function createCounter(param) {
             addBasicProps(counter,param)
             addMoveProps(counter)
             addSquadMoveProps(counter,param)
-            addFireProps(counter)
+            addFireProps(counter,param)
             addManInterface(counter)
             addCommandableProps(counter)
 
@@ -191,9 +210,10 @@ export function createCounter(param) {
             //const counter = Object.assign({}, )
 
             addBasicProps(counter,param)
+            addCommanderProps(counter,param)
             addMoveProps(counter)
             addSquadMoveProps(counter,param)
-            addFireProps(counter)
+            addFireProps(counter,param)
             addManInterface(counter)
 
             Object.assign(counter,BasicCounterMethods,Movable,Fireable,SquadMovable)
@@ -203,7 +223,7 @@ export function createCounter(param) {
         case 'MashineGun':
 
             addBasicProps(counter,param)
-            addFireProps(counter)
+            addFireProps(counter,param)
             addWeaponProps(counter,param)
             addWeaponInterface(counter)
 
