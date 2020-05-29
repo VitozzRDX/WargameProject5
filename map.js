@@ -114,7 +114,7 @@ class Map {
 
         return {x:center.x+num*size*0.25,y:center.y+num*size*0.25 }
     }
-
+//--------------------------------------------------------------------------------------------------------
     isHexNear(originHex, hexClicked){
 
         if (Math.abs(hexClicked.q - originHex.q)>1){
@@ -130,6 +130,53 @@ class Map {
         }
         
         return true
+    }
+
+    getHexesBetween(hexClicked,hexFired) {
+
+        return this.hex_linedraw(hexFired,hexClicked);
+    }
+
+    getHexHindrance(hex){
+        let h = JSON.stringify(hex)
+        let type = this.hex_hexTypeHash[h]
+
+        switch (type) {
+
+            case 'orchard':
+                return  1
+
+
+            case 'grain':
+
+                return  1
+        }
+    }
+
+
+    
+    getHexTEM(hex){
+        
+        let type = this.getHexType(hex)
+
+        switch (type) {
+
+            case 'woods':
+                return  1
+
+
+            case 'wooden building':
+
+                return  2
+            case 'stone building':
+
+                return  3
+            case 'woods-road' :
+                // if los and unit entered with road bonus = 0
+                // else = 1
+                return 'woods-road'
+
+        }
     }
 }
 

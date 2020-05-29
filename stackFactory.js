@@ -10,7 +10,8 @@ export function createStack(type) {
         commander: undefined,
         startingRoadBonus: 0,
         isOnTheRoadFromStart: undefined,
-        gotNoRoadBonus: true
+        gotNoRoadBonus: true,
+        experience:undefined
     }
 
 
@@ -134,49 +135,10 @@ export function createStack(type) {
 
         stack.mgArray.forEach((counter) => {
             counter.getRoadBonus()
+            counter.setOnTheRoad(true)
         })
 
     }
-
-    // function addToFiringStack(counter) {
-
-    //     // let counterType = counter.getType()
-    //     // switch (counterType) {
-    //     //     case 'MultiManCounter':
-    //     //         if (stack.MMCnumber == 3) {
-    //     //             console.log(' there are already 3 MMC in stack, cannot add more ')
-    //     //             return;
-    //     //         }
-
-    //     //         stack.mgArray.push(counter)
-    //     //         stack.MMCnumber += 1
-
-    //     //         break;
-
-    //     //     case 'MultiManCounter':
-    //     //         if (stack.MMCnumber == 3) {
-    //     //             console.log(' there are already 3 MMC in stack, cannot add more ')
-    //     //             return;
-    //     //         }
-
-    //     //         stack.mgArray.push(counter)
-    //     //         stack.MMCnumber += 1
-
-    //     //         break;
-    //     // }
-    //     let hex = JSON.stringify(counter.ownHex)
-    //     stack.mgArray.push(counter)
-
-    //     if (stack[hex]) {
-    //         stack[hex].push(counter)
-
-    //         return stack
-    //     }
-
-    //     stack[hex] = [counter]
-
-    //     return stack
-    // }
 
     function setHex_Bonus(hex, bonus) {
         let hex = JSON.stringify(hex)
@@ -224,18 +186,23 @@ export function createStack(type) {
     }
 
 
-    function setCommanderCover(){
-        if (Object.values(stack['hex_bonus']).length < Object.values(stack['hex_countersArray'])){
-            stack.underCommand = false    // stack.underCommand = true
-            return
-        }
-        stack.underCommand = true
-    }
+    // function setCommanderCover(){
+    //     if (Object.values(stack['hex_bonus']).length < Object.values(stack['hex_countersArray'])){
+    //         stack.underCommand = false    // stack.underCommand = true
+    //         return
+    //     }
+    //     stack.underCommand = true
+    // }
 
     function setHex_LoS(hex, bool) {
         let hex = JSON.stringify(hex)
 
         stack['hex_los'][hex] = bool
+    }
+
+    function setHex_Hindrance(hex,hind){
+        let hex = JSON.stringify(hex)
+        stack['hex_hindrance'][hex] = hind
     }
     switch (type) {
         case 'moving':
@@ -290,8 +257,9 @@ export function createStack(type) {
                 _isHex_CountersArrayEmpty,
                 addToGeneralCountersArray,
                 calculateCommanderBonus,
-                setCommanderCover,
-                setHex_LoS
+
+                setHex_LoS,
+                setHex_Hindrance,
             })
 
             break;

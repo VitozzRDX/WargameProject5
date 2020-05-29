@@ -18,6 +18,7 @@ function addBasicProps (counter,param) {
 
 function addMoveProps(counter) {
     counter.movingStatus = undefined
+    counter.onTheRoad = false
 }
 
 function addSquadMoveProps(counter,param) {
@@ -68,7 +69,14 @@ function addCommanderProps(counter,param){
     counter.commandBonus = param.commandBonus
 }
 
+function addSquadProps(counter,param){
+    if(!param.experience) {
+        throw console.error(e);
+        
+    }
 
+    counter.experience = param.experience
+}
 let Fireable = {
     setFiringStatus(status) {
         this.firingStatus = status
@@ -126,6 +134,10 @@ let SquadMovable = {
 
     getRoadBonus() {
         this.temporaryMF += 1
+    },
+
+    setOnTheRoad(bool){
+        this.onTheRoad = bool
     }
 }
 
@@ -200,7 +212,7 @@ export function createCounter(param) {
             addFireProps(counter,param)
             addManInterface(counter)
             addCommandableProps(counter)
-
+            addSquadProps(counter,param)
             Object.assign(counter,BasicCounterMethods,Movable,Fireable,SquadMovable,Commandable)
 
             return counter

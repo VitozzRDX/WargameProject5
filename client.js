@@ -385,7 +385,7 @@ class Client {
     };
     // ----------- added 22 02 2020
     buildCUI(counter) {
-        console.log('ggggg')
+
         let phase = this.game.getPhase()
         let schemeObj = counter.getScheme(phase)  // {'phase':{'Do Something':false,...]} - we get {'Do Something': false,...}
 
@@ -617,7 +617,6 @@ class Client {
 
         let stack = createStack('moving').addToStack(counter).setStatus(status).setOwnHex(counter.ownHex)
         // if ownHex == road - add Road Bonus
-
 
         this.changeColorOfBorder(counter, "red")
 
@@ -874,13 +873,6 @@ class Client {
         //----------------------------------------------------------------------------------------------------------------------------------------------      
     }
 
-    // clearStackUI(stack) {
-    //     for (let buttonName in this.getStackUIScheme(stack)) {
-
-    //         this.interface.clearUI(buttonName)
-    //     }
-    // }
-
     clearStackUI(stack) {
         for (let buttonName in this.getStackUIScheme(stack)) {
             this.interface.remove(buttonName)
@@ -942,6 +934,10 @@ class Client {
             stack.setHex_Bonus(counter.ownHex, counter.commandBonus)
         }
 
+        if (counter.experience == 'Inexperienced') {
+            stack.experience = 'Inexperienced'
+        }
+
         stack.addToGeneralCountersArray(counter)
         stack.setHex_countersArray(counter.ownHex, counter)
 
@@ -962,103 +958,364 @@ class Client {
         }
     }
 
-    fireProcessing(point, stack) {
+    // fireProcessing(point, stack) {
 
-        stack.calculateCommanderBonus()
-        stack.setCommanderCover()
+    //     stack.calculateCommanderBonus()
+    //     stack.setCommanderCover()
+
+    //     let targetHex = this.map.getHexFromCoords(point)
+    //     let countersIDsInHexArray = this.map.getCountersIDinHexArray(targetHex) // [conterID,...]
+
+    //     // let commanderDRM = this.calculateCommanderBonus(stack)
+
+    //     // this.setHex_LoS(stack,targetHex)
+    //     // this.setHex_Hindrance(stack,targetHex)
+
+    //     // let hindranceDRM = this.calculateWorstHindranceDRM(stack)
+    //     // let TEMDRM = this.calculateTEM(stack,targetHex)
+
+    //     // let DRM = commanderDRM + hindranceDRM + TEMDRM 
+
+    //     // let diceRoll =  
+    //     // let sumOfAllCountersFP = this.summingCounterFPforEachHex(stack,targetHex)
+
+    //     // let firePower = this.game.getActualFirePower(sumOfAllCountersFP,cower,stack.experience)
+
+
+    //     let firingHexesArr = Object.values(stack['hex_countersArray'])
+
+    //     firingHexesArr.forEach((hex) => {
+    //         let bool = this.map.isLoS(hex, targetHex)
+    //         if (!bool) {
+    //             stack.setHex_LoS(hex, bool)
+    //         }
+    //         // hex - hexes in los
+    //         // for each += hind
+    //         // set hex_hind[hex] = hind
+    //         // get worst
+    //         let arrayOfHexesInLoS = this.map.getHexesBetween(targetHex, hex)
+    //         //draw all
+    //         let hind = arrayOfHexesInLoS.reduce((acc, hex) => {
+
+    //             acc = acc + this.map.getHexHindrance(hex)
+    //             return acc
+    //         }, 0)
+
+    //         if (hind >= 6) {
+    //             stack.setHex_LoS(hex, false)
+    //         }
+    //     })
+
+    //     // also calc Hindrance stack.setHex_Hind - worst of all
+    //     // if Hind > 6 - this hex is not los
+
+    //     if (Object.values(stack['hex_los']).length > 0) { // && stack not in one hex
+    //         // build button
+    //         return console.log('building buttons to choose stack firing')
+    //     }
+
+    //     //-----------------------------------------------------------------------------------------------------------
+
+    //     //this.map.getHexTEM
+    //     //-----------------------------------------------------------------------------------------------------------
+
+
+    //     //let diceRoll =  
+    //     let firePower = this.calculateFirePower(stack, targetHex, diceRoll)
+
+    //     countersIDsInHexArray.forEach((counterID, index, arr) => {
+    //         let counter = this.getCounterByItsID(counterID)
+    //     })
+
+
+    //     //get array counters in taret hex
+    //     // in  case DFF only moving C are targets
+    //     // stack got hex-array structure
+    //     // for each hex check los
+    //     // if no los found build buttons Fire as Separate FG + Fire From Every Hex
+    //     // for every counter in FG use firing consequence (leaderDRM)
+    //     // animate
+    //     // else calculate FP (leaderDRM)
+    //     // for every counter in target use FP
+    //     // animate
+
+
+
+    // }
+
+    // calculateFirePower(stack, targetHex, diceRoll) {
+
+    //     let sumOfAllCountersFP = 0
+    //     let cower = false
+
+    //     let fp
+    //     let summaryDRM
+
+    //     let hindranceDRM = stack.getHindranceDRM()
+    //     let commanderDRM = stack.getCommanderDRM()
+    //     let FFMOdrm = stack.getFFMOdrm()
+    //     let FFNAMdrm = stack.getFFNAMdrm()
+
+    //     let targetTEM = stack.getTargetTEM()
+
+    //     if (diceRoll.red == diceRoll.white && !stack.underCommand) {
+    //         cower = true
+    //     }
+
+    //     for (let hex in stack['hex_countersArray']) {
+    //         stack['hex_countersArray'][hex].forEach((counter) => {
+
+    //             let fp = counter.firePower
+
+
+    //             if (this.map.isHexNear(counter.ownHex, targetHex)) {
+    //                 fp = counter.firePower * 2
+    //             }
+    //             else
+    //                 if (this.map.getDistanceBetween(counter.ownHex, targetHex) > counter.getNormalRange()) {
+    //                     fp = counter.firePower / 2    // can have fractions
+    //                 }
+
+    //             sumOfAllCountersFP = sumOfAllCountersFP + fp
+
+    //         })
+    //     }
+
+    //     // round sumOfAllCountersFP !!
+
+    //     //fp = this.game.approximateFP(sumOfAllCountersFP,cower,counter.experience)
+    //     fp = this.game.getActualFirePower(sumOfAllCountersFP, cower, counter.experience)
+    //     dr = hindranceDRM + commanderDRM + FFMOdrm + FFNAMdrm + targetTEM
+
+    //     return this.game.getIFT_FPresult(fp, dr)
+    // }
+
+    fireProcessing(point, stack) {
+        // switch between different Phases 
+        // PFPh , DFFPh
+        // in case of PF :
+        // FFNAM FFMO == 0
+        // in case DFFPh :
+        // if stack.firingStatus  == 'First Fire' && targetHex not closest between possible
+        // return
+
+        //stack.setCommanderCover()
 
         let targetHex = this.map.getHexFromCoords(point)
-        let countersIDsInHexArray = this.map.getCountersIDinHexArray(targetHex) // [conterID,...]
 
-        let firingHexesArr =  Object.values(stack['hex_countersArray'])
+        this.setHex_LoS(stack, targetHex)
 
-        firingHexesArr.forEach((hex)=>{
-            let bool = this.map.isLoS(hex,targetHex)
-            if (!bool){
-                stack.setHex_LoS(hex,bool)
-            }
-            // hex - hexes in los
-            // for each += hind
-            // set hex_hind[hex] = hind
-            // get worst
-            
-
-
-        })
-
-        // also calc Hindrance stack.setHex_Hind - worst of all
-        // if Hind > 6 - this hex is not los
-
-        if (Object.values(stack['hex_los']).length > 0) {
+        if (Object.values(stack['hex_los']).length > 0) { // && stack not in one hex
             // build button
             return console.log('building buttons to choose stack firing')
         }
 
-        //let diceRoll =  
-        let firePower = this.calculateFirePower(stack,targetHex,diceRoll)
+        this.setHex_Hindrance(stack, targetHex)
 
-        countersIDsInHexArray.forEach((counterID, index, arr) => {
-            let counter = this.getCounterByItsID(counterID)
-        })
-        //get array counters in taret hex
-        // in  case DFF only moving C are targets
-        // stack got hex-array structure
-        // for each hex check los
-        // if no los found build buttons Fire as Separate FG + Fire From Every Hex
-        // for every counter in FG use firing consequence (leaderDRM)
-        // animate
-        // else calculate FP (leaderDRM)
-        // for every counter in target use FP
-        // animate
+        let commanderDRM = this.calculateCommanderBonus(stack)
+        let hindranceDRM = this.calculateWorstHindranceDRM(stack)
+        let temDRM = this.calculateTEM(stack, targetHex)
 
+        let drm = commanderDRM + hindranceDRM + temDRM
+
+        let diceRoll = this.getResultRollingTwoDice()
+        
+        // let effectOnFirer    ????
+        // this.useFireOnFirer_and_Animate(diceRoll,phase)    - here RoF , cowering effect , change status on appropriate
+        
+//-----------------------------------------------------------------------------------------------------------------------------------
+
+        // if (diceRoll.red == diceRoll.white && !this.isStackUnderCommand(stack)) {    // this.isStackUnderCommand(stack)
+        //     cower = true
+        // }
+
+        // let DRsumPlusDRM = diceRoll['sum'] + drm
+
+        // let sumOfAllCountersFP = this.summingCounterFPforEachHex(stack, targetHex)
+
+        // let firePower = this.game.getActualFirePower(sumOfAllCountersFP, cower, stack.experience)
+
+        let effectOnTarget = this.calulateEffectOfFiring(diceRoll,stack,targetHex,drm) // this.game.getIFT_FPresult(firePower, DRsumPlusDRM)
+//-----------------------------------------------------------------------------------------------------------------------------------
+        this.rollForEffectOnEveryCounter_and_Animate(effectOnTarget,targetHex)
+        // animate
 
 
     }
 
-    calculateFirePower(stack,targetHex,diceRoll){
 
-        let sumOfAllCountersFP = 0
-        let cower = false
 
-        let fp 
-        let summaryDRM 
+    calculateCommanderBonus(stack) {
+        let arr = Object.values(stack['hex_bonus'])
+        console.log(arr);
 
-        let hindranceDRM = stack.getHindranceDRM()
-        let commanderDRM = stack.getCommanderDRM()
-        let FFMOdrm = stack.getFFMOdrm()
-        let FFNAMdrm = stack.getFFNAMdrm()
+        return Math.min(...arr)
+    }
 
-        if(diceRoll.red == diceRoll.white && !stack.underCommand) {
+    setHex_LoS(stack, targetHex) {
+        let firingHexesArr = Object.values(stack['hex_countersArray'])
+
+        firingHexesArr.forEach((hex) => {
+            let bool = this.map.isLoS(hex, targetHex)
+            if (!bool) {
+                stack.setHex_LoS(hex, bool)
+            }
+        })
+    }
+
+    setHex_Hindrance(stack, targetHex) {
+        let firingHexesArr = Object.values(stack['hex_countersArray'])
+        let hind = 0
+
+        for (let hex of firingHexesArr) {
+            let arrayOfHexesInLoS = this.map.getHexesBetween(targetHex, hex)
+
+            for (let h of arrayOfHexesInLoS) {
+                hind += this.map.getHexHindrance(h)
+                if (hind >= 6) {
+                    stack.setHex_LoS(hex, false)
+                    break
+                }
+
+
+            }
+
+            stack.setHex_Hindrance(hex, hind)
+            hind = 0
+
+        }
+        // firingHexesArr.forEach((hex)=>{
+        //     let arrayOfHexesInLoS = this.map.getHexesBetween(targetHex,hex)
+        //     //draw all
+        //     let hind = arrayOfHexesInLoS.reduce((acc,hex)=>{
+
+        //         acc = acc + this.map.getHexHindrance(hex)
+        //         return acc
+        //     }, 0)
+
+        //     if (hind >=6) {
+        //         stack.setHex_LoS(hex,false)
+        //     }
+
+        // })
+    }
+
+    calculateWorstHindranceDRM() {
+        let arr = Object.values(stack['hex_hindrance'])
+        console.log(arr);
+
+        return Math.max(...arr)
+
+    }
+
+    getResultRollingTwoDice() {
+        let d1 = this.diceRoll()
+        let d2 = this.diceRoll()
+        return { 'WhiteDice': d1, 'RedDice': d2, 'sum': d2 + d1 }
+    }
+
+    diceRoll() {
+        return Math.floor(Math.random() * 6) + 1;
+    }
+
+    calculateTEM(stack, targetHex) {
+        let tem = this.map.getHexTEM(targetHex)
+
+        if (tem == 'woods-road') {
+
+            let countersIDsInHexArray = this.map.getCountersIDinHexArray(targetHex)
+
+            let firingHexesArr = Object.values(stack['hex_countersArray'])
+
+            let bool = firingHexesArr.some((hex) => {
+                return !this.map.isLoSIncludingTargetHex(hex, targetHex)
+            })
+
+            let bool2 = countersIDsInHexArray.some((counterID) => {
+                let counter = this.getCounterByItsID(counterID)
+                return counter.onTheRoad
+            })
+
+            if (bool && bool2) {
+
+                console.log('stack is on ther road, not wood')
+                return 0
+            }
+        }
+
+        return tem
+    }
+
+    summingCounterFPforEachHex(stack,targetHex) {
+        // for (let hex in stack['hex_countersArray']) {
+        //     stack['hex_countersArray'][hex].forEach((counter) => {
+
+        //         let fp = counter.firePower
+
+
+        //         if (this.map.isHexNear(counter.ownHex, targetHex)) {
+        //             fp = counter.firePower * 2
+        //         }
+        //         else
+        //             if (this.map.getDistanceBetween(counter.ownHex, targetHex) > counter.getNormalRange()) {
+        //                 fp = counter.firePower / 2    // can have fractions
+        //             }
+
+        //         sumOfAllCountersFP = sumOfAllCountersFP + fp
+
+        //     })
+        // }
+
+        return stack['hex_countersArray'].reduce((sum, hex) => {
+            sum = stack['hex_countersArray'][hex].reduce((acc, counter) => {
+                fp = this.calculateCounterFirePower(counter, targetHex)
+                return acc + fp
+            }, 0)
+            return sum
+        }, 0)
+
+
+    }
+
+    calculateCounterFirePower(counter, targetHex) {
+
+        let normalRange = counter.getNormalRange()
+        let distance = this.map.getHexesBetween(counter.ownHex, targetHex).length
+
+        if (distance > normalRange*2){
+            return 0
+        }
+
+        if (distance == 0) {     //this.map.isHexNear(counter.ownHex, targetHex)
+            return counter.firePower * 2
+        }
+
+        if (distance > normalRange ) {
+            return counter.firePower / 2 // can have fractions
+        }
+
+        return counter.firePower
+    }
+
+    isStackUnderCommand(stack){
+
+        return Object.values(stack['hex_bonus']).length < Object.values(stack['hex_countersArray'])
+    }
+
+    calulateEffectOfFiring(diceRoll,stack,targetHex,drm){
+
+        if (diceRoll.red == diceRoll.white && !this.isStackUnderCommand(stack)) {    // this.isStackUnderCommand(stack)
             cower = true
         }
 
-        for(let hex in stack['hex_countersArray']) {
-            stack['hex_countersArray'][hex].forEach((counter)=>{
-                
-                let fp = counter.firePower
+        let DRsumPlusDRM = diceRoll['sum'] + drm
 
+        let sumOfAllCountersFP = this.summingCounterFPforEachHex(stack, targetHex)
 
-                if (this.map.isHexNear(counter.ownHex, targetHex)){
-                    fp = counter.firePower*2
-                }
-                else
-                if(this.map.getDistanceBetween(counter.ownHex, targetHex)>counter.getNormalRange()){
-                    fp = counter.firePower/2    // can have fractions
-                }
-                
-                sumOfAllCountersFP = sumOfAllCountersFP +  fp 
+        let firePower =  this.game.getActualFirePower(sumOfAllCountersFP, cower, stack.experience)
 
-            })
-        }
-
-        // round sumOfAllCountersFP !!
-
-        fp = this.game.approximateFP(sumOfAllCountersFP,cower,counter.experience)
-
-        return this.game.getIFT_FPresult(fp,dr)
+        return this.game.getIFT_FPresult(firePower, DRsumPlusDRM)
     }
-
-
 }
 
 // -- let's mix canvas reaction into our class

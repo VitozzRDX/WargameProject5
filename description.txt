@@ -726,3 +726,38 @@ calculateCommanderBonus
 fire processing, fire stack
 prepfire start,
 box shadow
+
+
+
+    getActualFirePower(fp,coweringCoefficient) {
+
+        let array =  Object.keys(this.infantryFireTable)
+
+        var closest = array.reduce((prev, curr) => {
+            return (Math.abs(curr - fp) < Math.abs(prev - fp) ? curr : prev);
+          });
+
+        let index = array.indexOf(closest)
+
+        return array[index+coweringCoefficient]
+        //if ()
+    }
+
+в game
+
+
+calculateWorstHindranceDRM
+
+------------------------------------------29 05 2020--------------------------------------------------------------------
+
+Поломка Пулемета
+Сохранение РоФ 
+воздействие выстрела на стрелков :
+    статус
+    группа 
+    анимация
+атака одного и того же гекса из одного гекса
+// let effectOnFirer        ????
+// this.useFireOnFirer
+
+пулемет может образовывать стек только  со своим хозяином ?

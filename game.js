@@ -19,6 +19,25 @@ class Game {
             'firstPlayerCloseCombatPhase': {},
 
         }
+
+        this.infantryFireTable ={
+            1:[[1,'KIA'],[1,'K/'],[1,'MC'],[1,'MC'],[0,'MC'],[0,'PTC'],],
+            2:[[2,'KIA'],[1,'KIA'],[1,'K/'],[1,'MC'],[1,'MC'],[0,'MC'],[0,'PTC']],
+            4:[[2,'KIA'],[1,'KIA'],[2,'K/'],[2,'MC'],[1,'MC'],[1,'MC'],[0,'MC'],[0,'PTC']],
+            6:[[3,'KIA'],[2,'KIA'],[1,'KIA'],[2,'K/'],[2,'MC'],[1,'MC'],[1,'MC'],[0,'MC'],[0,'PTC']],
+            8:[[3,'KIA'],[2,'KIA'],[1,'KIA'],[2,'K/'],[2,'MC'],[2,'MC'][1,'MC'],[1,'MC'],[0,'MC'],[0,'PTC']],
+            12:[[3,'KIA'],[2,'KIA'],[1,'KIA'],[3,'K/'],[3,'MC'],[2,'MC'],[2,'MC'],[1,'MC'],[1,'MC'],[0,'MC'],[0,'PTC']],
+            16:[[4,'KIA'],[3,'KIA'],[2,'KIA'],[1,'KIA'],[3,'K/'],[3,'MC'],[2,'MC'],[2,'MC'],[1,'MC'],[1,'MC'],[0,'MC'],[0,'PTC']],
+            20:[[4,'KIA'],[3,'KIA'],[2,'KIA'],[1,'KIA'],[4,'K/'],[4,'MC'],[3,'MC'],[2,'MC'],[2,'MC'],[1,'MC'],[1,'MC'],[0,'MC'],[0,'PTC']],
+            24:[[5,'KIA'],[4,'KIA'],[3,'KIA'],[2,'KIA'],[1,'KIA'],[4,'K/'],[4,'MC'],[3,'MC'],[2,'MC'],[2,'MC'],[1,'MC'],[1,'MC'],[0,'MC'],[0,'PTC']],
+            30:[[6,'KIA'],[5,'KIA'],[4,'KIA'],[3,'KIA'],[2,'KIA'],[1,'KIA'],[4,'K/'],[4,'MC'],[3,'MC'],[2,'MC'],[2,'MC'],[1,'MC'],[1,'MC'],[0,'MC'],[0,'PTC']],
+            36:[[7,'KIA'],[6,'KIA'],[5,'KIA'],[4,'KIA'],[3,'KIA'],[2,'KIA'],[1,'KIA'],[4,'K/'],[4,'MC'],[3,'MC'],[2,'MC'],[2,'MC'],[1,'MC'],[1,'MC'],[0,'MC'],[0,'PTC']]
+
+
+
+        }
+
+        
         this.microPhaseUITable = {
             'MMCfireMicroPhase': { 'Cancel Fire Preparation': true, 'End Phase': true }
         }
@@ -79,6 +98,26 @@ class Game {
     };
 
 
+    getActualFirePower(fp,cower,exp) {//,cower,counter.experience)
+
+        let array =  Object.keys(this.infantryFireTable)
+
+        var closest = array.reduce((prev, curr) => {
+            return (Math.abs(curr - fp) < Math.abs(prev - fp) ? curr : prev);
+          });
+
+        let index = array.indexOf(closest)
+
+        if (cower && exp == 'Inexperienced') {
+            return array[index+2]
+        }
+
+        if (cower) {
+            return array[index+1]
+        }
+
+        return array[index]
+    }
 };
 
 export { Game };
