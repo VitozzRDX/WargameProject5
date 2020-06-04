@@ -14,6 +14,7 @@ let hexFunctions = {
         return { orientation: orientation, size: size, origin: origin };
     },
     Hex(q, r, s) {
+        console.log(q, r, s)
         if (Math.round(q + r + s) !== 0) throw "q + r + s must be 0";
         return { q: q, r: r, s: s };
     },
@@ -53,7 +54,7 @@ let hexFunctions = {
         var pt = this.Point((p.x - origin.x) / size.x, (p.y - origin.y) / size.y);
         var q = M.b0 * pt.x + M.b1 * pt.y;
         var r = M.b2 * pt.x + M.b3 * pt.y;
-
+        console.log('fgf')
         return this.Hex(q, r, -q - r);
     },
     hex_round(h) {
@@ -73,24 +74,26 @@ let hexFunctions = {
             else {
                 si = -qi - ri;
             }
-
+        
+        console.log('hr')
         return this.Hex(qi, ri, si);
     },
 
     hex_linedraw(a, b) {
-
-        var N = hex_distance(a, b)
+        console.log('hhh')
+        var N = this.hex_distance(a, b)
 
         var results = [];
         var step = 1.0 / Math.max(N, 1);
         for (var i = 1; i <= N - 1; i++) {
-            results.push(hex_round(hex_lerp(a, b, step * i)));
+            results.push(this.hex_round(this.hex_lerp(a, b, step * i)));
         }
         return results;
     },
 
     hex_distance(a, b) {
-        return hex_length(hex_subtract(a, b));
+        console.log('mmm')
+        return this.hex_length(this.hex_subtract(a, b));
     },
 
     hex_length(hex) {
@@ -98,10 +101,13 @@ let hexFunctions = {
     },
 
     hex_subtract(a, b) {
-        return Hex(a.q - b.q, a.r - b.r, a.s - b.s);
+        console.log('s')
+        console.log(a, b)
+        return this.Hex(a.q - b.q, a.r - b.r, a.s - b.s);
     },
     hex_lerp(a, b, t) {
-        return Hex(a.q * (1.0 - t) + b.q * t, a.r * (1.0 - t) + b.r * t, a.s * (1.0 - t) + b.s * t);
+
+        return this.Hex(a.q * (1.0 - t) + b.q * t, a.r * (1.0 - t) + b.r * t, a.s * (1.0 - t) + b.s * t);
     }
 
 }

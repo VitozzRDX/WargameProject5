@@ -141,7 +141,7 @@ export function createStack(type) {
     }
 
     function setHex_Bonus(hex, bonus) {
-        let hex = JSON.stringify(hex)
+        hex = JSON.stringify(hex)
 
         if (stack['hex_bonus'][hex]) {
             let bonus1 = stack[hex]
@@ -153,7 +153,7 @@ export function createStack(type) {
     }
 
     function setHex_countersArray(hex, counter) {
-        let hex = JSON.stringify(hex)
+        hex = JSON.stringify(hex)
 
         if (stack['hex_countersArray'][hex]) {
             stack['hex_countersArray'][hex].push(counter)
@@ -165,7 +165,7 @@ export function createStack(type) {
     }
 
     function _isHex_CountersArrayEmpty(hex){
-        let hex = JSON.stringify(hex)
+        hex = JSON.stringify(hex)
 
         if (stack['hex_countersArray'][hex]) { 
             return false
@@ -195,13 +195,13 @@ export function createStack(type) {
     // }
 
     function setHex_LoS(hex, bool) {
-        let hex = JSON.stringify(hex)
+        hex = JSON.stringify(hex)
 
         stack['hex_los'][hex] = bool
     }
 
     function setHex_Hindrance(hex,hind){
-        let hex = JSON.stringify(hex)
+        hex = JSON.stringify(hex)
         stack['hex_hindrance'][hex] = hind
     }
     switch (type) {

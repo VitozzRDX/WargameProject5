@@ -17,12 +17,12 @@ let move = {
 
                 counter = options.target.counter
 
-                if (counter.group){
-                    console.log('group',counter.group)
-                    counter.group._restoreObjectsState()
+                // if (counter.group){
+                //     console.log('group',counter.group)
+                //     counter.group._restoreObjectsState()
 
-                    this.canvasObj.canvas.remove(counter.group)
-                }
+                //     this.canvasObj.canvas.remove(counter.group)
+                // }
                 if (counter.getMovingStatus() == "brokenStackRemnant") {    //this._checkForMovingStatus(counter,"brokenStackRemnant")
 
                     stack = this.createNewStack_setStatus_addCounter_setOwnHex('filledWithBrokenStackRemnants', counter)

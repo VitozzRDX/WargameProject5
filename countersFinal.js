@@ -34,7 +34,7 @@ function addSquadMoveProps(counter,param) {
 function addFireProps(counter,param) {
 
     if(!param.normalRange || !param.firePower) {
-        throw console.error(e);
+        throw console.error();
         
     }
     counter.firingStatus = undefined
@@ -71,7 +71,7 @@ function addCommanderProps(counter,param){
 
 function addSquadProps(counter,param){
     if(!param.experience) {
-        throw console.error(e);
+        throw console.error();
         
     }
 
@@ -225,7 +225,7 @@ export function createCounter(param) {
             addCommanderProps(counter,param)
             addMoveProps(counter)
             addSquadMoveProps(counter,param)
-            addFireProps(counter,param)
+            //addFireProps(counter,param)
             addManInterface(counter)
 
             Object.assign(counter,BasicCounterMethods,Movable,Fireable,SquadMovable)

@@ -10,6 +10,22 @@ let methods = {
         }
 
         let counter = options.target.counter
+
+        // if (counter.group) {
+        //     counter.group._restoreObjectsState()
+
+        //     this.canvasObj.canvas.remove(counter.group)
+        //     return
+        // }
+
+        // let i = this.canvasObj.getImageByID(counter.getImageID())
+        // let t = this.canvasObj.createPhaseTextBox(i, 'PREP_FIRE')
+        // //this.canvasObj.canvas.add(t);
+        // let g = this.canvasObj.createGroup(...[i, t])
+
+        // counter.group = g
+        // this.canvasObj.canvas.add(g)
+
         this.clearCounterInterface().buildCUI(counter)._setCurrentCounterInterface(counter)
         return
     },
@@ -50,7 +66,7 @@ let methods = {
 
             case 'uncreated':
 
-                if (!this._isClickedCounterOwnerIsSameAsPhaseOwner( options.target.counter, this.firstPlayer)) {
+                if (!this._isClickedCounterOwnerIsSameAsPhaseOwner(options.target.counter, this.firstPlayer)) {
                     return console.log('u click not your counter')
                 }
 
@@ -63,7 +79,7 @@ let methods = {
                     return
                 }
 
-                this.addingToFireStack(counter,stack)
+                this.addingToFireStack(counter, stack)
                 //stack.addToFiringStack(counter)
                 // stack.addToGeneralCountersArray(counter)
                 // stack.setHex_countersArray(counter.ownHex,counter)
@@ -75,33 +91,34 @@ let methods = {
                 break;
 
             case 'readyToFire':
-                
+
                 // if (!this._isLegalTargetToAddToFiringStack(options.target)) {   //already added
                 //     return
                 // }
 
-                if (!this._isClickedCounterOwnerIsSameAsPhaseOwner( options.target.counter, this.firstPlayer)) {
+                if (!this._isClickedCounterOwnerIsSameAsPhaseOwner(options.target.counter, this.firstPlayer)) {
                     // stack.calculateCommanderBonus()
                     // stack.setCommanderCover()
-                    this.fireProcessing(absolutePointer,stack)
+                    this.fireProcessing(absolutePointer, stack)
+                    return
                 }
 
                 if (counter.group) { // && group.type == 'attachedWeapon'
-                this.clearGroupUI()
+                    this.clearGroupUI()
                     let group = options.target.counter.group
                     this.buildGUI(group, stack)
                     return
                 }
 
-                if (this._isCounterInStack(counter,stack)){
+                if (this._isCounterInStack(counter, stack)) {
                     return console.log('selected counter is already in Moving Group')
                 }
 
-                if (!this._isCounterNearStack(counter,stack)){  
+                if (!this._isCounterNearStack(counter, stack)) {
                     return console.log('selected counter not near or in stack')
                 }
 
-                this.addingToFireStack(counter,stack)
+                this.addingToFireStack(counter, stack)
                 // if (counter.getType() == 'SingleManCounter' && stack._isHex_CountersArrayEmpty(hex)){
                 //     return console.log('u cannot add SMC to FG without MMC or Weapon')
                 // }

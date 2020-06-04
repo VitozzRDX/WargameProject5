@@ -34,7 +34,10 @@ let initialSettings = {
                 className: 'MultiManCounters',
                 owner: 'Ally',
                 movementFactor: 4,
-                type: 'MultiManCounter'
+                type: 'MultiManCounter',
+                normalRange:4,
+                firePower:6,
+                experience:'E',
             },
 
             'geSquadE-0': {
@@ -44,7 +47,10 @@ let initialSettings = {
                 owner: 'Nazi',
                 movementFactor: 4,
                 name: 'geSquadE-0',
-                type: 'MultiManCounter'
+                type: 'MultiManCounter',
+                normalRange:4,
+                firePower:6,
+                experience:'E',
             },
 
             'geSquadE-1': {
@@ -54,7 +60,10 @@ let initialSettings = {
                 owner: 'Nazi',
                 movementFactor: 4,
                 name: 'geSquadE-1',
-                type: 'MultiManCounter'
+                type: 'MultiManCounter',
+                normalRange:4,
+                firePower:6,
+                experience:'E',
             },
 
             'geSMC9-1': {
@@ -72,7 +81,9 @@ let initialSettings = {
                 className: "Weapon",
                 owner: 'Nazi',
                 name: 'geHMG',
-                type: 'MashineGun'
+                type: 'MashineGun',
+                normalRange:4,
+                firePower:6,
             }
         },
 

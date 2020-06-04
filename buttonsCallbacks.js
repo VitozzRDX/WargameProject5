@@ -244,7 +244,8 @@ let buttonsCallbacks = {
             ops.group.uiScheme['Add Squad To Fire Group'] = false
             this.changeColorOfBorder(ops.group.counter, 'red')
 
-            ops.stack.addToFiringStack(ops.group.counter)
+            this.addingToFireStack(ops.group.counter,ops.stack)
+            //ops.stack.addToFiringStack(ops.group.counter)
 
             console.log(ops.stack)
         },
@@ -255,7 +256,8 @@ let buttonsCallbacks = {
             ops.group.uiScheme['Add Weapon To Fire Group'] = false
             this.changeColorOfBorder(ops.group.weaponCounter, 'red')
 
-            ops.stack.addToFiringStack(ops.group.weaponCounter)
+            this.addingToFireStack(ops.group.weaponCounter,ops.stack)
+            //ops.stack.addToFiringStack(ops.group.weaponCounter)
 
             console.log(ops.stack)
         },

@@ -51,7 +51,7 @@ class Map {
         return this.hex_to_pixel(this.flat,hex)
     }
     getHexFromCoords(coords){
-
+        console.log(coords)
         if (!coords.x||!coords.y) throw 'coords should be an object with properties x and y'
         return this.hex_round(this.pixel_to_hex(this.flat,coords))
     }
@@ -133,7 +133,7 @@ class Map {
     }
 
     getHexesBetween(hexClicked,hexFired) {
-
+        console.log(hexClicked,hexFired)
         return this.hex_linedraw(hexFired,hexClicked);
     }
 
@@ -151,6 +151,7 @@ class Map {
 
                 return  1
         }
+        return 0
     }
 
 
@@ -177,6 +178,9 @@ class Map {
                 return 'woods-road'
 
         }
+    }
+    isLoS(hex, targetHex){
+        return true
     }
 }
 

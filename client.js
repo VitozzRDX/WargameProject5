@@ -236,8 +236,6 @@ class Client {
 
         //----------------------- added 21 02 2020
         //this.canvasObj.preloadAndDrawBackground(options.mapSrc,{top:0,left:0})
-        //this._createAndDrawCounters(options.countersOptions)
-
 
         // -------- Loading Creating and Drawing Background and Counters
 
@@ -250,7 +248,7 @@ class Client {
 
             }).
             then(() => {
-                //this._createAndDrawCounters(options.countersOptions)
+
                 this._drawCounters()
 
             }).
@@ -281,6 +279,7 @@ class Client {
 
                 ops.options = { top: centerPoint.y, left: centerPoint.x }       // {q:6,r:0,s:-6}
                 ops.ownHex = obj
+
                 let c = createCounter(ops)
 
                 this.fillCounterTrayHash(c.ID, c)
@@ -297,37 +296,6 @@ class Client {
             this.drawCounter(this.counterTrayHash[c])
         }
     }
-    //-----------added 20 20 2020----------------------------------------------------------
-
-    _createAndDrawCounters(countersOptions) {  //setOfOptionsforCounters
-
-        let parametersOnCreationHash = countersOptions.parametersOnCreationHash
-
-        for (let i in parametersOnCreationHash) {
-
-            let arrayOfCoords = parametersOnCreationHash[i]
-
-            arrayOfCoords.forEach((obj) => {
-
-                let ops = countersOptions.squadType_propertiesHash[i] // { src: "assets/ge467S.gif", otherSideSrc: "assets/geh7b.gif", className: "ManCounters" }
-
-                let centerPoint = this.map._calculateFreeCoords(obj, 48)
-
-                ops.options = { top: centerPoint.y, left: centerPoint.x }       // {q:6,r:0,s:-6}
-                ops.ownHex = obj
-
-                let className = ops['className']
-
-                let c = this.createCounterObject(className, ops) //{ src: src, options: options, otherSideSrc: otherSideSrc }
-
-                this.fillHex_CounterID_setHexOwner(obj, c)
-
-                this.fillCounterTrayHash(c.ID, c)
-
-                this.drawCounter(c)
-            })
-        }
-    };
 
     createCounterObject(className, ops) {
         let C = this.counterTable[className]
@@ -452,6 +420,7 @@ class Client {
     }
     // --------------------- added 26 02 2020
     _isClickedCounterOwnerIsSameAsPhaseOwner(counter, player) {
+
         return counter.owner == player
     }
     //----------------------------- 27 02 2020 -----------------------------------
@@ -594,7 +563,7 @@ class Client {
     }
 
     _check_ForNullTarget_ForOwner_ForMovingStatus(target) {
-
+        console.log(target)
         if (target == null) {
             console.log('clicked on empty space. Select Counter')
             return true
@@ -630,26 +599,10 @@ class Client {
     moveProcessing(point) {
 
         let targetHex = this.map.getHexFromCoords(point)
-        //=========================================================================================
 
-        // let targetHexType = this.map.getHexType(targetHex)
-        // let startOnTheRoadBonus = this.stack.getStartingRoadBonus() // == 0 or 1
-        // if (startOnTheRoadBonus) {
-        //     if (targetHexType == 'road'){
-        //         return
-        //     }
-        //     this.stack.setRoadBonus(0)
-        // }
-
-        //=========================================================================================
         let targetHexType = this.map.getHexType(targetHex)
-        //let startOnTheRoadBonus = this.stack.getStartingRoadBonus()
-        //console.log(targetHexType,startOnTheRoadBonus)
 
-
-
-        //=========================================================================================
-
+        console.log(targetHexType != 'road' && this.stack.isOnTheRoadFromStart)
         if (targetHexType != 'road' && this.stack.isOnTheRoadFromStart) {
 
             this.stack.isOnTheRoadFromStart = false
@@ -674,26 +627,9 @@ class Client {
 
         }
 
-        //=========================================================================================
-
-        // if (targetHexType != 'road'){
-        //     this.stack.isOnTheRoadFromStart = false
-        // }
-
         if (this._is_Click_NotInCoverArc_inOwnHex_onEnemy_EnterCostTooHigh(this.stack, targetHex)) {
             return
         }
-
-        //=========================================================================================
-        // if (targetHexType == 'road' && this.stack.isOnTheRoadFromStart && this.stack.gotNoRoadBonus){
-        //     //console.log('herr')
-        //     this.stack.mgArray.forEach((movingCounter) => {
-        //         movingCounter.getRoadBonus()
-        //     })
-        //     this.stack.gotNoRoadBonus = false
-        // }
-
-        //=========================================================================================
 
         this.stack.mgArray.forEach((movingCounter) => {
 
@@ -715,7 +651,7 @@ class Client {
 
                     this.rearrangeCountersPositionInHex(previousHex)
                     if (this._checkIfMovementPointsEnded(movingCounter)) {
-                        //console.log('h')
+
                         this.setMOVEDstatus_NullBorderColor_RemoveFromStack(movingCounter, this.stack)
                     }
                     if (this._isStackEmpty(this.stack)) {        //  && getMovingStackStatus() == 'filledWithBrokenStackRemnants'
@@ -927,7 +863,7 @@ class Client {
 
     addingToFireStack(counter, stack) {
 
-        if (counter.getType() == 'SingleManCounter' && stack._isHex_CountersArrayEmpty(hex)) {
+        if (counter.getType() == 'SingleManCounter' && stack._isHex_CountersArrayEmpty(counter.ownHex)) {
             return console.log('u cannot add SMC to FG without MMC or Weapon')
         }
         if (counter.getType() == 'SingleManCounter') {
@@ -947,10 +883,18 @@ class Client {
     }
 
     _isCounterNearStack(counter, stack) {
-        let arr = Object.values(stack['hex_countersArray'])
+
+        let arr = Object.keys(stack['hex_countersArray'])
+
         let result = arr.some((hex) => {
-            return this.map.isHexNear(counter.ownHex, hex)
+            let h = JSON.parse(hex)
+            //console.log('hex',hex)
+            //console.log(counter.ownHex)
+            //console.log(this.map.isHexNear(counter.ownHex, h))
+            return this.map.isHexNear(counter.ownHex, h)
         })
+
+
 
         if (result) {
             console.log('counter is near or inside hexes with stack')
@@ -1120,8 +1064,9 @@ class Client {
 
         let diceRoll = this.getResultRollingTwoDice()
         
+        let phase = this.game.getPhase()
         // let effectOnFirer    ????
-        // this.useFireOnFirer_and_Animate(diceRoll,phase)    - here RoF , cowering effect , change status on appropriate
+        this.useFireOnFirer_and_Animate(diceRoll,phase,stack)    //- here RoF , cowering effect , change status on appropriate
         
 //-----------------------------------------------------------------------------------------------------------------------------------
 
@@ -1135,19 +1080,35 @@ class Client {
 
         // let firePower = this.game.getActualFirePower(sumOfAllCountersFP, cower, stack.experience)
 
-        let effectOnTarget = this.calulateEffectOfFiring(diceRoll,stack,targetHex,drm) // this.game.getIFT_FPresult(firePower, DRsumPlusDRM)
-//-----------------------------------------------------------------------------------------------------------------------------------
-        this.rollForEffectOnEveryCounter_and_Animate(effectOnTarget,targetHex)
+//         let effectOnTarget = this.calulateEffectOfFiring(diceRoll,stack,targetHex,drm) // this.game.getIFT_FPresult(firePower, DRsumPlusDRM)
+// //-----------------------------------------------------------------------------------------------------------------------------------
+//         this.rollForEffectOnEveryCounter_and_Animate(effectOnTarget,targetHex)
         // animate
 
 
     }
 
+    useFireOnFirer_and_Animate(diceRoll,phase,stack) {
+
+        let status = 'FIRED'
+
+        stack.mgArray.forEach((counter)=>{
+
+            counter.setFiringStatus(status)
+            if (counter.group) {
+                console.log('group here', counter.group)
+                
+            }
+        })
+
+    }
 
 
     calculateCommanderBonus(stack) {
+
         let arr = Object.values(stack['hex_bonus'])
-        console.log(arr);
+        //console.log(arr);
+        if (arr.length == 0) {return 0}
 
         return Math.min(...arr)
     }
@@ -1164,14 +1125,19 @@ class Client {
     }
 
     setHex_Hindrance(stack, targetHex) {
-        let firingHexesArr = Object.values(stack['hex_countersArray'])
+        let firingHexesArr = Object.keys(stack['hex_countersArray'])
         let hind = 0
-
+        console.log(firingHexesArr)
         for (let hex of firingHexesArr) {
+            hex =  JSON.parse(hex)
+            //console.log(hex)
             let arrayOfHexesInLoS = this.map.getHexesBetween(targetHex, hex)
-
+            
             for (let h of arrayOfHexesInLoS) {
+
+                
                 hind += this.map.getHexHindrance(h)
+
                 if (hind >= 6) {
                     stack.setHex_LoS(hex, false)
                     break
@@ -1184,6 +1150,7 @@ class Client {
             hind = 0
 
         }
+
         // firingHexesArr.forEach((hex)=>{
         //     let arrayOfHexesInLoS = this.map.getHexesBetween(targetHex,hex)
         //     //draw all
@@ -1200,9 +1167,9 @@ class Client {
         // })
     }
 
-    calculateWorstHindranceDRM() {
+    calculateWorstHindranceDRM(stack) {
         let arr = Object.values(stack['hex_hindrance'])
-        console.log(arr);
+        console.log(stack);
 
         return Math.max(...arr)
 
