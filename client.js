@@ -249,7 +249,49 @@ class Client {
             }).
             then(() => {
 
-                this._drawCounters()
+                //this._drawCounters()
+
+                for (let id in this.counterTrayHash) {
+
+                    let c = this.counterTrayHash[id]
+                    //this.drawCounter(this.counterTrayHash[c])
+                    //console.log(this.counterTrayHash)
+                    let ref = c.src
+                    let ops = c.options
+                    Object.assign(ops, {
+                        originX: 'center',
+                        originY: 'center',
+                        //selectable: false
+                    })
+                    // let cb = (i) => {
+                    // c.imageID = i.id;
+                    // i.counter = c
+                    // }
+
+                    let prom = this.canvasObj.creatingPromise(ref)
+                    prom.then((img) => {
+                        img.set(ops)
+
+                        //let t = this.canvasObj.createPhaseTextBox(img, 'PREP_FIRE')
+                        //this.canvasObj.canvas.add(t);
+                        let g = this.canvasObj.createGroup(...[img]) //, t])
+
+                        //img = g
+                        c.group = g
+                        c.group.counter = c
+                        c.initialImg = img
+                        //this.canvasObj.canvas.add(g)
+
+
+                        this.canvasObj.create_and_fill_ID_ImageHash(img)
+                        c.imageID = img.id;
+                        img.counter = c
+
+                        this.canvasObj.canvas.add(g)
+                    })
+
+                    //this.canvasObj.draw(prom, ops, cb)
+                }
 
             }).
             then(() => {
@@ -265,6 +307,30 @@ class Client {
         this.canvasObj.setZoomListener()
 
     };
+
+    // _createCounters(countersOptions) {
+    //     let name_coordsArray_Hash = countersOptions.name_coordsArray_Hash
+    //     for (let name in name_coordsArray_Hash) {
+
+    //         let arrayOfCoords = name_coordsArray_Hash[name]
+
+    //         arrayOfCoords.forEach((hex) => {
+    //             let ops = countersOptions.squadType_propertiesHash[i]
+
+    //             let centerPoint = this.map._calculateFreeCoords(hex, 48)
+
+    //             ops.options = { top: centerPoint.y, left: centerPoint.x }       // {q:6,r:0,s:-6}
+    //             ops.ownHex = hex
+
+    //             let c = createCounter(ops)
+
+    //             this.fillCounterTrayHash(c.ID, c)
+    //             this.fillHex_CounterID_setHexOwner(hex, c)
+
+    //         })
+
+    //     }
+    // }
 
     _createCounters(countersOptions) {
         let parametersOnCreationHash = countersOptions.parametersOnCreationHash
@@ -1063,12 +1129,12 @@ class Client {
         let drm = commanderDRM + hindranceDRM + temDRM
 
         let diceRoll = this.getResultRollingTwoDice()
-        
+
         let phase = this.game.getPhase()
         // let effectOnFirer    ????
-        this.useFireOnFirer_and_Animate(diceRoll,phase,stack)    //- here RoF , cowering effect , change status on appropriate
-        
-//-----------------------------------------------------------------------------------------------------------------------------------
+        this.useFireOnFirer_and_Animate(diceRoll, phase, stack)    //- here RoF , cowering effect , change status on appropriate
+
+        //-----------------------------------------------------------------------------------------------------------------------------------
 
         // if (diceRoll.red == diceRoll.white && !this.isStackUnderCommand(stack)) {    // this.isStackUnderCommand(stack)
         //     cower = true
@@ -1080,24 +1146,24 @@ class Client {
 
         // let firePower = this.game.getActualFirePower(sumOfAllCountersFP, cower, stack.experience)
 
-//         let effectOnTarget = this.calulateEffectOfFiring(diceRoll,stack,targetHex,drm) // this.game.getIFT_FPresult(firePower, DRsumPlusDRM)
-// //-----------------------------------------------------------------------------------------------------------------------------------
-//         this.rollForEffectOnEveryCounter_and_Animate(effectOnTarget,targetHex)
+        //         let effectOnTarget = this.calulateEffectOfFiring(diceRoll,stack,targetHex,drm) // this.game.getIFT_FPresult(firePower, DRsumPlusDRM)
+        // //-----------------------------------------------------------------------------------------------------------------------------------
+        //         this.rollForEffectOnEveryCounter_and_Animate(effectOnTarget,targetHex)
         // animate
 
 
     }
 
-    useFireOnFirer_and_Animate(diceRoll,phase,stack) {
+    useFireOnFirer_and_Animate(diceRoll, phase, stack) {
 
         let status = 'FIRED'
 
-        stack.mgArray.forEach((counter)=>{
+        stack.mgArray.forEach((counter) => {
 
             counter.setFiringStatus(status)
             if (counter.group) {
                 console.log('group here', counter.group)
-                
+
             }
         })
 
@@ -1108,7 +1174,7 @@ class Client {
 
         let arr = Object.values(stack['hex_bonus'])
         //console.log(arr);
-        if (arr.length == 0) {return 0}
+        if (arr.length == 0) { return 0 }
 
         return Math.min(...arr)
     }
@@ -1129,13 +1195,13 @@ class Client {
         let hind = 0
         console.log(firingHexesArr)
         for (let hex of firingHexesArr) {
-            hex =  JSON.parse(hex)
+            hex = JSON.parse(hex)
             //console.log(hex)
             let arrayOfHexesInLoS = this.map.getHexesBetween(targetHex, hex)
-            
+
             for (let h of arrayOfHexesInLoS) {
 
-                
+
                 hind += this.map.getHexHindrance(h)
 
                 if (hind >= 6) {
@@ -1213,7 +1279,7 @@ class Client {
         return tem
     }
 
-    summingCounterFPforEachHex(stack,targetHex) {
+    summingCounterFPforEachHex(stack, targetHex) {
         // for (let hex in stack['hex_countersArray']) {
         //     stack['hex_countersArray'][hex].forEach((counter) => {
 
@@ -1249,7 +1315,7 @@ class Client {
         let normalRange = counter.getNormalRange()
         let distance = this.map.getHexesBetween(counter.ownHex, targetHex).length
 
-        if (distance > normalRange*2){
+        if (distance > normalRange * 2) {
             return 0
         }
 
@@ -1257,19 +1323,19 @@ class Client {
             return counter.firePower * 2
         }
 
-        if (distance > normalRange ) {
+        if (distance > normalRange) {
             return counter.firePower / 2 // can have fractions
         }
 
         return counter.firePower
     }
 
-    isStackUnderCommand(stack){
+    isStackUnderCommand(stack) {
 
         return Object.values(stack['hex_bonus']).length < Object.values(stack['hex_countersArray'])
     }
 
-    calulateEffectOfFiring(diceRoll,stack,targetHex,drm){
+    calulateEffectOfFiring(diceRoll, stack, targetHex, drm) {
 
         if (diceRoll.red == diceRoll.white && !this.isStackUnderCommand(stack)) {    // this.isStackUnderCommand(stack)
             cower = true
@@ -1279,7 +1345,7 @@ class Client {
 
         let sumOfAllCountersFP = this.summingCounterFPforEachHex(stack, targetHex)
 
-        let firePower =  this.game.getActualFirePower(sumOfAllCountersFP, cower, stack.experience)
+        let firePower = this.game.getActualFirePower(sumOfAllCountersFP, cower, stack.experience)
 
         return this.game.getIFT_FPresult(firePower, DRsumPlusDRM)
     }

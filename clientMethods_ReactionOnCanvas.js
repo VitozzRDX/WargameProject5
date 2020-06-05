@@ -18,13 +18,17 @@ let methods = {
         //     return
         // }
 
-        // let i = this.canvasObj.getImageByID(counter.getImageID())
-        // let t = this.canvasObj.createPhaseTextBox(i, 'PREP_FIRE')
+        //let i = this.canvasObj.getImageByID(counter.getImageID())
+        let i = counter.initialImg
+        let t = this.canvasObj.createPhaseTextBox(i, 'PREP_FIRE')
         // //this.canvasObj.canvas.add(t);
         // let g = this.canvasObj.createGroup(...[i, t])
 
         // counter.group = g
         // this.canvasObj.canvas.add(g)
+        counter.text = t
+        options.target.add(t)
+        this.canvasObj.canvas.requestRenderAll()
 
         this.clearCounterInterface().buildCUI(counter)._setCurrentCounterInterface(counter)
         return

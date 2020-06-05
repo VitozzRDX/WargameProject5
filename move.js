@@ -23,6 +23,8 @@ let move = {
 
                 //     this.canvasObj.canvas.remove(counter.group)
                 // }
+
+                //options.target.removeWithUpdate(counter.text)
                 if (counter.getMovingStatus() == "brokenStackRemnant") {    //this._checkForMovingStatus(counter,"brokenStackRemnant")
 
                     stack = this.createNewStack_setStatus_addCounter_setOwnHex('filledWithBrokenStackRemnants', counter)

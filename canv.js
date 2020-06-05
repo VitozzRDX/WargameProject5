@@ -4,7 +4,7 @@ class Canv {
 
         window.fabric.Object.prototype.objectCaching = true
         window.fabric.Object.prototype.hasControls = false
-        window.fabric.Object.prototype.hasBorders = false
+        //window.fabric.Object.prototype.hasBorders = false
         
         this.canvas = new window.fabric.CanvasEx('canvas');
 
@@ -325,12 +325,12 @@ this.ID_ImageHash = {}
             left: l - w / 2 - 12,
             top: t + w / 2,
 
-            fill: '#880E4F',
+            fill: 'red',//'#880E4F',
             strokeWidth: 0.1,
             stroke: "red",
             angle: -90,
             fontSize: 9,
-            //backgroundColor: 'white',
+            backgroundColor: 'white',
             selectable: false,
             evented: false
         });
@@ -375,6 +375,13 @@ this.ID_ImageHash = {}
         })
         this.canvas.renderAll()
     }
+
+    create_and_fill_ID_ImageHash(img){
+        let id = this.createID()
+        this.fill_ID_ImageHash(id,img)
+        img.id = id
+    }
+
 };
 
 

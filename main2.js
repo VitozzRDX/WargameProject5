@@ -38,6 +38,7 @@ let initialSettings = {
                 normalRange:4,
                 firePower:6,
                 experience:'E',
+                name: 'ruSquadE-0',
             },
 
             'geSquadE-0': {

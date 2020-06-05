@@ -117,7 +117,7 @@ let buttonsCallbacks = {
         },
 
         attachCallback(button, counter) {
-            let img = this.canvasObj.getImageByID(counter.getImageID())
+            let img =  counter.group//= this.canvasObj.getImageByID(counter.getImageID())
             this.changeColorOfBorder(counter, 'red')
     
             let newCallback = (options) => {
@@ -178,6 +178,53 @@ let buttonsCallbacks = {
     
             this._removeAllCallbacksOffCanvasAndSetNew(newCallback)
     
+        },
+
+        attachCallback(button, counter) {
+            let img =  counter.group
+            let newCallback = (options) => {
+                let counterToAttach = options.target.counter
+                if (counter == counterToAttach) {
+                    console.log('counter == counterToAttach')
+                    return
+                }
+
+                let i = counterToAttach.group
+                //console.log(i)
+                img.set({
+                    top: i.top + 10,
+                    left: i.left + 10,
+                    stroke: null
+                })
+                //this.canvasObj.canvas.requestRenderAll()
+
+                i.addWithUpdate(img)
+
+                this.canvasObj.canvas.requestRenderAll()
+
+                counterToAttach.weaponCounter = counter
+                counterToAttach.group.weapon = img
+                
+                counter.setWeightHex(0)
+                counterToAttach.setWeightHex(2)
+
+                counter.ownHex = counterToAttach.ownHex
+
+                this.map.fillhex_counterIDHash(counterToAttach.ownHex, counter.ID)
+                this.rearrangeCountersPositionInHex(counterToAttach.ownHex)
+                //---------------------------------------------------------------------------------------------------------
+                this.clearCounterInterface()
+    
+                this._removeAllCallbacksOffCanvasAndSetNew(this.firstPlayerRallyPhase.bind(this))
+                // console.log(img)
+
+                // i.add(img)
+                // console.log(i)
+                // this.canvasObj.canvas.add(i)
+                
+                //this.canvasObj.canvas.requestRenderAll()
+            }
+            this._removeAllCallbacksOffCanvasAndSetNew(newCallback)
         },
 
         endMovementCallback(button) {

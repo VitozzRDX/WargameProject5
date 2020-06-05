@@ -789,3 +789,64 @@ _isCounterNearStack
 1) если группа  - разбиваем, стираем
     a) создаем новый текст бокс 
 
+
+------------------------------------------04 06 2020--------------------------------------------------------------------
+
+counter.groupScheme = {
+    firingStatus : counter.firingStatusAsTextbox,   ??
+    weapon : undefined,
+    exhaustion : undefined,
+}
+
+this.calculateCoordsForFiringStatusTextbox(counter) {
+    let l = counter.img.left
+    let t = counter.img.top
+    let w = counter.img.width
+    return {
+            left: l - w / 2 - 12,
+            top: t + w / 2,
+    }
+}
+
+this.drawCounterGroupOnScreen(counter) = {
+    let counterImg = counter.img
+    let arr = []
+
+    for (let name of counter.groupScheme){
+        if (counter.groupScheme[name] == 'firingStatus') {
+            let coords =  this.calculateCoordsForFiringStatusTextbox(counter)
+            let t = this.canvasObj.createPhaseTextBox
+            t.set(coords)
+            arr.push(t)
+        }
+    }
+
+    let g = this.canvasObj.createGroup(...arr)
+
+    this.canvasObj.drawGroup(g)
+}
+
+this.drawCounterGroupOnScreen(counter,coords) = {
+    counter.img.set
+}
+
+------------------------------------------05 06 2020--------------------------------------------------------------------
+
+changeColorOfBorder(counter, color) - вводим counter.initialImg , меняем его
+
+
+Группа ставит свои коорлдинаты  == 5 и 5 , когда присоеденяется к группе . И возвращает прежние при отделении
+                console.log(img)
+                i.addWithUpdate(img)
+
+                console.log(img)
+
+                i.removeWithUpdate(img)
+                console.log(img)
+
+------------------------------------------05 06 2020--------------------------------------------------------------------
+
+Заменил img на group.
+Теперь для редактирования огневого статуса есть counter.text 
+                          орудия - counter.group.weapon
+Работает
