@@ -79,12 +79,15 @@ let initialSettings = {
             },
             'geHMG': {
                 src: "assets/geHMG.gif",
+                otherSideSrc: "assets/geHMGb.gif",
                 className: "Weapon",
                 owner: 'Nazi',
                 name: 'geHMG',
                 type: 'MashineGun',
                 normalRange:4,
                 firePower:6,
+                rateOfFire:2,
+                breakdownNumber:12,
             }
         },
 

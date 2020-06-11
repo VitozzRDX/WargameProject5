@@ -851,29 +851,29 @@ class Client {
 
     //--------------- 18 04 2020 ---------------------------------------------------------------------------
 
-    addCounterToStackProcessing(stack, counter) {
+    // addCounterToStackProcessing(stack, counter) {
 
-        this.addCounterToStack(counter, stack)
-        this.changeColorOfBorder(counter, 'red')
+    //     this.addCounterToStack(counter, stack)
+    //     this.changeColorOfBorder(counter, 'red')
 
-        //----------------------------------------------------------------------------------------------------------------------------------------------
-        if (stack.isUnderCommand()) {
-            try {
-                counter.getUnderCommand()
-                counter.getCommanderBonus()
+    //     //----------------------------------------------------------------------------------------------------------------------------------------------
+    //     if (stack.isUnderCommand()) {
+    //         try {
+    //             counter.getUnderCommand()
+    //             counter.getCommanderBonus()
 
-                return console.log('added squad to stack with Commander')
-            } catch (error) {
-                console.log(error, 'adding not Squad')
-            }
-        }
+    //             return console.log('added squad to stack with Commander')
+    //         } catch (error) {
+    //             console.log(error, 'adding not Squad')
+    //         }
+    //     }
 
-        if (counter.getType() == 'SingleManCounter') {   // maybe we do not need this check cause it is always one of this
-            stack.getCommandBonus()
-            stack.getUnderCommand(counter)
-        }
-        //----------------------------------------------------------------------------------------------------------------------------------------------      
-    }
+    //     if (counter.getType() == 'SingleManCounter') {   // maybe we do not need this check cause it is always one of this
+    //         stack.getCommandBonus()
+    //         stack.getUnderCommand(counter)
+    //     }
+    //     //----------------------------------------------------------------------------------------------------------------------------------------------      
+    // }
 
     clearStackUI(stack) {
         for (let buttonName in this.getStackUIScheme(stack)) {
@@ -883,16 +883,19 @@ class Client {
 
 
     buildGUI(group, stack) {
-
+console.log(stack)
         let scheme = group.uiScheme
+
+        //console.log(scheme)
         let k = 0
         for (let name in scheme) {
-
+            //console.log(name)
             let bool = scheme[name];
 
-            if (!bool) {
-                return  // this counter already added
-            }
+            // if (!bool) {
+            //     console.log(bool)
+            //     return  // this counter already added
+            // }
 
             let btton = this.interface.buildButton(this.interfaceScheme[name], bool, { group: group, stack: stack })
 
@@ -928,10 +931,10 @@ class Client {
     }
 
     addingToFireStack(counter, stack) {
-
-        if (counter.getType() == 'SingleManCounter' && stack._isHex_CountersArrayEmpty(counter.ownHex)) {
-            return console.log('u cannot add SMC to FG without MMC or Weapon')
-        }
+        
+        // if (counter.getType() == 'SingleManCounter' && stack._isHex_CountersArrayEmpty(counter.ownHex)) {
+        //     return console.log('u cannot add SMC to FG without MMC or Weapon')
+        // }
         if (counter.getType() == 'SingleManCounter') {
             stack.setHex_Bonus(counter.ownHex, counter.commandBonus)
         }
@@ -942,7 +945,7 @@ class Client {
 
         stack.addToGeneralCountersArray(counter)
         stack.setHex_countersArray(counter.ownHex, counter)
-
+        
         this.changeColorOfBorder(counter, "red")
 
         this.clearGroupUI()
@@ -954,9 +957,7 @@ class Client {
 
         let result = arr.some((hex) => {
             let h = JSON.parse(hex)
-            //console.log('hex',hex)
-            //console.log(counter.ownHex)
-            //console.log(this.map.isHexNear(counter.ownHex, h))
+
             return this.map.isHexNear(counter.ownHex, h)
         })
 
@@ -1132,7 +1133,16 @@ class Client {
 
         let phase = this.game.getPhase()
         // let effectOnFirer    ????
-        this.useFireOnFirer_and_Animate(diceRoll, phase, stack)    //- here RoF , cowering effect , change status on appropriate
+        //this.useFireOnFirer_and_Animate(diceRoll, phase, stack)    //- here RoF , cowering effect , change status on appropriate
+
+
+         this.calculate_And_SetFiringStatus(diceRoll, phase, stack)
+         this.animateFireEffectOnFirer(stack)
+
+         console.log(stack)
+
+         stack = undefined
+         this.firingStack = { status: 'uncreated' }
 
         //-----------------------------------------------------------------------------------------------------------------------------------
 
@@ -1154,26 +1164,12 @@ class Client {
 
     }
 
-    useFireOnFirer_and_Animate(diceRoll, phase, stack) {
-
-        let status = 'FIRED'
-
-        stack.mgArray.forEach((counter) => {
-
-            counter.setFiringStatus(status)
-            if (counter.group) {
-                console.log('group here', counter.group)
-
-            }
-        })
-
-    }
 
 
     calculateCommanderBonus(stack) {
 
         let arr = Object.values(stack['hex_bonus'])
-        //console.log(arr);
+
         if (arr.length == 0) { return 0 }
 
         return Math.min(...arr)
@@ -1193,7 +1189,7 @@ class Client {
     setHex_Hindrance(stack, targetHex) {
         let firingHexesArr = Object.keys(stack['hex_countersArray'])
         let hind = 0
-        console.log(firingHexesArr)
+
         for (let hex of firingHexesArr) {
             hex = JSON.parse(hex)
             //console.log(hex)
@@ -1248,7 +1244,8 @@ class Client {
     }
 
     diceRoll() {
-        return Math.floor(Math.random() * 6) + 1;
+        //return Math.floor(Math.random() * 6) + 1;
+        return 6
     }
 
     calculateTEM(stack, targetHex) {
@@ -1349,6 +1346,168 @@ class Client {
 
         return this.game.getIFT_FPresult(firePower, DRsumPlusDRM)
     }
+
+    
+    useFireOnFirer_and_Animate(diceRoll, phase, stack) {
+
+        stack.mgArray.forEach((counter) => {
+
+            let status = this.calculateFiringStatus(diceRoll,phase,counter,stack)
+
+            if (status == '_ROF_') {
+
+                //this.changeColorOfBorder(counter, null)
+                return console.log('%Mashine Gun saved ROF ','color:blue');
+            }
+
+            if (status == 'broken') {
+                this.changeColorOfBorder(counter, null)
+                this.flipCounterOnOtherSide(counter)
+                counter.setBrokenStatus()
+                return console.log('%Mashine Gun is broken ','color:blue');
+            }
+
+
+
+            counter.setFiringStatus(status)
+            let img = counter.initialImg
+            let t = this.canvasObj.createPhaseTextBox(img, status)
+            
+            counter.group.add(t)
+            
+            this.changeColorOfBorder(counter, null)
+            //this.canvasObj.canvas.requestRenderAll()
+        })
+
+    }
+
+    calculate_And_SetFiringStatus(diceRoll, phase, stack){
+
+        stack.mgArray.forEach((counter) => {
+
+            let status = this.calculateFiringStatus(diceRoll,phase,counter,stack)
+            console.log('status :',status)
+
+            
+            counter.setFiringStatus(status)
+
+        })
+
+    }
+
+    animateFireEffectOnFirer(stack) {
+        let cb
+        let c= 0
+        let self = this
+        stack.mgArray.forEach((counter) => {
+            c = c+1000
+            
+            switch (counter.firingStatus) {
+                case '_ROF_':
+
+                    console.log('%Mashine Gun saved ROF ','color:blue');
+
+                    cb = ()=>{
+                        counter.group.bringToFront()
+                        self.changeColorOfBorder(counter, null)
+                    }
+                break;
+                    
+                case 'PREP_FIRE':
+                    cb = ()=>{
+
+                        let img = counter.initialImg
+                        let t = self.canvasObj.createPhaseTextBox(img, counter.firingStatus)
+
+
+                        
+                        counter.group.add(t)
+                        counter.initialImg.bringToFront()
+                        self.changeColorOfBorder(counter, null)
+                    }
+    
+                break;
+
+                case 'broken':
+                    //self.flipCounterOnOtherSide(counter)
+                    
+                    //ounter.initialImg.setSrc(counter.otherSideSrc)
+                    //console.log(counter.group)
+                    //counter.group.bringToFront()
+                    cb = ()=>{
+                        counter.group.bringToFront()
+                        counter.initialImg.setSrc(counter.otherSideSrc,()=>{
+                            self.changeColorOfBorder(counter, null)
+                        })
+                    //console.log(counter.group)
+                        
+
+
+                        //self.flipCounterOnOtherSide(counter)
+                        //counter.setBrokenStatus()
+                        // counter.initialImg.setSrc(counter.otherSideSrc,()=>{
+                        //     //counter.initialImg.bringToFront()
+                        //     console.log('%Mashine Gun is broken ','color:blue');
+                        //     self.canvasObj.canvas.requestRenderAll()
+                        //     counter.initialImg.bringToFront()
+                        // })
+                        //console.log('%Mashine Gun is broken ','color:blue');
+                        //console.log(counter.groupToAttach)
+
+                        //counter.group.bringToFront()
+
+
+
+//                         counter.group.moveTo(0)
+//   // force fabric to redraw the group
+//   counter.groupToAttach.dirty = true
+// self.canvasObj.canvas.requestRenderAll()
+
+                    }
+
+
+                break;
+            } 
+            setTimeout(cb,c)
+        })
+    }
+
+    calculateFiringStatus(diceRoll,phase,counter,stack) {
+
+        if(counter.rateOfFire && diceRoll.RedDice <= counter.rateOfFire ) {
+            return '_ROF_'
+        }
+
+        if (counter.breakdownNumber && diceRoll['sum']>= counter.breakdownNumber) {
+            return 'broken'
+        }
+
+        if (diceRoll.red == diceRoll.white && !this.isStackUnderCommand(stack) && phase=='secondPlayerDefenciveFirePhase') {
+            return 'FINAL_FIRE'
+        }
+
+        if (phase=='secondPlayerDefenciveFirePhase' && counter.firingStatus == 'FIRST_FIRE') {
+            return 'FINAL_FIRE'
+        }
+
+        if (phase=='secondPlayerDefenciveFirePhase' && counter.firingStatus == 'FINAL_FIRE') {
+            return 'FINAL_FIRE'
+        }
+
+        if (phase=='secondPlayerDefenciveFirePhase' ) {
+            return  'FIRST_FIRE'
+        }
+
+        return 'PREP_FIRE'
+    }
+
+    flipCounterOnOtherSide(counter){
+        let self = this
+        counter.initialImg.setSrc(counter.otherSideSrc, () => {
+            self.canvasObj.canvas.renderAll()
+        })
+    }
+
 }
 
 // -- let's mix canvas reaction into our class

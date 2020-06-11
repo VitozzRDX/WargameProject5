@@ -54,7 +54,7 @@ let hexFunctions = {
         var pt = this.Point((p.x - origin.x) / size.x, (p.y - origin.y) / size.y);
         var q = M.b0 * pt.x + M.b1 * pt.y;
         var r = M.b2 * pt.x + M.b3 * pt.y;
-        console.log('fgf')
+
         return this.Hex(q, r, -q - r);
     },
     hex_round(h) {
@@ -75,12 +75,12 @@ let hexFunctions = {
                 si = -qi - ri;
             }
         
-        console.log('hr')
+
         return this.Hex(qi, ri, si);
     },
 
     hex_linedraw(a, b) {
-        console.log('hhh')
+
         var N = this.hex_distance(a, b)
 
         var results = [];
@@ -92,7 +92,7 @@ let hexFunctions = {
     },
 
     hex_distance(a, b) {
-        console.log('mmm')
+
         return this.hex_length(this.hex_subtract(a, b));
     },
 
@@ -101,8 +101,6 @@ let hexFunctions = {
     },
 
     hex_subtract(a, b) {
-        console.log('s')
-        console.log(a, b)
         return this.Hex(a.q - b.q, a.r - b.r, a.s - b.s);
     },
     hex_lerp(a, b, t) {

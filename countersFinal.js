@@ -53,6 +53,8 @@ function addManInterface(counter){
 
 function addWeaponProps(counter,param) {
     counter.attachedTo = param.owner|| undefined
+    counter.rateOfFire = param.rateOfFire
+    counter.breakdownNumber = param.breakdownNumber
 }
 
 function addWeaponInterface(counter) {

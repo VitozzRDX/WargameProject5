@@ -116,69 +116,69 @@ let buttonsCallbacks = {
     
         },
 
-        attachCallback(button, counter) {
-            let img =  counter.group//= this.canvasObj.getImageByID(counter.getImageID())
-            this.changeColorOfBorder(counter, 'red')
+        // attachCallback(button, counter) {
+        //     let img =  counter.group//= this.canvasObj.getImageByID(counter.getImageID())
+        //     this.changeColorOfBorder(counter, 'red')
     
-            let newCallback = (options) => {
+        //     let newCallback = (options) => {
     
-                if (options.target == null) {
-                    console.log('options.target == null')
-                    return
-                }
+        //         if (options.target == null) {
+        //             console.log('options.target == null')
+        //             return
+        //         }
     
-                let counterToAttach = options.target.counter
+        //         let counterToAttach = options.target.counter
     
-                if (counter == counterToAttach) {
-                    console.log('counter == counterToAttach')
-                    return
-                }
+        //         if (counter == counterToAttach) {
+        //             console.log('counter == counterToAttach')
+        //             return
+        //         }
     
     
-                let i = this.canvasObj.getImageByID(counterToAttach.getImageID())
+        //         let i = this.canvasObj.getImageByID(counterToAttach.getImageID())
     
-                this.canvasObj.canvas.discardActiveObject()
+        //         this.canvasObj.canvas.discardActiveObject()
     
-                img.set({
-                    top: i.top + 10,
-                    left: i.left + 10,
-                    stroke: null
-                })//.bringToFront()
+        //         img.set({
+        //             top: i.top + 10,
+        //             left: i.left + 10,
+        //             stroke: null
+        //         })//.bringToFront()
     
-                this.canvasObj.canvas.add(img)
+        //         this.canvasObj.canvas.add(img)
     
-                //-------------- group start---------------------------------------------------------------------------------------
-                let group = this.canvasObj.createGroup(i, img)
+        //         //-------------- group start---------------------------------------------------------------------------------------
+        //         let group = this.canvasObj.createGroup(i, img)
     
-                counterToAttach.group = group
-                group.counter = counterToAttach
-                group.weaponCounter = counter
+        //         counterToAttach.group = group
+        //         group.counter = counterToAttach
+        //         group.weaponCounter = counter
                 
-                group.uiScheme = {'Add Squad To Fire Group':true,'Add Weapon To Fire Group':true} 
+        //         group.uiScheme = {'Add Squad To Fire Group':true,'Add Weapon To Fire Group':true} 
 
 
 
-                this.canvasObj.drawGroup(group)
+        //         this.canvasObj.drawGroup(group)
 
 
-                //-------------- group end---------------------------------------------------------------------------------------
+        //         //-------------- group end---------------------------------------------------------------------------------------
     
-                counter.setWeightHex(0)
-                counterToAttach.setWeightHex(2)
+        //         counter.setWeightHex(0)
+        //         counterToAttach.setWeightHex(2)
 
-                counter.ownHex = counterToAttach.ownHex
-                //---------------------------------------------------------------------------------------------------------
-                this.map.fillhex_counterIDHash(counterToAttach.ownHex, counter.ID)
-                this.rearrangeCountersPositionInHex(counterToAttach.ownHex)
-                //---------------------------------------------------------------------------------------------------------
-                this.clearCounterInterface()
+        //         counter.ownHex = counterToAttach.ownHex
+        //         //---------------------------------------------------------------------------------------------------------
+        //         this.map.fillhex_counterIDHash(counterToAttach.ownHex, counter.ID)
+        //         this.rearrangeCountersPositionInHex(counterToAttach.ownHex)
+        //         //---------------------------------------------------------------------------------------------------------
+        //         this.clearCounterInterface()
     
-                this._removeAllCallbacksOffCanvasAndSetNew(this.firstPlayerRallyPhase.bind(this))
-            }
+        //         this._removeAllCallbacksOffCanvasAndSetNew(this.firstPlayerRallyPhase.bind(this))
+        //     }
     
-            this._removeAllCallbacksOffCanvasAndSetNew(newCallback)
+        //     this._removeAllCallbacksOffCanvasAndSetNew(newCallback)
     
-        },
+        // },
 
         attachCallback(button, counter) {
             let img =  counter.group
@@ -202,9 +202,13 @@ let buttonsCallbacks = {
 
                 this.canvasObj.canvas.requestRenderAll()
 
-                counterToAttach.weaponCounter = counter
+                counterToAttach.group.weaponCounter = counter
+                counterToAttach.group.counter = counterToAttach
                 counterToAttach.group.weapon = img
+                counterToAttach.group.uiScheme = {'Add Squad To Fire Group':true,'Add Weapon To Fire Group':true} 
                 
+                counter.groupToAttach = counterToAttach.group
+
                 counter.setWeightHex(0)
                 counterToAttach.setWeightHex(2)
 
@@ -299,6 +303,7 @@ let buttonsCallbacks = {
 
         addWeaponToFG(button, ops){
 
+            console.log(ops)
             button.disabled = true;
             ops.group.uiScheme['Add Weapon To Fire Group'] = false
             this.changeColorOfBorder(ops.group.weaponCounter, 'red')

@@ -11,24 +11,24 @@ let methods = {
 
         let counter = options.target.counter
 
-        // if (counter.group) {
-        //     counter.group._restoreObjectsState()
+        // // if (counter.group) {
+        // //     counter.group._restoreObjectsState()
 
-        //     this.canvasObj.canvas.remove(counter.group)
-        //     return
-        // }
+        // //     this.canvasObj.canvas.remove(counter.group)
+        // //     return
+        // // }
 
-        //let i = this.canvasObj.getImageByID(counter.getImageID())
-        let i = counter.initialImg
-        let t = this.canvasObj.createPhaseTextBox(i, 'PREP_FIRE')
-        // //this.canvasObj.canvas.add(t);
-        // let g = this.canvasObj.createGroup(...[i, t])
+        // //let i = this.canvasObj.getImageByID(counter.getImageID())
+        // let i = counter.initialImg
+        // let t = this.canvasObj.createPhaseTextBox(i, 'PREP_FIRE')
+        // // //this.canvasObj.canvas.add(t);
+        // // let g = this.canvasObj.createGroup(...[i, t])
 
-        // counter.group = g
-        // this.canvasObj.canvas.add(g)
-        counter.text = t
-        options.target.add(t)
-        this.canvasObj.canvas.requestRenderAll()
+        // // counter.group = g
+        // // this.canvasObj.canvas.add(g)
+        // counter.text = t
+        // options.target.add(t)
+        // this.canvasObj.canvas.requestRenderAll()
 
         this.clearCounterInterface().buildCUI(counter)._setCurrentCounterInterface(counter)
         return
@@ -74,11 +74,16 @@ let methods = {
                     return console.log('u click not your counter')
                 }
 
+                if (counter.getType() == 'SingleManCounter' && !counter.group.weaponCounter) {
+                    return console.log('u cannot add SMC to FG without MMC or Weapon')
+                }
+
                 stack = this.createNewFStack('readyToFire')
                 this.firingStack = stack
 
-                if (counter.group) { // && group.type == 'attachedWeapon'
+                if (counter.group.weapon) { // && group.type == 'attachedWeapon'
                     let group = options.target.counter.group
+                    console.log(stack)
                     this.buildGUI(group, stack)
                     return
                 }
@@ -107,15 +112,16 @@ let methods = {
                     return
                 }
 
-                if (counter.group) { // && group.type == 'attachedWeapon'
+                if (counter.group.weapon) { // && group.type == 'attachedWeapon'
+                    console.log('with MG')
                     this.clearGroupUI()
-                    let group = options.target.counter.group
+                    let group = counter.group
                     this.buildGUI(group, stack)
                     return
                 }
 
                 if (this._isCounterInStack(counter, stack)) {
-                    return console.log('selected counter is already in Moving Group')
+                    return console.log('selected counter is already in Firing Group')
                 }
 
                 if (!this._isCounterNearStack(counter, stack)) {

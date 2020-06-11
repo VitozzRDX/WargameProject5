@@ -288,33 +288,6 @@ this.ID_ImageHash = {}
 
         return  new Promise((resolve, reject) => { this.animate(img,where,resolve) })
     }
-
-    //---------------------28 02 2020
-
-    // createFiringBorder(param) {
-    //     self = this;
-        
-    //     let l = param.left
-    //     let t = param.top
-    //     let w = param.width
-
-	// 	var rect = new fabric.Rect({
-    //         left: l,
-    //         top: t,
-
-    //         originX: 'center',
-    //         originY: 'center',
-    //         width: w + 2,
-    //         height: w + 2,
-    //         stroke: 'red',
-    //         strokeWidth: 2,
-    //         fill: '',
-    //         selectable: false,
-    //         evented : false
-    //     });
-		
-	// 	return rect
-    // }
     
     createPhaseTextBox(param, text) {
         let l = param.left
@@ -323,7 +296,7 @@ this.ID_ImageHash = {}
 
         var textbox = new fabric.Textbox(text, {
             left: l - w / 2 - 12,
-            top: t + w / 2,
+            top: t + w / 2 + 2,
 
             fill: 'red',//'#880E4F',
             strokeWidth: 0.1,
@@ -332,7 +305,13 @@ this.ID_ImageHash = {}
             fontSize: 9,
             backgroundColor: 'white',
             selectable: false,
-            evented: false
+            evented: false,
+            borderColor: 'red',
+            // editingBorderColor: 'blue',
+            // padding: 2
+            width:w+5,
+
+            textAlign: 'center',
         });
 
         return textbox
