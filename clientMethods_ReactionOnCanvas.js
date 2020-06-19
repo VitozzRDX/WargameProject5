@@ -4,9 +4,11 @@ import { defenciveFF } from './defenciveFF.js'
 
 let methods = {
     firstPlayerRallyPhase(options) {
-
+        let absolutePointer = options.absolutePointer
+        console.log(this.map.getHexFromCoords(absolutePointer))
+        console.log(absolutePointer)
         if (options.target == null) {
-            return console.log('clicked on empty space in FPRPhase')
+            return //console.log('clicked on empty space in FPRPhase')
         }
 
         let counter = options.target.counter

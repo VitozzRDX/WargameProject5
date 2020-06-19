@@ -3,7 +3,7 @@ import { hexFunctions } from './hexFunctions.js'
 class Map {
     constructor() {
 
-        this.flat =this.Layout(this.layout_flat(), this.Point(37.5, 37.5), this.Point(-1, 30));//(-112,-33)); // refactor . We should get orient,size and orig from consttructor
+        this.flat = this.Layout(this.layout_flat(), this.Point(37.5, 37.5), this.Point(-1, 30));//(-112,-33)); // refactor . We should get orient,size and orig from consttructor
         this.hexOwnerAndNumberOfCountersHash = {}
 
         this.hex_counterIDHash = {}
@@ -11,35 +11,54 @@ class Map {
         this.hex_lastCounterCoordinates = {}
 
         this.hex_hexTypeHash = {
-            '{"q":8,"r":5,"s":-13}':'road',
-            '{"q":9,"r":4,"s":-13}':'road',
-            '{"q":10,"r":3,"s":-13}':'road',
-            '{"q":11,"r":2,"s":-13}':'road',
-            '{"q":12,"r":1,"s":-13}':'road',
-            '{"q":13,"r":1,"s":-14}':'road',
-            '{"q":14,"r":1,"s":-15}':'road',
-            '{"q":15,"r":1,"s":-16}':'road',
-            '{"q":16,"r":1,"s":-17}':'road',
-            '{"q":16,"r":0,"s":-16}':'road',
-            '{"q":16,"r":-1,"s":-15}':'road',
-            '{"q":16,"r":-2,"s":-14}':'road',
-            '{"q":17,"r":-3,"s":-14}':'road',
-            '{"q":18,"r":-4,"s":-14}':'road',
-            '{"q":19,"r":-5,"s":-14}':'road',
-            '{"q":20,"r":-6,"s":-14}':'road',
-            '{"q":21,"r":-7,"s":-14}':'road',
-            '{"q":22,"r":-8,"s":-14}':'road',
-            '{"q":23,"r":-9,"s":-14}':'road',
-            '{"q":24,"r":-9,"s":-15}':'road',
-            '{"q":25,"r":-9,"s":-16}':'road',
-            '{"q":26,"r":-9,"s":-17}':'road',
-            '{"q":27,"r":-9,"s":-18}':'road',
-            '{"q":28,"r":-9,"s":-19}':'road',
-            '{"q":29,"r":-10,"s":-19}':'road',
-            '{"q":30,"r":-11,"s":-19}':'road',
-            '{"q":24,"r":-10,"s":-14}':'road',
-            '{"q":24,"r":-11,"s":-13}':'road',
-            '{"q":24,"r":-12,"s":-12}':'road',
+            '{"q":8,"r":5,"s":-13}': 'road',
+            '{"q":9,"r":4,"s":-13}': 'road',
+            '{"q":10,"r":3,"s":-13}': 'road',
+            '{"q":11,"r":2,"s":-13}': 'road',
+            '{"q":12,"r":1,"s":-13}': 'road',
+            '{"q":13,"r":1,"s":-14}': 'road',
+            '{"q":14,"r":1,"s":-15}': 'road',
+            '{"q":15,"r":1,"s":-16}': 'road',
+            '{"q":16,"r":1,"s":-17}': 'road',
+            '{"q":16,"r":0,"s":-16}': 'road',
+            '{"q":16,"r":-1,"s":-15}': 'road',
+            '{"q":16,"r":-2,"s":-14}': 'road',
+            '{"q":17,"r":-3,"s":-14}': 'road',
+            '{"q":18,"r":-4,"s":-14}': 'road',
+            '{"q":19,"r":-5,"s":-14}': 'road',
+            '{"q":20,"r":-6,"s":-14}': 'road',
+            '{"q":21,"r":-7,"s":-14}': 'road',
+            '{"q":22,"r":-8,"s":-14}': 'road',
+            '{"q":23,"r":-9,"s":-14}': 'road',
+            '{"q":24,"r":-9,"s":-15}': 'road',
+            '{"q":25,"r":-9,"s":-16}': 'road',
+            '{"q":26,"r":-9,"s":-17}': 'road',
+            '{"q":27,"r":-9,"s":-18}': 'road',
+            '{"q":28,"r":-9,"s":-19}': 'road',
+            '{"q":29,"r":-10,"s":-19}': 'road',
+            '{"q":30,"r":-11,"s":-19}': 'road',
+            '{"q":24,"r":-10,"s":-14}': 'road',
+            '{"q":24,"r":-11,"s":-13}': 'road',
+            '{"q":24,"r":-12,"s":-12}': 'road',
+        }
+
+        this.hex_hexType_segmentsObjHash = {
+            '{"q":8,"r":5,"s":-13}': { type: 'road', segments: [] },
+
+            '{"q":10,"r":0,"s":-10}': {
+                type: 'hill', segments: [
+
+                    [{ x: 531.8801072684491, y: 343.7543075657528 }, { x: 557.1160219596728, y: 368.1549874790053 }],
+
+                ]
+            },
+
+            '{"q":8,"r":0,"s":-8}': {
+                type: 'hill', segments: [
+                    [{ x: 431.59146379623246, y: 318.0853485064011 }, { x: 466.8126916578007, y: 259.82219061166427 }]
+                ]
+            },
+
         }
     }
 
@@ -48,139 +67,310 @@ class Map {
         return this.polygon_corners(this.flat, { q: hex.q, r: hex.r, s: hex.s })    // refactor (this.flat, hex)
     }
     getCenterCoordsObjFromHex(hex) {
-        return this.hex_to_pixel(this.flat,hex)
+        return this.hex_to_pixel(this.flat, hex)
     }
-    getHexFromCoords(coords){
-        console.log(coords)
-        if (!coords.x||!coords.y) throw 'coords should be an object with properties x and y'
-        return this.hex_round(this.pixel_to_hex(this.flat,coords))
+    getHexFromCoords(coords) {
+
+        if (!coords.x || !coords.y) throw 'coords should be an object with properties x and y'
+        return this.hex_round(this.pixel_to_hex(this.flat, coords))
     }
 
-    getOwnerOfHex(hex){
+    getOwnerOfHex(hex) {
         //console.log(this.hex_ownerHash)
         let h = JSON.stringify(hex)
         return this.hex_ownerHash[h]
 
     }
 
-    setOwnerOfHex(hex,owner){
+    setOwnerOfHex(hex, owner) {
         let h = JSON.stringify(hex)
-        this.hex_ownerHash[h]= owner // owner can be 'disputed'
+        this.hex_ownerHash[h] = owner // owner can be 'disputed'
     }
 
-    getHexType(hex){
+    getHexType(hex) {
         let h = JSON.stringify(hex)
-        return this.hex_hexTypeHash[h]||'plain'
+        return this.hex_hexTypeHash[h] || 'plain'
     }
 
-    _checkIfHexIsOccupied(hex){
+    _checkIfHexIsOccupied(hex) {
         return false
     }
 
-    addHexTohex_counterIDHash(hex){
+    addHexTohex_counterIDHash(hex) {
         let h = JSON.stringify(hex)
-        if(this.hex_counterIDHash[h]) {
+        if (this.hex_counterIDHash[h]) {
             return console.log('this hex is already in hex_counterIDHash')
         }
         this.hex_counterIDHash[h] = []
     }
 
-    fillhex_counterIDHash(hex,counterID){
+    fillhex_counterIDHash(hex, counterID) {
         let h = JSON.stringify(hex)
         this.hex_counterIDHash[h].push(counterID)
     }
 
-    getCountersIDinHexArray(hex){
+    getCountersIDinHexArray(hex) {
         let h = JSON.stringify(hex)
         return this.hex_counterIDHash[h]
     }
 
-    removeIDFromHex_counterIDHash(hex,ID){
+    removeIDFromHex_counterIDHash(hex, ID) {
         console.log('removeIDFromHex_counterIDHash')
         let h = JSON.stringify(hex)
         let ind = this.hex_counterIDHash[h].indexOf(ID)
 
-        this.hex_counterIDHash[h].splice(ind,1)
+        this.hex_counterIDHash[h].splice(ind, 1)
 
     }
 
-    _calculateFreeCoords(hex,size){
+    _calculateFreeCoords(hex, size) {
         let center = this.getCenterCoordsObjFromHex(hex)
-        let arr = this.getCountersIDinHexArray(hex)||[]
+        let arr = this.getCountersIDinHexArray(hex) || []
 
-        if (arr.length == 0 ) return {x:center.x,y:center.y}
+        if (arr.length == 0) return { x: center.x, y: center.y }
         let num = arr.length
-        
 
-        return {x:center.x+num*size*0.25,y:center.y+num*size*0.25 }
+
+        return { x: center.x + num * size * 0.25, y: center.y + num * size * 0.25 }
     }
-//--------------------------------------------------------------------------------------------------------
-    isHexNear(originHex, hexClicked){
+    //--------------------------------------------------------------------------------------------------------
+    isHexNear(originHex, hexClicked) {
 
-        if (Math.abs(hexClicked.q - originHex.q)>1){
+        if (Math.abs(hexClicked.q - originHex.q) > 1) {
             return false
         }
 
-        if (Math.abs(hexClicked.r - originHex.r)>1){
+        if (Math.abs(hexClicked.r - originHex.r) > 1) {
             return false
         }
 
-        if (Math.abs(hexClicked.s - originHex.s)>1){
+        if (Math.abs(hexClicked.s - originHex.s) > 1) {
             return false
         }
-        
+
         return true
     }
 
-    getHexesBetween(hexClicked,hexFired) {
-        console.log(hexClicked,hexFired)
-        return this.hex_linedraw(hexFired,hexClicked);
+    getHexesBetween(hexClicked, hexFired) {
+        //console.log(hexClicked, hexFired)
+        return this.hex_linedraw(hexFired, hexClicked);
     }
 
-    getHexHindrance(hex){
+    getHexHindrance(hex) {
         let h = JSON.stringify(hex)
         let type = this.hex_hexTypeHash[h]
 
         switch (type) {
 
             case 'orchard':
-                return  1
+                return 1
 
 
             case 'grain':
 
-                return  1
+                return 1
         }
         return 0
     }
 
 
-    
-    getHexTEM(hex){
-        
+
+    getHexTEM(hex) {
+
         let type = this.getHexType(hex)
 
         switch (type) {
 
             case 'woods':
-                return  1
+                return 1
 
 
             case 'wooden building':
 
-                return  2
+                return 2
             case 'stone building':
 
-                return  3
-            case 'woods-road' :
+                return 3
+            case 'woods-road':
                 // if los and unit entered with road bonus = 0
                 // else = 1
                 return 'woods-road'
 
         }
     }
-    isLoS(hex, targetHex){
-        return true
+    isLoS(hex, targetHex, callbackToDrawLines) {
+
+        //console.log(hex,targetHex)
+        hex = JSON.parse(hex)
+        let result = true
+        let pointA = this.getCenterCoordsObjFromHex(hex)
+        let pointB = this.getCenterCoordsObjFromHex(targetHex)
+
+        //console.log(pointA,pointB)
+        // draw line between 
+
+        let segmentA = [pointA, pointB]
+
+        callbackToDrawLines(segmentA)
+
+        let arrayOfHexesInLoS = this.getHexesBetween(hex, targetHex)
+
+        console.log(arrayOfHexesInLoS)
+
+        // let us compile all segments on every hex this line goes through
+        // let arrayOfHexesInLoS =  this.getHexesBetween(hex, targetHex)
+        // // let allSegments = (()=>{
+
+        // // })()
+
+        // // let allSegmentsInLoSArr = arrayOfHexesInLoS.reduce((acc,hex)=>{
+
+        // // },[])
+
+        for (let hex of arrayOfHexesInLoS) {
+
+            let segmentsArray = this.getSegmentsFrom_Hex_SegmentsArrayHash(hex)
+
+            console.log(segmentsArray)
+            result = segmentsArray.some((segment) => {
+
+                if (this._isLineSegmentsCross(segment, segmentA)) {
+                    callbackToDrawLines(segment)
+                    return true
+                }
+
+            })
+
+            if (result) {
+
+                // draw segment
+
+
+                return console.log('line crossing !')
+            }
+
+            console.log('no line cross in hex ', hex)
+        }
+
+
+        //--------------------------------------------------------------
+        //let segmentsArray = this.getSegmentsFrom_Hex_SegmentsArrayHash(targetHex)
+
+        // let result = (() => {
+        //     if (
+
+        //     ) {
+        //         return false
+        //     }
+
+        //     return true
+        // })()
+
+        //  
+        // return (this._isLineSegmentsCross(segmentA,segmentB))
+
+
+        return result
+    }
+
+    _isLineSegmentsCross(segment, segmentA) {
+        if (segment == 0) {
+            return false
+        }
+        console.log(this.doLineSegmentsIntersect(segment, segmentA))
+        return this.doLineSegmentsIntersect(segment, segmentA).bool
+    }
+
+    getSegmentsFrom_Hex_SegmentsArrayHash(hex) {
+        hex = JSON.stringify(hex)
+
+        if (!this.hex_hexType_segmentsObjHash[hex] || !this.hex_hexType_segmentsObjHash[hex]['segments']) {
+            console.log('no segments here')
+            return [0]
+        }
+
+        return this.hex_hexType_segmentsObjHash[hex]['segments']
+    }
+
+    doLineSegmentsIntersect(l1, l2) {  // l = [{x:num,y:num},{}]
+
+        console.log('inside doLineSegmentsIntersect(l1, l2) :', [l1, l2])
+
+        function subtractPoints(point1, point2) {
+            var result = {};
+            result.x = point1.x - point2.x;
+            result.y = point1.y - point2.y;
+        
+            return result;
+        }
+        function crossProduct(point1, point2) {
+            return point1.x * point2.y - point1.y * point2.x;
+        }
+        function equalPoints(point1, point2) {
+            return (point1.x == point2.x) && (point1.y == point2.y)
+        }
+        
+        function allEqual(args) {
+            var firstValue = arguments[0],
+                i;
+            for (i = 1; i < arguments.length; i += 1) {
+                if (arguments[i] != firstValue) {
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        var p = l1[0]
+
+        var p2 = l1[1];
+
+        var q = l2[0];
+        var q2 = l2[1];
+        var r = subtractPoints(p2, p);
+        var s = subtractPoints(q2, q);
+
+        var uNumerator = crossProduct(subtractPoints(q, p), r);
+        var denominator = crossProduct(r, s);
+
+        if (uNumerator == 0 && denominator == 0) {
+            // They are coLlinear
+
+            // Do they touch? (Are any of the points equal?)
+            if (equalPoints(p, q) || equalPoints(p, q2) || equalPoints(p2, q) || equalPoints(p2, q2)) {
+                return true
+            }
+            // Do they overlap? (Are all the point differences in either direction the same sign)
+            return !allEqual(
+                (q.x - p.x < 0),
+                (q.x - p2.x < 0),
+                (q2.x - p.x < 0),
+                (q2.x - p2.x < 0)) ||
+                !allEqual(
+                    (q.y - p.y < 0),
+                    (q.y - p2.y < 0),
+                    (q2.y - p.y < 0),
+                    (q2.y - p2.y < 0));
+        }
+
+        if (denominator == 0) {
+            console.log('lines are paralell')
+            // lines are paralell
+            return false;
+        }
+
+        var u = uNumerator / denominator;
+        var t = crossProduct(subtractPoints(q, p), s) / denominator;
+        //------------------------------------------------------------add-on-------------
+
+        let x = p.x + t * (p2.x - p.x)
+        let y = p.y + t * (p2.y - p.y)
+        //---------------------------------------------------------------
+        if ((t >= 0) && (t <= 1) && (u >= 0) && (u <= 1)) {
+            return { 'bool': true, 'obstaclePoint': [x, y] }
+        }
+
+        return { 'bool': false, 'obstaclePoint': null }
     }
 }
 

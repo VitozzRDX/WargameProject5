@@ -883,7 +883,7 @@ class Client {
 
 
     buildGUI(group, stack) {
-console.log(stack)
+        console.log(stack)
         let scheme = group.uiScheme
 
         //console.log(scheme)
@@ -931,7 +931,7 @@ console.log(stack)
     }
 
     addingToFireStack(counter, stack) {
-        
+
         // if (counter.getType() == 'SingleManCounter' && stack._isHex_CountersArrayEmpty(counter.ownHex)) {
         //     return console.log('u cannot add SMC to FG without MMC or Weapon')
         // }
@@ -945,7 +945,7 @@ console.log(stack)
 
         stack.addToGeneralCountersArray(counter)
         stack.setHex_countersArray(counter.ownHex, counter)
-        
+
         this.changeColorOfBorder(counter, "red")
 
         this.clearGroupUI()
@@ -1110,18 +1110,16 @@ console.log(stack)
         // if stack.firingStatus  == 'First Fire' && targetHex not closest between possible
         // return
 
-        //stack.setCommanderCover()
-
         let targetHex = this.map.getHexFromCoords(point)
 
         this.setHex_LoS(stack, targetHex)
 
-        if (Object.values(stack['hex_los']).length > 0) { // && stack not in one hex
-            // build button
-            return console.log('building buttons to choose stack firing')
-        }
+        // if (!isEveryFiringHexGotLoS(stack)) { // && stack not in one hex    // isEveryFiringHexGotLoS
+        //     // build button
+        //     return console.log('building buttons to choose stack firing')
+        // }
 
-        this.setHex_Hindrance(stack, targetHex)
+        this.setHex_Hindrance(stack, targetHex) // move up after setHex_LoS but before isEveryFiringHexGotLoS ?
 
         let commanderDRM = this.calculateCommanderBonus(stack)
         let hindranceDRM = this.calculateWorstHindranceDRM(stack)
@@ -1132,17 +1130,13 @@ console.log(stack)
         let diceRoll = this.getResultRollingTwoDice()
 
         let phase = this.game.getPhase()
-        // let effectOnFirer    ????
-        //this.useFireOnFirer_and_Animate(diceRoll, phase, stack)    //- here RoF , cowering effect , change status on appropriate
 
+        this.calculate_And_SetFiringStatus(diceRoll, phase, stack)
+        this.animateFireEffectOnFirer(stack)
+        this.returnMashinGunsOnTopOfGroup(stack)
 
-         this.calculate_And_SetFiringStatus(diceRoll, phase, stack)
-         this.animateFireEffectOnFirer(stack)
-
-         console.log(stack)
-
-         stack = undefined
-         this.firingStack = { status: 'uncreated' }
+        // stack = undefined
+        this.firingStack = { status: 'uncreated' }
 
         //-----------------------------------------------------------------------------------------------------------------------------------
 
@@ -1176,10 +1170,10 @@ console.log(stack)
     }
 
     setHex_LoS(stack, targetHex) {
-        let firingHexesArr = Object.values(stack['hex_countersArray'])
+        let firingHexesArr = Object.keys(stack['hex_countersArray'])
 
         firingHexesArr.forEach((hex) => {
-            let bool = this.map.isLoS(hex, targetHex)
+            let bool = this.map.isLoS(hex, targetHex,this.callbackToDrawLines.bind(this))
             if (!bool) {
                 stack.setHex_LoS(hex, bool)
             }
@@ -1347,48 +1341,14 @@ console.log(stack)
         return this.game.getIFT_FPresult(firePower, DRsumPlusDRM)
     }
 
-    
-    useFireOnFirer_and_Animate(diceRoll, phase, stack) {
+
+    calculate_And_SetFiringStatus(diceRoll, phase, stack) {
 
         stack.mgArray.forEach((counter) => {
 
-            let status = this.calculateFiringStatus(diceRoll,phase,counter,stack)
+            let status = this.calculateFiringStatus(diceRoll, phase, counter, stack)
+            console.log('status :', status)
 
-            if (status == '_ROF_') {
-
-                //this.changeColorOfBorder(counter, null)
-                return console.log('%Mashine Gun saved ROF ','color:blue');
-            }
-
-            if (status == 'broken') {
-                this.changeColorOfBorder(counter, null)
-                this.flipCounterOnOtherSide(counter)
-                counter.setBrokenStatus()
-                return console.log('%Mashine Gun is broken ','color:blue');
-            }
-
-
-
-            counter.setFiringStatus(status)
-            let img = counter.initialImg
-            let t = this.canvasObj.createPhaseTextBox(img, status)
-            
-            counter.group.add(t)
-            
-            this.changeColorOfBorder(counter, null)
-            //this.canvasObj.canvas.requestRenderAll()
-        })
-
-    }
-
-    calculate_And_SetFiringStatus(diceRoll, phase, stack){
-
-        stack.mgArray.forEach((counter) => {
-
-            let status = this.calculateFiringStatus(diceRoll,phase,counter,stack)
-            console.log('status :',status)
-
-            
             counter.setFiringStatus(status)
 
         })
@@ -1397,51 +1357,48 @@ console.log(stack)
 
     animateFireEffectOnFirer(stack) {
         let cb
-        let c= 0
+        let c = 0
         let self = this
         stack.mgArray.forEach((counter) => {
-            c = c+1000
-            
+            c = c + 1000
+
             switch (counter.firingStatus) {
                 case '_ROF_':
 
-                    console.log('%Mashine Gun saved ROF ','color:blue');
+                    console.log('%Mashine Gun saved ROF ', 'color:blue');
 
-                    cb = ()=>{
+                    cb = () => {
                         counter.group.bringToFront()
                         self.changeColorOfBorder(counter, null)
                     }
-                break;
-                    
+                    break;
+
                 case 'PREP_FIRE':
-                    cb = ()=>{
+                    cb = () => {
 
                         let img = counter.initialImg
                         let t = self.canvasObj.createPhaseTextBox(img, counter.firingStatus)
 
 
-                        
+
                         counter.group.add(t)
+                        counter.group.bringToFront()
                         counter.initialImg.bringToFront()
                         self.changeColorOfBorder(counter, null)
                     }
-    
-                break;
+
+                    break;
 
                 case 'broken':
                     //self.flipCounterOnOtherSide(counter)
-                    
-                    //ounter.initialImg.setSrc(counter.otherSideSrc)
-                    //console.log(counter.group)
-                    //counter.group.bringToFront()
-                    cb = ()=>{
-                        counter.group.bringToFront()
-                        counter.initialImg.setSrc(counter.otherSideSrc,()=>{
+
+                    cb = () => {
+                        counter.groupToAttach.bringToFront()
+                        //----------------- flipCounterOnOtherSide ---------------------------
+                        counter.initialImg.setSrc(counter.otherSideSrc, () => {
+                            counter.group.bringToFront()
                             self.changeColorOfBorder(counter, null)
                         })
-                    //console.log(counter.group)
-                        
-
 
                         //self.flipCounterOnOtherSide(counter)
                         //counter.setBrokenStatus()
@@ -1451,63 +1408,83 @@ console.log(stack)
                         //     self.canvasObj.canvas.requestRenderAll()
                         //     counter.initialImg.bringToFront()
                         // })
-                        //console.log('%Mashine Gun is broken ','color:blue');
-                        //console.log(counter.groupToAttach)
-
                         //counter.group.bringToFront()
-
-
-
-//                         counter.group.moveTo(0)
-//   // force fabric to redraw the group
-//   counter.groupToAttach.dirty = true
-// self.canvasObj.canvas.requestRenderAll()
 
                     }
 
 
-                break;
-            } 
-            setTimeout(cb,c)
+                    break;
+            }
+            setTimeout(cb, c)
         })
     }
 
-    calculateFiringStatus(diceRoll,phase,counter,stack) {
+    calculateFiringStatus(diceRoll, phase, counter, stack) {
 
-        if(counter.rateOfFire && diceRoll.RedDice <= counter.rateOfFire ) {
+        if (counter.rateOfFire && diceRoll.RedDice <= counter.rateOfFire) {
             return '_ROF_'
         }
 
-        if (counter.breakdownNumber && diceRoll['sum']>= counter.breakdownNumber) {
+        if (counter.breakdownNumber && diceRoll['sum'] >= counter.breakdownNumber) {
             return 'broken'
         }
 
-        if (diceRoll.red == diceRoll.white && !this.isStackUnderCommand(stack) && phase=='secondPlayerDefenciveFirePhase') {
+        if (diceRoll.red == diceRoll.white && !this.isStackUnderCommand(stack) && phase == 'secondPlayerDefenciveFirePhase') {
             return 'FINAL_FIRE'
         }
 
-        if (phase=='secondPlayerDefenciveFirePhase' && counter.firingStatus == 'FIRST_FIRE') {
+        if (phase == 'secondPlayerDefenciveFirePhase' && counter.firingStatus == 'FIRST_FIRE') {
             return 'FINAL_FIRE'
         }
 
-        if (phase=='secondPlayerDefenciveFirePhase' && counter.firingStatus == 'FINAL_FIRE') {
+        if (phase == 'secondPlayerDefenciveFirePhase' && counter.firingStatus == 'FINAL_FIRE') {
             return 'FINAL_FIRE'
         }
 
-        if (phase=='secondPlayerDefenciveFirePhase' ) {
-            return  'FIRST_FIRE'
+        if (phase == 'secondPlayerDefenciveFirePhase') {
+            return 'FIRST_FIRE'
         }
 
         return 'PREP_FIRE'
     }
 
-    flipCounterOnOtherSide(counter){
+    flipCounterOnOtherSide(counter) {
         let self = this
         counter.initialImg.setSrc(counter.otherSideSrc, () => {
             self.canvasObj.canvas.renderAll()
         })
     }
 
+    returnMashinGunsOnTopOfGroup(stack){
+        setTimeout(() => {
+            stack.mgArray.forEach((counter) => {
+                if (counter.getType() == 'MashineGun') {
+
+                    counter.group.bringToFront()
+
+                    this.canvasObj.getImageByID(counter.getImageID()).set({ // only to show changes ! Without it won't work
+                        strokeWidth: 4
+                    })
+                    this.canvasObj.canvas.requestRenderAll()
+                }
+            })
+        }, (stack.mgArray.length +1)*1000)
+    }
+
+    isEveryFiringHexGotLoS(stack){
+        return Object.values(stack['hex_los']).length == 0
+    }
+
+    callbackToDrawLines(arr){
+
+        let a  = [Object.values(arr[0]),Object.values(arr[1])]
+        
+        console.log(a)
+
+        const segment = [].concat(...a)
+
+        this.canvasObj.drawLine(segment)
+    }
 }
 
 // -- let's mix canvas reaction into our class
