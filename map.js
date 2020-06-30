@@ -54,10 +54,18 @@ class Map {
             },
 
             '{"q":8,"r":0,"s":-8}': {
-                type: 'hill', segments: [
+                type: 'hill', 
+                segments: [
                     [{ x: 431.59146379623246, y: 318.0853485064011 }, { x: 466.8126916578007, y: 259.82219061166427 }]
                 ]
             },
+
+            '{"q":8,"r":3,"s":-11}':{
+                type: 'hill', 
+                segments: [
+                    [{ x: 420.49940546967895, y: 497.46697388632873 }, { x: 476.43281807372176, y: 466.56221198156686 }]
+                ]
+            }
 
         }
     }
@@ -76,7 +84,7 @@ class Map {
     }
 
     getOwnerOfHex(hex) {
-        //console.log(this.hex_ownerHash)
+
         let h = JSON.stringify(hex)
         return this.hex_ownerHash[h]
 
@@ -152,7 +160,7 @@ class Map {
     }
 
     getHexesBetween(hexClicked, hexFired) {
-        //console.log(hexClicked, hexFired)
+
         return this.hex_linedraw(hexFired, hexClicked);
     }
 
@@ -200,13 +208,13 @@ class Map {
     }
     isLoS(hex, targetHex, callbackToDrawLines) {
 
-        //console.log(hex,targetHex)
+
         hex = JSON.parse(hex)
         let result = true
         let pointA = this.getCenterCoordsObjFromHex(hex)
         let pointB = this.getCenterCoordsObjFromHex(targetHex)
 
-        //console.log(pointA,pointB)
+
         // draw line between 
 
         let segmentA = [pointA, pointB]
@@ -215,23 +223,11 @@ class Map {
 
         let arrayOfHexesInLoS = this.getHexesBetween(hex, targetHex)
 
-        console.log(arrayOfHexesInLoS)
-
-        // let us compile all segments on every hex this line goes through
-        // let arrayOfHexesInLoS =  this.getHexesBetween(hex, targetHex)
-        // // let allSegments = (()=>{
-
-        // // })()
-
-        // // let allSegmentsInLoSArr = arrayOfHexesInLoS.reduce((acc,hex)=>{
-
-        // // },[])
 
         for (let hex of arrayOfHexesInLoS) {
 
             let segmentsArray = this.getSegmentsFrom_Hex_SegmentsArrayHash(hex)
 
-            console.log(segmentsArray)
             result = segmentsArray.some((segment) => {
 
                 if (this._isLineSegmentsCross(segment, segmentA)) {
@@ -242,35 +238,15 @@ class Map {
             })
 
             if (result) {
-
-                // draw segment
-
-
-                return console.log('line crossing !')
+                console.log('line crossing !')
+                return false
             }
 
-            console.log('no line cross in hex ', hex)
+            //console.log('no line cross in hex ', hex)
         }
 
 
-        //--------------------------------------------------------------
-        //let segmentsArray = this.getSegmentsFrom_Hex_SegmentsArrayHash(targetHex)
-
-        // let result = (() => {
-        //     if (
-
-        //     ) {
-        //         return false
-        //     }
-
-        //     return true
-        // })()
-
-        //  
-        // return (this._isLineSegmentsCross(segmentA,segmentB))
-
-
-        return result
+        return true
     }
 
     _isLineSegmentsCross(segment, segmentA) {
@@ -282,10 +258,10 @@ class Map {
     }
 
     getSegmentsFrom_Hex_SegmentsArrayHash(hex) {
-        hex = JSON.stringify(hex)
+     hex = JSON.stringify(hex)
 
         if (!this.hex_hexType_segmentsObjHash[hex] || !this.hex_hexType_segmentsObjHash[hex]['segments']) {
-            console.log('no segments here')
+            //console.log('no segments here')
             return [0]
         }
 
@@ -294,13 +270,13 @@ class Map {
 
     doLineSegmentsIntersect(l1, l2) {  // l = [{x:num,y:num},{}]
 
-        console.log('inside doLineSegmentsIntersect(l1, l2) :', [l1, l2])
+        //console.log('inside doLineSegmentsIntersect(l1, l2) :', [l1, l2])
 
         function subtractPoints(point1, point2) {
             var result = {};
             result.x = point1.x - point2.x;
             result.y = point1.y - point2.y;
-        
+
             return result;
         }
         function crossProduct(point1, point2) {
@@ -309,7 +285,7 @@ class Map {
         function equalPoints(point1, point2) {
             return (point1.x == point2.x) && (point1.y == point2.y)
         }
-        
+
         function allEqual(args) {
             var firstValue = arguments[0],
                 i;

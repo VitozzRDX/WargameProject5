@@ -5,8 +5,10 @@ import { defenciveFF } from './defenciveFF.js'
 let methods = {
     firstPlayerRallyPhase(options) {
         let absolutePointer = options.absolutePointer
+
         console.log(this.map.getHexFromCoords(absolutePointer))
         console.log(absolutePointer)
+
         if (options.target == null) {
             return //console.log('clicked on empty space in FPRPhase')
         }
@@ -84,20 +86,18 @@ let methods = {
                 this.firingStack = stack
 
                 if (counter.group.weapon) { // && group.type == 'attachedWeapon'
+
                     let group = options.target.counter.group
-                    console.log(stack)
                     this.buildGUI(group, stack)
                     return
                 }
 
                 this.addingToFireStack(counter, stack)
-                //stack.addToFiringStack(counter)
-                // stack.addToGeneralCountersArray(counter)
-                // stack.setHex_countersArray(counter.ownHex,counter)
 
-                // this.changeColorOfBorder(counter, "red")
+                this.clearStackUI(stack)
+                this.buildStackUI(stack)
 
-                // this.clearGroupUI()
+                console.log(stack)
 
                 break;
 

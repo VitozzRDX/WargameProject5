@@ -362,12 +362,6 @@ this.ID_ImageHash = {}
     }
 
     drawLine(arr) {
-        // let a  = [Object.values(arr[0]),Object.values(arr[1])]
-        // console.log([Object.values(arr[0]),Object.values(arr[1])])
-
-        // const flat = [].concat(...a)
-
-        console.log(arr)
         
         let line = new fabric.Line(arr, {
             stroke: 'red',

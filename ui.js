@@ -27,7 +27,7 @@ class Interface {
         m.appendChild(button)
 
         this.buttonsHash[obj.name] = button
-        console.log('g')
+
         return button
 
     }

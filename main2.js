@@ -93,10 +93,11 @@ let initialSettings = {
 
         parametersOnCreationHash: {
             'ruSquadE-0': [{ q: 6, r: 0, s: -6 }],                                        // {top:100,left:100}
-            'geSquadE-0': [{ q: 12, r: 0, s: -12 }],
+            'geSquadE-0': [{ q: 12, r: 0, s: -12 },{ q: 9, r: 4, s: -13 },{ q: 10, r: 3, s: -13 },{ q: 10, r: 3, s: -13 },{ q: 10, r: 3, s: -13 }],
             'geSquadE-1': [{ q: 8, r: 5, s: -13 }],
             'geSMC9-1': [{ q: 8, r: 5, s: -13 }],
-            'geHMG' : [{ q: 11, r: 0, s: -11 }]
+            'geHMG' : [{ q: 11, r: 0, s: -11 }],
+
         },
 
 

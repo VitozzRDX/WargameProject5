@@ -11,7 +11,7 @@ export function createStack(type) {
         startingRoadBonus: 0,
         isOnTheRoadFromStart: undefined,
         gotNoRoadBonus: true,
-        experience:undefined
+        experience: undefined
     }
 
 
@@ -141,7 +141,11 @@ export function createStack(type) {
     }
 
     function setHex_Bonus(hex, bonus) {
-        hex = JSON.stringify(hex)
+
+        if (typeof hex === 'object') {
+            hex = JSON.stringify(hex)
+        }
+        //hex = JSON.stringify(hex)
 
         if (stack['hex_bonus'][hex]) {
             let bonus1 = stack[hex]
@@ -153,7 +157,11 @@ export function createStack(type) {
     }
 
     function setHex_countersArray(hex, counter) {
-        hex = JSON.stringify(hex)
+
+
+        if (typeof hex === 'object') {
+            hex = JSON.stringify(hex)
+        }
 
         if (stack['hex_countersArray'][hex]) {
             stack['hex_countersArray'][hex].push(counter)
@@ -164,21 +172,22 @@ export function createStack(type) {
 
     }
 
-    function _isHex_CountersArrayEmpty(hex){
-        hex = JSON.stringify(hex)
-
-        if (stack['hex_countersArray'][hex]) { 
+    function _isHex_CountersArrayEmpty(hex) {
+        if (typeof hex === 'object') {
+            hex = JSON.stringify(hex)
+        }
+        if (stack['hex_countersArray'][hex]) {
             return false
         }
 
         return true
     }
 
-    function addToGeneralCountersArray(counter){
+    function addToGeneralCountersArray(counter) {
         stack.mgArray.push(counter)
     }
-    function calculateCommanderBonus(){
-        let arr  = Object.values(stack['hex_bonus'])
+    function calculateCommanderBonus() {
+        let arr = Object.values(stack['hex_bonus'])
         console.log(arr);
 
         return Math.min(...arr)
@@ -195,15 +204,46 @@ export function createStack(type) {
     // }
 
     function setHex_LoS(hex, bool) {
-        hex = JSON.stringify(hex)
-
+        if (typeof hex === 'object') {
+            hex = JSON.stringify(hex)
+        }
         stack['hex_los'][hex] = bool
     }
 
-    function setHex_Hindrance(hex,hind){
-        hex = JSON.stringify(hex)
+    function setHex_Hindrance(hex, hind) {
+        if (typeof hex === 'object') {
+            hex = JSON.stringify(hex)
+        }
         stack['hex_hindrance'][hex] = hind
     }
+
+    function getNumberOfHexes() {
+        return Object.values(stack['hex_los']).length
+    }
+    function setUISchemeButton(name, bool) {
+        stack.schemeObj[name] = bool
+    }
+
+    function getHexesWithoutLoSArray() {
+        let arr = []
+        for (let hex in stack['hex_los']) {
+            if (stack['hex_los'][hex]) {
+                arr.push(hex)
+            }
+        }
+        return arr
+    }
+
+    function getHexesWithLoSArray() {
+        let arr = []
+        for (let hex in stack['hex_los']) {
+            if (!stack['hex_los'][hex]) {
+                arr.push(hex)
+            }
+        }
+        return arr
+    }
+
     switch (type) {
         case 'moving':
             Object.assign(stack, {
@@ -237,17 +277,19 @@ export function createStack(type) {
             stack = {
                 commander: undefined,
                 status: undefined,
-                hindranceDRM:undefined,
+                hindranceDRM: undefined,
                 mgArray: [],
                 hex_countersArray: {},
                 hex_bonus: {},
-                hex_los:{},
-                hex_hindrance:{},
+                hex_los: {},
+                hex_hindrance: {},
                 //ownHexes:[],
             }
             Object.assign(stack, {
                 schemeObj: {
                     'Cancel Fire': true,
+                    // 'Fire As Separate Groups':false,
+                    // 'Fire From Every Hexes':false,
                 },
                 //addToFiringStack,
                 setStatus,
@@ -257,9 +299,13 @@ export function createStack(type) {
                 _isHex_CountersArrayEmpty,
                 addToGeneralCountersArray,
                 calculateCommanderBonus,
-
+                getNumberOfHexes,
                 setHex_LoS,
                 setHex_Hindrance,
+                setUISchemeButton,
+                getUIScheme,
+                getHexesWithoutLoSArray,
+                getHexesWithLoSArray
             })
 
             break;

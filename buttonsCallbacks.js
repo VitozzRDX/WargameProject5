@@ -298,12 +298,11 @@ let buttonsCallbacks = {
             this.addingToFireStack(ops.group.counter,ops.stack)
             //ops.stack.addToFiringStack(ops.group.counter)
 
-            console.log(ops.stack)
+            //console.log(ops.stack)
         },
 
         addWeaponToFG(button, ops){
 
-            console.log(ops)
             button.disabled = true;
             ops.group.uiScheme['Add Weapon To Fire Group'] = false
             this.changeColorOfBorder(ops.group.weaponCounter, 'red')
@@ -311,7 +310,7 @@ let buttonsCallbacks = {
             this.addingToFireStack(ops.group.weaponCounter,ops.stack)
             //ops.stack.addToFiringStack(ops.group.weaponCounter)
 
-            console.log(ops.stack)
+            //console.log(ops.stack)
         },
 
 

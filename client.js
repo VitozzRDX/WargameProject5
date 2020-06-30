@@ -187,6 +187,21 @@ class Client {
                 'callback': this.addWeaponToFG.bind(this),
                 'class': 'AddSquadToFG',
                 'name': 'Add Weapon To Fire Group',
+            },
+            'Fire As Separate Groups': {
+                'callback': this.fireAsSeparateGroups.bind(this),
+                'class': 'FireAsSeparateGroups',
+                'name': 'Fire As Separate Groups',
+            },
+            'Fire From Every Hexes': {
+                'callback': this.fireFromEveryHexes.bind(this),
+                'class': 'FireFromEveryHexes',
+                'name': 'Fire From Every Hexes',
+            },
+            'Cancel Fire': {
+                'callback': this.cancelFire.bind(this),
+                'class': 'CancelFire',
+                'name': 'Cancel Fire',
             }
 
         };
@@ -194,6 +209,7 @@ class Client {
     }
 
     init(options) {
+
 
         this._createCounters(options.countersOptions)
 
@@ -513,8 +529,11 @@ class Client {
     buildStackUI(stack) {
         //console.log('buildStackUI')
         for (let buttonName in this.getStackUIScheme(stack)) {
+            console.log(buttonName)
             let obj = this.interfaceScheme[buttonName]
-            let bool = this.stack.schemeObj[buttonName]
+            console.log(obj)
+            //let bool = this.stack.schemeObj[buttonName]
+            let bool = stack.schemeObj[buttonName]
             this.interface.buildButton(obj, bool)
         }
     }
@@ -668,7 +687,7 @@ class Client {
 
         let targetHexType = this.map.getHexType(targetHex)
 
-        console.log(targetHexType != 'road' && this.stack.isOnTheRoadFromStart)
+        //console.log(targetHexType != 'road' && this.stack.isOnTheRoadFromStart)
         if (targetHexType != 'road' && this.stack.isOnTheRoadFromStart) {
 
             this.stack.isOnTheRoadFromStart = false
@@ -883,19 +902,13 @@ class Client {
 
 
     buildGUI(group, stack) {
-        console.log(stack)
+
         let scheme = group.uiScheme
 
-        //console.log(scheme)
         let k = 0
         for (let name in scheme) {
-            //console.log(name)
-            let bool = scheme[name];
 
-            // if (!bool) {
-            //     console.log(bool)
-            //     return  // this counter already added
-            // }
+            let bool = scheme[name];
 
             let btton = this.interface.buildButton(this.interfaceScheme[name], bool, { group: group, stack: stack })
 
@@ -960,8 +973,6 @@ class Client {
 
             return this.map.isHexNear(counter.ownHex, h)
         })
-
-
 
         if (result) {
             console.log('counter is near or inside hexes with stack')
@@ -1111,32 +1122,29 @@ class Client {
         // return
 
         let targetHex = this.map.getHexFromCoords(point)
-
-        this.setHex_LoS(stack, targetHex)
-
-        // if (!isEveryFiringHexGotLoS(stack)) { // && stack not in one hex    // isEveryFiringHexGotLoS
-        //     // build button
-        //     return console.log('building buttons to choose stack firing')
-        // }
-
-        this.setHex_Hindrance(stack, targetHex) // move up after setHex_LoS but before isEveryFiringHexGotLoS ?
-
-        let commanderDRM = this.calculateCommanderBonus(stack)
-        let hindranceDRM = this.calculateWorstHindranceDRM(stack)
-        let temDRM = this.calculateTEM(stack, targetHex)
-
-        let drm = commanderDRM + hindranceDRM + temDRM
-
         let diceRoll = this.getResultRollingTwoDice()
 
-        let phase = this.game.getPhase()
+        this.setHex_LoS(stack, targetHex)   // + drawLine
+        this.setHex_Hindrance(stack, targetHex) // move up after setHex_LoS but before isEveryFiringHexGotLoS ?
 
-        this.calculate_And_SetFiringStatus(diceRoll, phase, stack)
-        this.animateFireEffectOnFirer(stack)
-        this.returnMashinGunsOnTopOfGroup(stack)
+        if (!this.isEveryFiringHexGotLoS(stack) && stack.getNumberOfHexes() > 1) {
 
-        // stack = undefined
-        this.firingStack = { status: 'uncreated' }
+            this.buildingButtonsToChooseStackFiringOnNoLoS(stack, point)
+
+            return console.log('building buttons to choose stack firing')
+
+        }
+
+        if (!this.isEveryFiringHexGotLoS(stack)) {
+
+            this.calcFireStatus_Animate(diceRoll, stack)
+
+            return console.log('these firing hexes got no LoS')
+        }
+
+        this.calcFireStatus_Animate(diceRoll, stack)
+
+        let drm = this.calcDRM(stack, targetHex)// commanderDRM + hindranceDRM + temDRM
 
         //-----------------------------------------------------------------------------------------------------------------------------------
 
@@ -1155,6 +1163,8 @@ class Client {
         //         this.rollForEffectOnEveryCounter_and_Animate(effectOnTarget,targetHex)
         // animate
 
+        // stack = undefined
+        this.firingStack = { status: 'uncreated' }
 
     }
 
@@ -1170,23 +1180,37 @@ class Client {
     }
 
     setHex_LoS(stack, targetHex) {
+
+        if (!Object.keys(stack['hex_los']).length == 0) {
+            return console.log('this stack  already set LoS')
+        }
+
         let firingHexesArr = Object.keys(stack['hex_countersArray'])
 
         firingHexesArr.forEach((hex) => {
-            let bool = this.map.isLoS(hex, targetHex,this.callbackToDrawLines.bind(this))
-            if (!bool) {
-                stack.setHex_LoS(hex, bool)
-            }
+
+            let bool = this.map.isLoS(hex, targetHex, this.callbackToDrawLines.bind(this))
+            stack.setHex_LoS(hex, bool)
+            // if (!bool) {
+            //     stack.setHex_LoS(hex, bool)
+            // }
         })
     }
 
     setHex_Hindrance(stack, targetHex) {
+
+        if (!Object.keys(stack['hex_los']).length == 0) {       // hind not everywhere, but los is/ that's why
+            return console.log('this stack already set hindrance')
+        }
+
         let firingHexesArr = Object.keys(stack['hex_countersArray'])
         let hind = 0
 
         for (let hex of firingHexesArr) {
+
+            // if (stack.)
             hex = JSON.parse(hex)
-            //console.log(hex)
+
             let arrayOfHexesInLoS = this.map.getHexesBetween(targetHex, hex)
 
             for (let h of arrayOfHexesInLoS) {
@@ -1198,34 +1222,15 @@ class Client {
                     stack.setHex_LoS(hex, false)
                     break
                 }
-
-
             }
 
             stack.setHex_Hindrance(hex, hind)
             hind = 0
-
         }
-
-        // firingHexesArr.forEach((hex)=>{
-        //     let arrayOfHexesInLoS = this.map.getHexesBetween(targetHex,hex)
-        //     //draw all
-        //     let hind = arrayOfHexesInLoS.reduce((acc,hex)=>{
-
-        //         acc = acc + this.map.getHexHindrance(hex)
-        //         return acc
-        //     }, 0)
-
-        //     if (hind >=6) {
-        //         stack.setHex_LoS(hex,false)
-        //     }
-
-        // })
     }
 
     calculateWorstHindranceDRM(stack) {
         let arr = Object.values(stack['hex_hindrance'])
-        console.log(stack);
 
         return Math.max(...arr)
 
@@ -1271,24 +1276,6 @@ class Client {
     }
 
     summingCounterFPforEachHex(stack, targetHex) {
-        // for (let hex in stack['hex_countersArray']) {
-        //     stack['hex_countersArray'][hex].forEach((counter) => {
-
-        //         let fp = counter.firePower
-
-
-        //         if (this.map.isHexNear(counter.ownHex, targetHex)) {
-        //             fp = counter.firePower * 2
-        //         }
-        //         else
-        //             if (this.map.getDistanceBetween(counter.ownHex, targetHex) > counter.getNormalRange()) {
-        //                 fp = counter.firePower / 2    // can have fractions
-        //             }
-
-        //         sumOfAllCountersFP = sumOfAllCountersFP + fp
-
-        //     })
-        // }
 
         return stack['hex_countersArray'].reduce((sum, hex) => {
             sum = stack['hex_countersArray'][hex].reduce((acc, counter) => {
@@ -1356,6 +1343,7 @@ class Client {
     }
 
     animateFireEffectOnFirer(stack) {
+
         let cb
         let c = 0
         let self = this
@@ -1455,7 +1443,7 @@ class Client {
         })
     }
 
-    returnMashinGunsOnTopOfGroup(stack){
+    returnMashinGunsOnTopOfGroup(stack) {
         setTimeout(() => {
             stack.mgArray.forEach((counter) => {
                 if (counter.getType() == 'MashineGun') {
@@ -1468,22 +1456,155 @@ class Client {
                     this.canvasObj.canvas.requestRenderAll()
                 }
             })
-        }, (stack.mgArray.length +1)*1000)
+        }, (stack.mgArray.length + 1) * 1000)
     }
 
-    isEveryFiringHexGotLoS(stack){
-        return Object.values(stack['hex_los']).length == 0
+    isEveryFiringHexGotLoS(stack) {
+
+        //return false
+        // console.log(stack['hex_los'])
+        // console.log(Object.values(stack['hex_los']).indexOf(false))
+        return Object.values(stack['hex_los']).indexOf(false) == -1
     }
 
-    callbackToDrawLines(arr){
 
-        let a  = [Object.values(arr[0]),Object.values(arr[1])]
-        
-        console.log(a)
+    callbackToDrawLines(arr) {
+
+        let a = [Object.values(arr[0]), Object.values(arr[1])]
 
         const segment = [].concat(...a)
 
         this.canvasObj.drawLine(segment)
+    }
+
+    fireAsSeparateGroups(button, ops) {
+
+
+        // rebuild all possible stacks
+        // for each call fire processing
+
+        // let hexesWithoutLoSArray = 
+        let hexesWithoutLoSArray = ops.stack.getHexesWithoutLoSArray()
+        let hexesWithLoSArray = ops.stack.getHexesWithLoSArray()
+
+        let stacksArr = this.rebuildAllPossibleStacks(ops.stack)
+
+        stacksArr.forEach((stack) => {
+
+            //console.log(stack)
+
+            this.fireProcessing(ops.point, stack)
+        })
+
+    }
+
+    fireFromEveryHexes() {
+        console.log('fff')
+    }
+
+    cancelFire() {
+        console.log('ffff')
+    }
+
+    rebuildAllPossibleStacks(stack) {
+        let arr = []
+        let arrayOfNearestHexesArr = []
+        let stacksArray = []
+        let obj = stack.hex_los
+
+        for (let hex in obj) {
+            if (obj[hex]) {
+                arr.push(hex)
+            }
+        }
+
+        while (arr.length > 0) {
+
+            let startingHex = JSON.parse(arr[0])
+            let a = []
+
+            // place chain of hexes nearest to first one into array
+            arr.forEach((hex) => {
+                hex = JSON.parse(hex)
+
+                // console.log(hex, startingHex)
+                // console.log(this.map.isHexNear(hex, startingHex))
+
+                if (this.map.isHexNear(hex, startingHex)) {
+                    hex = JSON.stringify(hex)
+                    a.push(hex)
+                }
+            })
+
+            console.log(a)
+
+            // place this array in array
+            arrayOfNearestHexesArr.push(a)
+            // remove array of nearest hexes from basic one
+
+            arr = arr.filter(hex => !a.includes(hex))
+
+            console.log(arr)
+
+        }
+
+        console.log(arrayOfNearestHexesArr)
+
+        // create array with new stacks
+
+        for (let hexesArr of arrayOfNearestHexesArr) {
+            let newStack = this.createNewFStack('readyToFire')
+
+            hexesArr.forEach((hex) => {
+
+                let countersArr = stack.hex_countersArray[hex]
+                countersArr.forEach((counter) => {
+                    this.addingToFireStack(counter, newStack)
+                })
+
+                newStack.setHex_LoS(hex, true)  // to not check it again when fireProcessing
+
+            })
+
+            stacksArray.push(newStack)
+        }
+
+        console.log(stacksArray)
+
+        return stacksArray
+
+    }
+
+    calcFireStatus_Animate(diceRoll, stack) {
+
+        let phase = this.game.getPhase()
+
+        this.calculate_And_SetFiringStatus(diceRoll, phase, stack)
+        this.animateFireEffectOnFirer(stack)
+        this.returnMashinGunsOnTopOfGroup(stack)
+    }
+
+    calcDRM(stack, targetHex) {
+        let commanderDRM = this.calculateCommanderBonus(stack)
+        let hindranceDRM = this.calculateWorstHindranceDRM(stack)
+        let temDRM = this.calculateTEM(stack, targetHex)
+
+        return commanderDRM + hindranceDRM + temDRM
+    }
+
+    buildingButtonsToChooseStackFiringOnNoLoS(stack, point) {
+
+        this.interface.buildButton(this.interfaceScheme['Fire As Separate Groups'], true, { stack: stack, point: point })
+        this.interface.buildButton(this.interfaceScheme['Fire From Every Hexes'], true)
+
+        this.canvasObj.setOffMouseClickListener()
+
+        stack.setUISchemeButton('Cancel Fire', false)
+
+        this.clearStackUI(stack)
+        this.buildStackUI(stack)
+
+        this.interface.disableButton(`End ${this.firstPlayer}'s Phase`)
     }
 }
 

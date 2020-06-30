@@ -867,3 +867,36 @@ changeColorOfBorder(counter, color) - вводим counter.initialImg , меня
 Реализовал:
 
 Работает проверка на пересечение Линии видимости и Линии преграды
+
+------------------------------------------19 06 2020 ----------------------------------------------------------------------
+
+Делаем огонь из нескольких гексов с отсутствующим Лос
+
+------------------------------------------ 30 06 2020 ---------------------------------------------------------------------
+
+Реализовано :
+При обнаружении ведущего огонь гекса без ЛоС строится пара кнопок с возможностью выстрелить погруппно или погексово
+При огне погруппно строятся новые отдельные  стаки и вызывается fireProcessing для каждого из них
+
+Однако необходим эффект огня также и для остатков
+
+Разделим fireProcessing на 
+
+stack setHex_LoS_Hindrance
+if(!this.isEveryFiringHexGotLoS(stack) && stack.getNumberOfHexes()>1)
+    buildButton&&Stuff
+
+fireProcessing :
+вынесем эффект на стреляющего вверх
+эффект на цель запускаем если !stack.noLoSforEveryCounter
+
+
+    fireAsSeparateGroups(button, ops) {
+
+
+        // rebuild all possible stacks
+        // for each call fire processing
+
+        // let hexesWithoutLoSArray = 
+        let hexesWithoutLoSArray = ops.stack.getHexesWithoutLoSArray()
+        let hexesWithLoSArray = ops.stack.getHexesWithLoSArray()
