@@ -890,13 +890,7 @@ fireProcessing :
 вынесем эффект на стреляющего вверх
 эффект на цель запускаем если !stack.noLoSforEveryCounter
 
+------------------------------------------ 01 07 2020 ---------------------------------------------------------------------
+Реализовано :
 
-    fireAsSeparateGroups(button, ops) {
-
-
-        // rebuild all possible stacks
-        // for each call fire processing
-
-        // let hexesWithoutLoSArray = 
-        let hexesWithoutLoSArray = ops.stack.getHexesWithoutLoSArray()
-        let hexesWithLoSArray = ops.stack.getHexesWithLoSArray()
+Кнопка separateFire .

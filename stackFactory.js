@@ -227,7 +227,7 @@ export function createStack(type) {
     function getHexesWithoutLoSArray() {
         let arr = []
         for (let hex in stack['hex_los']) {
-            if (stack['hex_los'][hex]) {
+            if (!stack['hex_los'][hex]) {
                 arr.push(hex)
             }
         }
@@ -237,7 +237,7 @@ export function createStack(type) {
     function getHexesWithLoSArray() {
         let arr = []
         for (let hex in stack['hex_los']) {
-            if (!stack['hex_los'][hex]) {
+            if (stack['hex_los'][hex]) {
                 arr.push(hex)
             }
         }

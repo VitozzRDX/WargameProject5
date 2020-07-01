@@ -144,6 +144,13 @@ class Map {
     //--------------------------------------------------------------------------------------------------------
     isHexNear(originHex, hexClicked) {
 
+        if (typeof originHex === 'string') {
+            originHex = JSON.parse(originHex)
+        }
+        if (typeof hexClicked === 'string') {
+            hexClicked = JSON.parse(hexClicked)
+        }
+
         if (Math.abs(hexClicked.q - originHex.q) > 1) {
             return false
         }

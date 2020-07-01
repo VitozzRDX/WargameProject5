@@ -1112,61 +1112,7 @@ class Client {
     //     return this.game.getIFT_FPresult(fp, dr)
     // }
 
-    fireProcessing(point, stack) {
-        // switch between different Phases 
-        // PFPh , DFFPh
-        // in case of PF :
-        // FFNAM FFMO == 0
-        // in case DFFPh :
-        // if stack.firingStatus  == 'First Fire' && targetHex not closest between possible
-        // return
 
-        let targetHex = this.map.getHexFromCoords(point)
-        let diceRoll = this.getResultRollingTwoDice()
-
-        this.setHex_LoS(stack, targetHex)   // + drawLine
-        this.setHex_Hindrance(stack, targetHex) // move up after setHex_LoS but before isEveryFiringHexGotLoS ?
-
-        if (!this.isEveryFiringHexGotLoS(stack) && stack.getNumberOfHexes() > 1) {
-
-            this.buildingButtonsToChooseStackFiringOnNoLoS(stack, point)
-
-            return console.log('building buttons to choose stack firing')
-
-        }
-
-        if (!this.isEveryFiringHexGotLoS(stack)) {
-
-            this.calcFireStatus_Animate(diceRoll, stack)
-
-            return console.log('these firing hexes got no LoS')
-        }
-
-        this.calcFireStatus_Animate(diceRoll, stack)
-
-        let drm = this.calcDRM(stack, targetHex)// commanderDRM + hindranceDRM + temDRM
-
-        //-----------------------------------------------------------------------------------------------------------------------------------
-
-        // if (diceRoll.red == diceRoll.white && !this.isStackUnderCommand(stack)) {    // this.isStackUnderCommand(stack)
-        //     cower = true
-        // }
-
-        // let DRsumPlusDRM = diceRoll['sum'] + drm
-
-        // let sumOfAllCountersFP = this.summingCounterFPforEachHex(stack, targetHex)
-
-        // let firePower = this.game.getActualFirePower(sumOfAllCountersFP, cower, stack.experience)
-
-        //         let effectOnTarget = this.calulateEffectOfFiring(diceRoll,stack,targetHex,drm) // this.game.getIFT_FPresult(firePower, DRsumPlusDRM)
-        // //-----------------------------------------------------------------------------------------------------------------------------------
-        //         this.rollForEffectOnEveryCounter_and_Animate(effectOnTarget,targetHex)
-        // animate
-
-        // stack = undefined
-        this.firingStack = { status: 'uncreated' }
-
-    }
 
 
 
@@ -1177,56 +1123,6 @@ class Client {
         if (arr.length == 0) { return 0 }
 
         return Math.min(...arr)
-    }
-
-    setHex_LoS(stack, targetHex) {
-
-        if (!Object.keys(stack['hex_los']).length == 0) {
-            return console.log('this stack  already set LoS')
-        }
-
-        let firingHexesArr = Object.keys(stack['hex_countersArray'])
-
-        firingHexesArr.forEach((hex) => {
-
-            let bool = this.map.isLoS(hex, targetHex, this.callbackToDrawLines.bind(this))
-            stack.setHex_LoS(hex, bool)
-            // if (!bool) {
-            //     stack.setHex_LoS(hex, bool)
-            // }
-        })
-    }
-
-    setHex_Hindrance(stack, targetHex) {
-
-        if (!Object.keys(stack['hex_los']).length == 0) {       // hind not everywhere, but los is/ that's why
-            return console.log('this stack already set hindrance')
-        }
-
-        let firingHexesArr = Object.keys(stack['hex_countersArray'])
-        let hind = 0
-
-        for (let hex of firingHexesArr) {
-
-            // if (stack.)
-            hex = JSON.parse(hex)
-
-            let arrayOfHexesInLoS = this.map.getHexesBetween(targetHex, hex)
-
-            for (let h of arrayOfHexesInLoS) {
-
-
-                hind += this.map.getHexHindrance(h)
-
-                if (hind >= 6) {
-                    stack.setHex_LoS(hex, false)
-                    break
-                }
-            }
-
-            stack.setHex_Hindrance(hex, hind)
-            hind = 0
-        }
     }
 
     calculateWorstHindranceDRM(stack) {
@@ -1477,26 +1373,7 @@ class Client {
         this.canvasObj.drawLine(segment)
     }
 
-    fireAsSeparateGroups(button, ops) {
 
-
-        // rebuild all possible stacks
-        // for each call fire processing
-
-        // let hexesWithoutLoSArray = 
-        let hexesWithoutLoSArray = ops.stack.getHexesWithoutLoSArray()
-        let hexesWithLoSArray = ops.stack.getHexesWithLoSArray()
-
-        let stacksArr = this.rebuildAllPossibleStacks(ops.stack)
-
-        stacksArr.forEach((stack) => {
-
-            //console.log(stack)
-
-            this.fireProcessing(ops.point, stack)
-        })
-
-    }
 
     fireFromEveryHexes() {
         console.log('fff')
@@ -1506,74 +1383,56 @@ class Client {
         console.log('ffff')
     }
 
-    rebuildAllPossibleStacks(stack) {
-        let arr = []
-        let arrayOfNearestHexesArr = []
-        let stacksArray = []
-        let obj = stack.hex_los
+    //------------------------------------------------------------------------------------------------------------------------
+    setHex_LoS(stack, targetHex) {
 
-        for (let hex in obj) {
-            if (obj[hex]) {
-                arr.push(hex)
-            }
+        if (!Object.keys(stack['hex_los']).length == 0) {
+            return console.log('this stack  already set LoS')
         }
 
-        while (arr.length > 0) {
+        let firingHexesArr = Object.keys(stack['hex_countersArray'])
 
-            let startingHex = JSON.parse(arr[0])
-            let a = []
+        firingHexesArr.forEach((hex) => {
 
-            // place chain of hexes nearest to first one into array
-            arr.forEach((hex) => {
-                hex = JSON.parse(hex)
-
-                // console.log(hex, startingHex)
-                // console.log(this.map.isHexNear(hex, startingHex))
-
-                if (this.map.isHexNear(hex, startingHex)) {
-                    hex = JSON.stringify(hex)
-                    a.push(hex)
-                }
-            })
-
-            console.log(a)
-
-            // place this array in array
-            arrayOfNearestHexesArr.push(a)
-            // remove array of nearest hexes from basic one
-
-            arr = arr.filter(hex => !a.includes(hex))
-
-            console.log(arr)
-
-        }
-
-        console.log(arrayOfNearestHexesArr)
-
-        // create array with new stacks
-
-        for (let hexesArr of arrayOfNearestHexesArr) {
-            let newStack = this.createNewFStack('readyToFire')
-
-            hexesArr.forEach((hex) => {
-
-                let countersArr = stack.hex_countersArray[hex]
-                countersArr.forEach((counter) => {
-                    this.addingToFireStack(counter, newStack)
-                })
-
-                newStack.setHex_LoS(hex, true)  // to not check it again when fireProcessing
-
-            })
-
-            stacksArray.push(newStack)
-        }
-
-        console.log(stacksArray)
-
-        return stacksArray
-
+            let bool = this.map.isLoS(hex, targetHex, this.callbackToDrawLines.bind(this))
+            stack.setHex_LoS(hex, bool)
+            // if (!bool) {
+            //     stack.setHex_LoS(hex, bool)
+            // }
+        })
     }
+
+    setHex_Hindrance(stack, targetHex) {
+
+        if (!Object.keys(stack['hex_los']).length == 0) {       // hind not everywhere, but los is/ that's why
+            return console.log('this stack already set hindrance')
+        }
+
+        let firingHexesArr = Object.keys(stack['hex_countersArray'])
+        let hind = 0
+
+        for (let hex of firingHexesArr) {
+
+            hex = JSON.parse(hex)
+
+            let arrayOfHexesInLoS = this.map.getHexesBetween(targetHex, hex)
+
+            for (let h of arrayOfHexesInLoS) {
+
+                hind += this.map.getHexHindrance(h)
+
+                if (hind >= 6) {
+                    stack.setHex_LoS(hex, false)
+                    break
+                }
+            }
+
+            stack.setHex_Hindrance(hex, hind)
+            hind = 0
+        }
+    }
+
+
 
     calcFireStatus_Animate(diceRoll, stack) {
 
@@ -1605,6 +1464,222 @@ class Client {
         this.buildStackUI(stack)
 
         this.interface.disableButton(`End ${this.firstPlayer}'s Phase`)
+    }
+
+    fireAsSeparateGroups(button, ops) {
+
+
+        // rebuild all possible stacks
+        // for each call fire processing
+
+        let hexesWithoutLoSArray = ops.stack.getHexesWithoutLoSArray()
+        let hexesWithLoSArray = ops.stack.getHexesWithLoSArray()
+
+        console.log(hexesWithoutLoSArray)
+        console.log(hexesWithLoSArray)
+
+        let sortedNoLoS = this.sortToArrayOfSeparateHexesArrays(hexesWithoutLoSArray)
+        let sortedLoS = this.sortToArrayOfNearestHexesArrays(hexesWithLoSArray)
+
+        console.log(sortedLoS)
+        console.log(sortedNoLoS)
+
+        let stacksWithoutLoSArray = this.createNewStacksOfOldOne_AddCounters(ops.stack, sortedNoLoS, false)
+        let stacksWithLoSArray = this.createNewStacksOfOldOne_AddCounters(ops.stack, sortedLoS, true)
+
+
+        console.log(stacksWithoutLoSArray)
+        console.log(stacksWithLoSArray)
+
+        stacksWithLoSArray.forEach((stack) => {
+
+            this.fireProcessing(ops.point, stack)
+        })
+
+        stacksWithoutLoSArray.forEach((stack) => {
+            this.fireProcessing(ops.point, stack)
+        })
+
+    }
+
+    sortToArrayOfSeparateHexesArrays(hexesArr) {
+
+        return  hexesArr.map((hex)=>{
+            return [hex]
+        })
+
+    }
+
+    sortToArrayOfNearestHexesArrays(hexesArr) {
+
+        let arrayOfNearestHexesArrays = []
+
+        while (hexesArr.length > 0) {
+
+            // place chain of hexes nearest to first one into array
+            let arrayOfNearestHexes = hexesArr.filter((hex) => {
+                return this.map.isHexNear(hex, hexesArr[0])
+            })
+
+            console.log(arrayOfNearestHexes)
+
+            arrayOfNearestHexesArrays.push(arrayOfNearestHexes)     // [[h,h],[h]]
+
+            // remove array of nearest hexes from basic one
+            hexesArr = hexesArr.filter(hex => !arrayOfNearestHexes.includes(hex))
+
+        }
+
+        return arrayOfNearestHexesArrays
+    }
+
+    createNewStacksOfOldOne_AddCounters(stack, arrayOfNearestHexesArr, bool) {  // createNewStacksOfOldOne_AddCounters(stack,arrayOfNearestHexesArr)
+
+        let stacksArray = []
+        for (let hexesArr of arrayOfNearestHexesArr) {
+            let newStack = this.createNewFStack('readyToFire')
+
+            hexesArr.forEach((hex) => {
+                console.log(hex)
+                let countersArr = stack.hex_countersArray[hex]
+                countersArr.forEach((counter) => {
+                    this.addingToFireStack(counter, newStack)
+                })
+
+                newStack.setHex_LoS(hex, bool)  // to not check it again when fireProcessing
+
+            })
+
+            stacksArray.push(newStack)
+        }
+
+        return stacksArray
+    }
+
+    // rebuildAllPossibleStacks(stack) {
+    //     let arr = []
+    //     let arrayOfNearestHexesArr = []
+    //     let stacksArray = []
+    //     let obj = stack.hex_los
+
+    //     for (let hex in obj) {
+    //         if (obj[hex]) {
+    //             arr.push(hex)
+    //         }
+    //     }
+
+    //     while (arr.length > 0) {
+
+    //         let startingHex = JSON.parse(arr[0])
+    //         let a = []
+
+    //         // place chain of hexes nearest to first one into array
+    //         arr.forEach((hex) => {
+    //             hex = JSON.parse(hex)
+
+    //             if (this.map.isHexNear(hex, startingHex)) {
+    //                 hex = JSON.stringify(hex)
+    //                 a.push(hex)
+    //             }
+    //         })
+
+    //         // a = arr.filter((hex)=>{
+
+    //         // })
+
+    //         console.log(a)
+
+    //         // place this array in array
+    //         arrayOfNearestHexesArr.push(a)
+    //         // remove array of nearest hexes from basic one
+
+    //         arr = arr.filter(hex => !a.includes(hex))
+
+    //         console.log(arr)
+
+    //     }
+
+    //     console.log(arrayOfNearestHexesArr)
+
+    //     // create array with new stacks
+
+    //     for (let hexesArr of arrayOfNearestHexesArr) {
+    //         let newStack = this.createNewFStack('readyToFire')
+
+    //         hexesArr.forEach((hex) => {
+
+    //             let countersArr = stack.hex_countersArray[hex]
+    //             countersArr.forEach((counter) => {
+    //                 this.addingToFireStack(counter, newStack)
+    //             })
+
+    //             newStack.setHex_LoS(hex, true)  // to not check it again when fireProcessing
+
+    //         })
+
+    //         stacksArray.push(newStack)
+    //     }
+
+    //     console.log(stacksArray)
+
+    //     return stacksArray
+
+    // }
+
+    fireProcessing(point, stack) {
+        // switch between different Phases 
+        // PFPh , DFFPh
+        // in case of PF :
+        // FFNAM FFMO == 0
+        // in case DFFPh :
+        // if stack.firingStatus  == 'First Fire' && targetHex not closest between possible
+        // return
+
+        let targetHex = this.map.getHexFromCoords(point)
+        let diceRoll = this.getResultRollingTwoDice()
+
+        this.setHex_LoS(stack, targetHex)   // + drawLine
+        this.setHex_Hindrance(stack, targetHex) // move up after setHex_LoS but before isEveryFiringHexGotLoS ?
+
+        if (!this.isEveryFiringHexGotLoS(stack) && stack.getNumberOfHexes() > 1) {
+
+            this.buildingButtonsToChooseStackFiringOnNoLoS(stack, point)
+
+            return console.log('building buttons to choose stack firing')
+
+        }
+
+        if (!this.isEveryFiringHexGotLoS(stack)) {
+
+            this.calcFireStatus_Animate(diceRoll, stack)
+
+            return console.log('these firing hexes got no LoS')
+        }
+
+        this.calcFireStatus_Animate(diceRoll, stack)
+
+        let drm = this.calcDRM(stack, targetHex)// commanderDRM + hindranceDRM + temDRM
+
+        //-----------------------------------------------------------------------------------------------------------------------------------
+
+        // if (diceRoll.red == diceRoll.white && !this.isStackUnderCommand(stack)) {    // this.isStackUnderCommand(stack)
+        //     cower = true
+        // }
+
+        // let DRsumPlusDRM = diceRoll['sum'] + drm
+
+        // let sumOfAllCountersFP = this.summingCounterFPforEachHex(stack, targetHex)
+
+        // let firePower = this.game.getActualFirePower(sumOfAllCountersFP, cower, stack.experience)
+
+        //         let effectOnTarget = this.calulateEffectOfFiring(diceRoll,stack,targetHex,drm) // this.game.getIFT_FPresult(firePower, DRsumPlusDRM)
+        // //-----------------------------------------------------------------------------------------------------------------------------------
+        //         this.rollForEffectOnEveryCounter_and_Animate(effectOnTarget,targetHex)
+        // animate
+
+        // stack = undefined
+        this.firingStack = { status: 'uncreated' }
+
     }
 }
 
