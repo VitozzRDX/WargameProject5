@@ -118,6 +118,10 @@ class Game {
 
         return array[index]
     }
+
+    getIFT_FPresult(fp,dr) {
+        return this.infantryFireTable[fp][dr-1]   // return undef if rolled more then PTC result
+    };
 };
 
 export { Game };

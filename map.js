@@ -107,7 +107,7 @@ class Map {
     addHexTohex_counterIDHash(hex) {
         let h = JSON.stringify(hex)
         if (this.hex_counterIDHash[h]) {
-            return console.log('this hex is already in hex_counterIDHash')
+            return //console.log('this hex is already in hex_counterIDHash')
         }
         this.hex_counterIDHash[h] = []
     }
@@ -118,6 +118,8 @@ class Map {
     }
 
     getCountersIDinHexArray(hex) {
+
+        
         let h = JSON.stringify(hex)
         return this.hex_counterIDHash[h]
     }
@@ -193,7 +195,7 @@ class Map {
     getHexTEM(hex) {
 
         let type = this.getHexType(hex)
-
+        console.log('type - ',type)
         switch (type) {
 
             case 'woods':
@@ -210,6 +212,8 @@ class Map {
                 // if los and unit entered with road bonus = 0
                 // else = 1
                 return 'woods-road'
+            case 'plain' :
+                return 0
 
         }
     }
@@ -260,7 +264,7 @@ class Map {
         if (segment == 0) {
             return false
         }
-        console.log(this.doLineSegmentsIntersect(segment, segmentA))
+        //console.log(this.doLineSegmentsIntersect(segment, segmentA))
         return this.doLineSegmentsIntersect(segment, segmentA).bool
     }
 

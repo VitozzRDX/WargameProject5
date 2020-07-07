@@ -97,8 +97,6 @@ let methods = {
                 this.clearStackUI(stack)
                 this.buildStackUI(stack)
 
-                console.log(stack)
-
                 break;
 
             case 'readyToFire':

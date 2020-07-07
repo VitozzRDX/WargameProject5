@@ -9,7 +9,8 @@ function addBasicProps (counter,param) {
     counter.ownHex = param.ownHex
     counter.img = undefined;
     counter.imageID = undefined;
-    counter.status = undefined;
+    counter.status = param.status||'ready to action';
+    counter.newStatus = undefined;
     counter.colorBorder = undefined
     counter.weightHex = 1
     counter.ID = (Math.random() + 1).toString(36).slice(2, 18);
@@ -68,7 +69,9 @@ function addCommandableProps(counter){
 }
 
 function addCommanderProps(counter,param){
-    counter.commandBonus = param.commandBonus
+    counter.commandBonus = counter.basicCommandBonus = param.commandBonus
+    counter.morale = param.morale
+    
 }
 
 function addSquadProps(counter,param){
@@ -78,6 +81,8 @@ function addSquadProps(counter,param){
     }
 
     counter.experience = param.experience
+    counter.size = param.size || 'squad'
+    counter.morale = param.morale
 }
 let Fireable = {
     setFiringStatus(status) {
@@ -156,14 +161,28 @@ const Commandable = {
     removeCommanderBonus() {
         this.temporaryMF -= 1
     },
+
     isUnderCommand() {
         return this.underCommand
+    },
+
+    setReductedState(){
+        let reductedProps = this.halfSquad
+        Object.assign(this,reductedProps)
     }
 }
 
 const Attachable = {
     attachTo(counter) {
         console.log('attaching')
+    }
+}
+
+const Woundable = {
+    setWoundedState(){
+        this.movementFactor -=1
+        this.morale -=1
+        this.commandBonus +=1
     }
 }
 
@@ -179,7 +198,7 @@ let BasicCounterMethods = {
         this.ownHex = hex
     },
     setNewStatus(status) {
-        this.status = status
+        this.newStatus = status
     },
     getStatus() {
         return this.status
@@ -215,6 +234,7 @@ export function createCounter(param) {
             addManInterface(counter)
             addCommandableProps(counter)
             addSquadProps(counter,param)
+
             Object.assign(counter,BasicCounterMethods,Movable,Fireable,SquadMovable,Commandable)
 
             return counter

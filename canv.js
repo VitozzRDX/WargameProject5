@@ -371,6 +371,30 @@ this.ID_ImageHash = {}
         this.canvas.add(line)
     }
 
+    createUnderFireTextBox(param, text) {
+
+        let l = param.left
+        let t = param.top
+        let w = param.width
+
+        var textbox = new fabric.Textbox(text, {
+            left: l - w / 2,
+            top: t + w / 4,
+
+            fill: '#880E4F',
+            strokeWidth: 0.1,
+            stroke: "red",
+            angle: -35,
+            fontSize: 14,
+            backgroundColor: 'white',
+            selectable: false,
+            evented: false
+        })
+
+        return textbox
+    }
+
+
 };
 
 

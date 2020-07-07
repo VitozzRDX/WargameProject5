@@ -30,15 +30,23 @@ let initialSettings = {
         squadType_propertiesHash: {
             'ruSquadE-0': {
                 src: 'assets/628corrected3(a).svg',
-                otherSideSrc: 'assets/628.svg',//'assets/ruh7b.gif',
+                otherSideSrc: 'assets/ruh7b.gif',//'assets/628.svg',//'assets/ruh7b.gif',
                 className: 'MultiManCounters',
                 owner: 'Ally',
                 movementFactor: 4,
                 type: 'MultiManCounter',
-                normalRange:4,
-                firePower:6,
+                normalRange:6,
+                firePower:2,
                 experience:'E',
+                morale : 8,
                 name: 'ruSquadE-0',
+
+                halfSquad: {
+                    src: 'assets/ru328H.gif',
+                    otherSideSrc: 'assets/ruh7b.gif',
+                    normalRange:3,
+                    size : 'halfsquad'
+                },
             },
 
             'geSquadE-0': {
@@ -52,6 +60,7 @@ let initialSettings = {
                 normalRange:4,
                 firePower:6,
                 experience:'E',
+                morale : 8,
             },
 
             'geSquadE-1': {
@@ -65,6 +74,7 @@ let initialSettings = {
                 normalRange:4,
                 firePower:6,
                 experience:'E',
+                morale : 8,
             },
 
             'geSMC9-1': {
@@ -76,6 +86,9 @@ let initialSettings = {
                 name: 'geSMC9-1',
                 type: 'SingleManCounter',
                 commandBonus:-1,
+                morale : 8,
+
+
             },
             'geHMG': {
                 src: "assets/geHMG.gif",
@@ -88,7 +101,40 @@ let initialSettings = {
                 firePower:6,
                 rateOfFire:2,
                 breakdownNumber:12,
-            }
+            },
+            'ruSMC8-0': {
+                src: 'assets/ruL80.gif',   
+                otherSideSrc: 'assets/ruL80b.gif',
+                className: 'SingleManCounters',
+                owner: 'Ally',
+                movementFactor: 6,
+                name: 'ruSMC8-0',
+                type: 'SingleManCounter',
+                commandBonus:-0,
+                morale : 8,
+            },
+            'ruSMC8-1': {
+                src: 'assets/ruL81.gif',   
+                otherSideSrc: 'assets/ruL81b.gif',
+                className: 'SingleManCounters',
+                owner: 'Ally',
+                movementFactor: 6,
+                name: 'ruSMC8-1',
+                type: 'SingleManCounter',
+                commandBonus:-1,
+                morale : 8,
+            },
+            'ruSMC7-0': {
+                src: 'assets/ruL70.gif',   
+                otherSideSrc: 'assets/ruL70b.gif',
+                className: 'SingleManCounters',
+                owner: 'Ally',
+                movementFactor: 6,
+                name: 'ruSMC7-0',
+                type: 'SingleManCounter',
+                commandBonus:-0,
+                morale : 8,
+            },
         },
 
         parametersOnCreationHash: {
@@ -97,6 +143,10 @@ let initialSettings = {
             'geSquadE-1': [{ q: 8, r: 5, s: -13 }],
             'geSMC9-1': [{ q: 8, r: 5, s: -13 }],
             'geHMG' : [{ q: 11, r: 0, s: -11 }],
+
+            'ruSMC8-0': [{ q: 6, r: 0, s: -6 }],
+            'ruSMC8-1': [{ q: 6, r: 0, s: -6 }],
+            'ruSMC7-0': [{ q: 6, r: 0, s: -6 }],
 
         },
 
