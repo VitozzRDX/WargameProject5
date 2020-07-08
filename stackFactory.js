@@ -153,7 +153,9 @@ export function createStack(type) {
             return
         }
 
-        stack[hex] = bonus
+        console.log('bonus-',bonus)
+
+        stack['hex_bonus'][hex] = bonus
     }
 
     function setHex_countersArray(hex, counter) {

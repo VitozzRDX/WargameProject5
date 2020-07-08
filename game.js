@@ -109,11 +109,13 @@ class Game {
         let index = array.indexOf(closest)
 
         if (cower && exp == 'Inexperienced') {
-            return array[index+2]
+            console.log('Inexperienced')
+            return array[index-2] || array[0]
         }
 
         if (cower) {
-            return array[index+1]
+            console.log('cower')
+            return array[index-1] || array[0]
         }
 
         return array[index]

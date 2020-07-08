@@ -917,3 +917,54 @@ fireProcessing :
 
     Эффект от попадания ver 0.0.1
 
+    рефакторим :
+
+    вводим killingAnimation , desperationAnimation
+    разбиваем calcStatus_Change_Animate_UnderFire
+
+ ----------------------------------- 08 07 2020 ----------------------------------------------------------------
+
+ Interdiction
+
+ 1 Broken ? Adjacent to Known Enemy ? End of RtPhase ? - Elliminated
+ 2 Broken ? In Open Ground ? In LoS and normal range of Known Enemy ? Not Low Crawled ? - Elliminated
+
+Start :
+
+1 let brokenArray = 
+
+for each :
+
+1 Adjacent to Known Enemy ? -  add to array
+2 In Open Ground ? In LoS and normal range of Known Enemy (that capable to Interdict it i.e fire  at least 1FP)? -  add to array
+
+Known Enemy - все кто In LoS and normal range в стартовом гексе
+    a) Все Тяжелые пулеметы проверяем на нормал рейндж (16). Если да - в массив
+    б) Все легкие (8)
+    в) полученный массив проверяем на ЛоС - в новый массив
+    г) получаем все гексы на максималном нормальном расстоянии от стартового (6) 
+    д) получаем из них массив всех гексов с каунтерами - далее массив гексов с ЛоС 
+    е) плюсуем с пулеметным
+
+
+ 1) Собираем всех кто ДОЛЖЕН убегать (см выше).
+ 2) Даем им tempMF = 6 
+ 3) Даем статус Desperate
+ 4) находим ближайшие Здание или Лес , + которое не приближает каунтер к Known Enemy
+
+        В радиусе 4 гекса находим все Лес и Здания гексы
+        Выделяем те , что не ближе к Known Enemy , чем стартовый гекс
+        Подсвечиваем их
+
+ 4а) Если таковых нет на расстоянии 4 MF (еще 2 надо на вход) , то можно идти в любое место при условии , что ни один гекс маршрута не приближается к Known Enemy
+ 6) Двигаемся в Open Ground ? Без Low Crawl ? Known Enemy имеет LoS и нормал рейндж ? Може стрелять хоть 1 ФП ? - Interdiction
+    
+ 2) По нажатию Конец Фазы вновь проверяем на те же условия ( + Not Low Crawled ), если по прежнему да - Уничтожаем
+
+------------------------------------------------------------------------------------------------------------------------
+
+порушим
+        this.changeCounterStateUnderFire(status, counter)
+        this.animateChangingCounterState(status, counter, dr)
+
+

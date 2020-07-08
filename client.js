@@ -271,7 +271,7 @@ class Client {
 
                     let c = this.counterTrayHash[id]
                     //this.drawCounter(this.counterTrayHash[c])
-                    //console.log(this.counterTrayHash)
+
                     let ref = c.src
                     let ops = c.options
                     Object.assign(ops, {
@@ -296,8 +296,6 @@ class Client {
                         c.group = g
                         c.group.counter = c
                         c.initialImg = img
-                        //this.canvasObj.canvas.add(g)
-
 
                         this.canvasObj.create_and_fill_ID_ImageHash(img)
                         c.imageID = img.id;
@@ -908,8 +906,12 @@ class Client {
         //     return console.log('u cannot add SMC to FG without MMC or Weapon')
         // }
         if (counter.getType() == 'SingleManCounter') {
+
+            console.log('add SMC')
             stack.setHex_Bonus(counter.ownHex, counter.commandBonus)
         }
+
+        console.log(stack)
 
         if (counter.experience == 'Inexperienced') {
             stack.experience = 'Inexperienced'
@@ -938,142 +940,6 @@ class Client {
             return true
         }
     }
-
-    // fireProcessing(point, stack) {
-
-    //     stack.calculateCommanderBonus()
-    //     stack.setCommanderCover()
-
-    //     let targetHex = this.map.getHexFromCoords(point)
-    //     let countersIDsInHexArray = this.map.getCountersIDinHexArray(targetHex) // [conterID,...]
-
-    //     // let commanderDRM = this.calculateCommanderBonus(stack)
-
-    //     // this.setHex_LoS(stack,targetHex)
-    //     // this.setHex_Hindrance(stack,targetHex)
-
-    //     // let hindranceDRM = this.calculateWorstHindranceDRM(stack)
-    //     // let TEMDRM = this.calculateTEM(stack,targetHex)
-
-    //     // let DRM = commanderDRM + hindranceDRM + TEMDRM 
-
-    //     // let diceRoll =  
-    //     // let sumOfAllCountersFP = this.summingCounterFPforEachHex(stack,targetHex)
-
-    //     // let firePower = this.game.getActualFirePower(sumOfAllCountersFP,cower,stack.experience)
-
-
-    //     let firingHexesArr = Object.values(stack['hex_countersArray'])
-
-    //     firingHexesArr.forEach((hex) => {
-    //         let bool = this.map.isLoS(hex, targetHex)
-    //         if (!bool) {
-    //             stack.setHex_LoS(hex, bool)
-    //         }
-    //         // hex - hexes in los
-    //         // for each += hind
-    //         // set hex_hind[hex] = hind
-    //         // get worst
-    //         let arrayOfHexesInLoS = this.map.getHexesBetween(targetHex, hex)
-    //         //draw all
-    //         let hind = arrayOfHexesInLoS.reduce((acc, hex) => {
-
-    //             acc = acc + this.map.getHexHindrance(hex)
-    //             return acc
-    //         }, 0)
-
-    //         if (hind >= 6) {
-    //             stack.setHex_LoS(hex, false)
-    //         }
-    //     })
-
-    //     // also calc Hindrance stack.setHex_Hind - worst of all
-    //     // if Hind > 6 - this hex is not los
-
-    //     if (Object.values(stack['hex_los']).length > 0) { // && stack not in one hex
-    //         // build button
-    //         return console.log('building buttons to choose stack firing')
-    //     }
-
-    //     //-----------------------------------------------------------------------------------------------------------
-
-    //     //this.map.getHexTEM
-    //     //-----------------------------------------------------------------------------------------------------------
-
-
-    //     //let diceRoll =  
-    //     let firePower = this.calculateFirePower(stack, targetHex, diceRoll)
-
-    //     countersIDsInHexArray.forEach((counterID, index, arr) => {
-    //         let counter = this.getCounterByItsID(counterID)
-    //     })
-
-
-    //     //get array counters in taret hex
-    //     // in  case DFF only moving C are targets
-    //     // stack got hex-array structure
-    //     // for each hex check los
-    //     // if no los found build buttons Fire as Separate FG + Fire From Every Hex
-    //     // for every counter in FG use firing consequence (leaderDRM)
-    //     // animate
-    //     // else calculate FP (leaderDRM)
-    //     // for every counter in target use FP
-    //     // animate
-
-
-
-    // }
-
-    // calculateFirePower(stack, targetHex, diceRoll) {
-
-    //     let sumOfAllCountersFP = 0
-    //     let cower = false
-
-    //     let fp
-    //     let summaryDRM
-
-    //     let hindranceDRM = stack.getHindranceDRM()
-    //     let commanderDRM = stack.getCommanderDRM()
-    //     let FFMOdrm = stack.getFFMOdrm()
-    //     let FFNAMdrm = stack.getFFNAMdrm()
-
-    //     let targetTEM = stack.getTargetTEM()
-
-    //     if (diceRoll.red == diceRoll.white && !stack.underCommand) {
-    //         cower = true
-    //     }
-
-    //     for (let hex in stack['hex_countersArray']) {
-    //         stack['hex_countersArray'][hex].forEach((counter) => {
-
-    //             let fp = counter.firePower
-
-
-    //             if (this.map.isHexNear(counter.ownHex, targetHex)) {
-    //                 fp = counter.firePower * 2
-    //             }
-    //             else
-    //                 if (this.map.getDistanceBetween(counter.ownHex, targetHex) > counter.getNormalRange()) {
-    //                     fp = counter.firePower / 2    // can have fractions
-    //                 }
-
-    //             sumOfAllCountersFP = sumOfAllCountersFP + fp
-
-    //         })
-    //     }
-
-    //     // round sumOfAllCountersFP !!
-
-    //     //fp = this.game.approximateFP(sumOfAllCountersFP,cower,counter.experience)
-    //     fp = this.game.getActualFirePower(sumOfAllCountersFP, cower, counter.experience)
-    //     dr = hindranceDRM + commanderDRM + FFMOdrm + FFNAMdrm + targetTEM
-
-    //     return this.game.getIFT_FPresult(fp, dr)
-    // }
-
-
-
-
 
     calculateCommanderBonus(stack) {
 
@@ -1345,6 +1211,8 @@ class Client {
 
             this.calcFireStatus_Animate(diceRoll, stack)
 
+            this.firingStack = { status: 'uncreated' }
+
             return console.log('these firing hexes got no LoS')
         }
 
@@ -1353,7 +1221,7 @@ class Client {
         let drm = this.calcDRM(stack, targetHex)// commanderDRM + hindranceDRM + temDRM
 
         //-----------------------------------------------------------------------------------------------------------------------------------
-
+        console.log('drm - ',drm)
 
         let effectOnTarget = this.calculateEffectOfFiring(diceRoll, stack, targetHex, drm)
 
@@ -1362,31 +1230,9 @@ class Client {
 
         // -------------------- Add check on phase . If Phase is MOve - exclude not moving
 
-
-        // this.setStatusesOnTargets(effectOnTarget, targetCountersArray)
-
-        // this.animateFireEffectOnTarget(targetHex)
-
-        //------------------------------------------------------------------------------------------------------
-
         this.targetFireEffectProcessing(targetHex, effectOnTarget)
 
-        // if (diceRoll.red == diceRoll.white && !this.isStackUnderCommand(stack)) {    // this.isStackUnderCommand(stack)
-        //     cower = true
-        // }
-
-        // let DRsumPlusDRM = diceRoll['sum'] + drm
-
-        // let sumOfAllCountersFP = this.summingCounterFPforEachHex(stack, targetHex)
-
-        // let firePower = this.game.getActualFirePower(sumOfAllCountersFP, cower, stack.experience)
-
-        //         let effectOnTarget = this.calculateEffectOfFiring(diceRoll,stack,targetHex,drm) // this.game.getIFT_FPresult(firePower, DRsumPlusDRM)
-        // //-----------------------------------------------------------------------------------------------------------------------------------
-        //         this.rollForEffectOnEveryCounter_and_Animate(effectOnTarget,targetHex)
-        // animate
-
-        // stack = undefined
+        //stack = undefined
         this.firingStack = { status: 'uncreated' }
 
     }
@@ -1438,18 +1284,17 @@ class Client {
     }
 
     calculateEffectOfFiring(diceRoll, stack, targetHex, drm) {
-        let cower;
+        let cower 
 
-        if (diceRoll.red == diceRoll.white && !this.isStackUnderCommand(stack)) {    // this.isStackUnderCommand(stack)
+        if (diceRoll.RedDice == diceRoll.WhiteDice && !this.isStackUnderCommand(stack)) {    // this.isStackUnderCommand(stack)
             cower = true
         }
 
 
         let DRsumPlusDRM = diceRoll['sum'] + drm
-
         let sumOfAllCountersFP = this.summingCounterFPforEachHex(stack, targetHex)
 
-        //console.log(sumOfAllCountersFP)
+        console.log('sumOfAllCountersFP - ',sumOfAllCountersFP)
 
         let firePower = this.game.getActualFirePower(sumOfAllCountersFP, cower, stack.experience)
 
@@ -1461,10 +1306,14 @@ class Client {
     summingCounterFPforEachHex(stack, targetHex) {
 
         return Object.keys(stack['hex_countersArray']).reduce((sum, hex) => {
+
             sum = stack['hex_countersArray'][hex].reduce((acc, counter) => {
+
                 let fp = this.calculateCounterFirePower(counter, targetHex)
+
                 return acc + fp
             }, 0)
+
             return sum
         }, 0)
     }
@@ -1473,8 +1322,13 @@ class Client {
 
         //return 4
 
+        if (counter.getType() == 'SingleManCounter') {
+            return 0
+        }
+
         let normalRange = counter.getNormalRange()
-        let distance = this.map.getHexesBetween(counter.ownHex, targetHex).length
+        let distance = this.map.getHexesBetween(counter.ownHex, targetHex).length + 1
+
 
         if (distance > normalRange * 2) {
             return 0
@@ -1486,6 +1340,7 @@ class Client {
 
         if (distance > normalRange) {
 
+            console.log('distance greater than normal. Divide FP by 2')
             return counter.firePower / 2 // can have fractions
         }
 
@@ -1524,58 +1379,6 @@ class Client {
 
         return tem
     }
-
-
-    // setStatusesOnTargets(effectOnTarget, targetHex) {
-
-    //     let effect = effectOnTarget[1]
-    //     let effectNum = effectOnTarget[0]
-    //     let targetCountersIDArray = this.map.getCountersIDinHexArray(targetHex)
-    //     let targetCountersArray = targetCountersIDArray.map((id) => {
-    //         return this.getCounterByItsID(id)
-    //     })
-
-    //     switch (effect) {
-    //         case 'KIA':
-    //             break
-    //         case 'K/':
-    //             break
-    //         case 'MC':
-    //             console.log('roll for MoralCheck')
-
-    //             let bestLeader = this.findBestLeaderInArray(targetCountersArray)
-
-    //             let commandBonus = 0
-
-    //             if (bestLeader) {     //---------------he must checks moral first by rule
-
-    //                 // let dr = this.getResultRollingTwoDice()
-    //                 // let status = this.calcStatusAfterMoralCheck(bestLeader, bestLeader.commandBonus, effectNum, dr)
-
-    //                 // if (!status == 'no effect') {
-    //                 //     bestLeader.setStatus(status)
-    //                 // }
-
-    //                 this.roll_CalcStatusAfterChecks_SetStatus(bestLeader, 0, effectNum)  // commandbonus = 0 by rule
-
-    //                 targetCountersArray.splice(targetCountersArray.indexOf(bestLeader), 1)
-
-    //                 commandBonus = bestLeader.commandBonus
-
-    //             }
-
-    //             targetCountersArray.forEach((counter) => {
-
-    //                 this.roll_CalcStatusAfterChecks_SetStatus(counter, commandBonus, effectNum)
-    //             })
-
-
-
-    //             break
-    //         case 'PTC':
-    //             break
-    //     }
-    // }
 
     //----------------------------------------------------------------------------------------------------
 
@@ -1667,25 +1470,14 @@ class Client {
         }, undefined)
     }
 
-    // roll_CalcStatusAfterChecks_SetStatus(counter, commandBonus, effectNum) {
 
-    //     let dr = this.getResultRollingTwoDice()
-    //     let status = this.calcStatusAfterMoralCheck(counter, commandBonus, effectNum, dr)
-
-    //     if (!status == 'no effect') {
-    //         counter.setNewStatus(status)
-    //     }
-    // }
-
-    animateChangingCounterState(status, counter, dr){
-        let cb
+    animateChangingCounterState(status, counter, dr) {
+        //let cb
         let self = this
         switch (status) {
             case 'desperate':
 
-            cb = () =>{
-
-                let t = self.canvasObj.createUnderFireTextBox(counter.initialImg,'DM_+_4')
+                let t = self.canvasObj.createUnderFireTextBox(counter.initialImg, 'DM_+_4')
 
                 counter.group.add(t)
                 counter.initialImg.setSrc(counter.otherSideSrc, () => {
@@ -1697,8 +1489,22 @@ class Client {
                 console.log('-------- fire ----------')
                 console.log(dr)
 
-            }
-            return cb
+                // cb = () => {
+
+                //     let t = self.canvasObj.createUnderFireTextBox(counter.initialImg, 'DM_+_4')
+
+                //     counter.group.add(t)
+                //     counter.initialImg.setSrc(counter.otherSideSrc, () => {
+
+                //         counter.group.bringToFront()
+                //         self.canvasObj.canvas.renderAll()
+                //     })
+
+                //     console.log('-------- fire ----------')
+                //     console.log(dr)
+
+                // }
+                //return cb
         }
 
     }
@@ -1769,84 +1575,35 @@ class Client {
 
     targetFireEffectProcessing(targetHex, effectOnTarget) {
 
-        // const targetCountersArray =  this.map.getCountersIDinHexArray(targetHex).map(id => this.getCounterByItsID(id))
-        // const bestLeader = this.findBestLeaderInArray(targetCountersArray)
-        // const diceRollsForEveryTarget = targetCountersArray.map(() => { return this.getResultRollingTwoDice() })
-
-        // let commandBonus = 0
-
-        // let diceRoll = this.getResultRollingTwoDice()
-        // let newStatus = this.calcStatusUnderFire(effectOnTarget[1],effectOnTarget[0],bestLeader,diceRoll,commandBonus)
-
-        // this.useNewStatusToChangeCounterState(status,bestLeader)
-
         const targetCountersArray = this.map.getCountersIDinHexArray(targetHex).map(id => this.getCounterByItsID(id))
         const effect = effectOnTarget[1]
         const effectNum = effectOnTarget[0]
 
         let commandBonus = 0
-        //let targetCountersArrayAfterCalcStatuses  = this.calcStatusUnderFire(targetCountersArray,effectOnTarget) 
-        let c = 1000
+        //let c = 1000
 
         switch (effect) {
             case 'KIA':
+
+                this.killedInActionEffectProcessing(targetCountersArray, effect, effectNum)
+
                 break
+
             case 'K/':
                 break
+
             case 'MC':
 
-                const bestLeader = this.findBestLeaderInArray(targetCountersArray)
-
-                console.log(bestLeader)
-                if (bestLeader) {
-
-                    let self = this
-                    c = 0
-
-                    setTimeout(self.calcStatus_Change_Animate_UnderFire(bestLeader, effect,commandBonus,effectNum), c)
-
-
-                    commandBonus = bestLeader.commandBonus
-
-                    targetCountersArray.splice(targetCountersArray.indexOf(bestLeader), 1)
-                }
-
-                
-                targetCountersArray.forEach((counter) => {
-
-                    let self = this
-                    c = c + 1000
-                    //this.calcStatus_Change_Animate_UnderFire(counter, effect,commandBonus,effectNum)
-
-                    setTimeout(self.calcStatus_Change_Animate_UnderFire(counter, effect,commandBonus,effectNum), c)
-
-                })
+                this.moralCheckEffectProcessing(targetCountersArray, effect, effectNum, commandBonus)
 
             case 'PTC':
                 break
         }
     }
 
-    calcStatus_Change_Animate_UnderFire(counter, effect,commandBonus,effectNum) {
 
-        let status
-        let dr = this.getResultRollingTwoDice()
 
-        switch (effect) {
 
-            case 'MC':
-
-                status = this.calcStatusAfterMoralCheck(counter, commandBonus, effectNum, dr)
-
-                console.log('status :',status)
-
-            break;
-        }
-
-        this.changeCounterStateUnderFire(status, counter)
-
-        return this.animateChangingCounterState(status, counter, dr)
-    }
 
     changeCounterStateUnderFire(status, counter) {
 
@@ -1861,64 +1618,176 @@ class Client {
                 counter.setNewStatus('KIA')
                 // nulify counter from everywher
 
-            break;
+                break;
 
-            case 'desperate' :
+            case 'desperate':
 
                 counter.setNewStatus('desperate')
                 //counter.morale = 
 
 
-            break;
+                break;
 
-            case 'pinned' :
+            case 'pinned':
 
                 counter.setNewStatus('pinned')
 
-            break;
+                break;
 
-            case 'wounded' :
+            case 'wounded':
 
                 counter.setWoundedState()
                 counter.setNewStatus('wounded')
 
-            break;
+                break;
 
             case 'reducted':
 
                 counter.setReductedState()
                 counter.status = 'ready to action'
-                
 
-            break;
+
+                break;
 
         }
     }
 
-    // calcStatusUnderFire(targetCountersArray,effectOnTarget) {
+    moralCheckEffectProcessing(targetCountersArray, effect, effectNum) {
 
-    //     const effect = effectOnTarget[1]
-    //     const effectNum = effectOnTarget[0]
-    //     const bestLeader = this.findBestLeaderInArray(targetCountersArray)
+        let c = 1000
+        let commandBonus = 0
+        const bestLeader = this.findBestLeaderInArray(targetCountersArray)
+
+        console.log('bestLeader -', bestLeader)
+
+        if (bestLeader) {
+
+            let self = this
+            c = 0
+
+            //setTimeout(self.calcStatus_Change_Animate_UnderFire(bestLeader, effect, commandBonus, effectNum), c)
+
+            setTimeout(() => {
+
+                let dr = self.getResultRollingTwoDice()
+                let status = self.calcStatusUnderFire(effect, effectNum,bestLeader, commandBonus,dr)
+
+                self.changeCounterStateUnderFire(status, bestLeader)
+                self.animateChangingCounterState(status, bestLeader, dr)
+
+            }, c)
+
+            commandBonus = bestLeader.commandBonus
+
+            targetCountersArray.splice(targetCountersArray.indexOf(bestLeader), 1)
+        }
+
+
+        targetCountersArray.forEach((counter) => {
+
+            let self = this
+            c = c + 1000
+            //this.calcStatus_Change_Animate_UnderFire(counter, effect,commandBonus,effectNum)
+
+            //setTimeout(self.calcStatus_Change_Animate_UnderFire(counter, effect, commandBonus, effectNum), c)
+
+            setTimeout(() => {
+
+                let dr = self.getResultRollingTwoDice()
+                let status = self.calcStatusUnderFire(effect, effectNum,counter, commandBonus,dr)
+
+                self.changeCounterStateUnderFire(status, counter)
+                self.animateChangingCounterState(status, counter, dr)
+
+            }, c)
+
+        })
+
+        if (bestLeader.newStatus == 'KIA') {
+            console.log('LLTC')
+        }
+    }
+
+    roll_CalcStatus_ChangeState_Animate(effect, effectNum,counter, commandBonus) {
+
+        let dr = this.getResultRollingTwoDice()
+        let status = this.calcStatusUnderFire(effect, effectNum,counter, commandBonus,dr)
+
+        this.changeCounterStateUnderFire(status, counter)
+        this.animateChangingCounterState(status, counter, dr)
+
+    }
+
+    // calcStatus_Change_Animate_UnderFire(counter, effect, commandBonus, effectNum) {
+
+    //     let status
+    //     let dr = this.getResultRollingTwoDice()
 
     //     switch (effect) {
-    //         case 'KIA':
-    //             break
-    //         case 'K/':
-    //             break
+
     //         case 'MC':
 
-    //             let commandBonus = 0
-    //             if(bestLeader) {
-    //                 let status = this.calcStatusAfterMoralCheck(bestLeader,commandBonus, effectNum, drArray[0])
-    //             }
+    //             status = this.calcStatusAfterMoralCheck(counter, commandBonus, effectNum, dr)
 
+    //             console.log('status :', status)
 
-    //         case 'PTC':
-    //             break
+    //             break;
     //     }
 
+    //     this.changeCounterStateUnderFire(status, counter)
+
+    //     return this.animateChangingCounterState(status, counter, dr)
     // }
+
+    killedInActionEffectProcessing(targetCountersArray, effect, effectNum) {
+        // randomly choose effectNum counters of targetCountersArray
+        //, statuses == KIA
+        // its Images shows wyth KIA then
+        // its images(group) removed from canvas , statuses == KIA
+        // killed counters removed from hexes , recalc hex reshow new positions
+        // every other counter are desperate or CR if already
+
+        //---------choose randomly targets from hex :
+        let arToKill = (() => {
+
+            // do numbers of killed is bigger then numbers of counters ?
+            if (arr.length < num) {
+                return arr
+            }
+
+            let res = []
+            for (let i = 0; i < num; i++) {
+                var item = arr[Math.floor(Math.random() * arr.length)];
+                arr.splice(arr.indexOf(item), 1)
+                res.push(item)
+            }
+            return res
+        })();
+
+        const arrToKill = targetCountersArray.reduce((acc,counter)=>{
+
+        },[])
+
+
+
+
+
+    }
+
+    calcStatusUnderFire(effect, effectNum,counter, commandBonus,dr){
+
+        switch (effect) {
+
+            case 'MC':
+
+                status = this.calcStatusAfterMoralCheck(counter, commandBonus, effectNum, dr)
+
+                console.log('status :', status)
+
+            return status;
+        }
+
+    }
 
 }
 

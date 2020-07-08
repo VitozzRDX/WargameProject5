@@ -71,7 +71,8 @@ let initialSettings = {
                 movementFactor: 4,
                 name: 'geSquadE-1',
                 type: 'MultiManCounter',
-                normalRange:4,
+                
+                normalRange:8,
                 firePower:6,
                 experience:'E',
                 morale : 8,
