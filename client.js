@@ -82,7 +82,7 @@ class Client {
 
         this.image = undefined
 
-        this.counterTrayHash = {}
+        this.counterID_Counter_Hash = {}
         //---------------------------------------------------------------------------------------------------------------------
         this.secondPlayerHeavyMashineGunsArray = []
         this.secondPlayerLightMashineGunsArray = []
@@ -211,11 +211,15 @@ class Client {
 
     init(options) {
 
+        this.firstPlayer = options.firstPlayer
+        this.secondPlayer = options.secondPlayer
+
 
         this._createCounters(options.countersOptions)
 
-        this.firstPlayer = options.firstPlayer
-        this.secondPlayer = options.secondPlayer
+        let allCountersArr =  Object.values(this.counterID_Counter_Hash)
+
+
 
         this.setInterfaceScheme()
         // let's set starting Phase . Because it is Single Player variant there will be all phases one by one
@@ -257,228 +261,85 @@ class Client {
         // -------- Loading Creating and Drawing Background and Counters
 
         //this.canvasObj.loadSVGFromURL(options.mapSrc)
-//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-        // let p = this.canvasObj.creatingPromise(options.mapSrc)    // options.mapSrc
-        // p.
-        //     then((img) => {
-        //         this.canvasObj.draw(p, { top: 0, left: 0, evented: false, selectable: false, }, () => { this.canvasObj.canvas.sendToBack(img) })//this.canvas.sendToBack(img) 
 
-        //     }).
-        //     then(() => {
-        //         let dr
+        let p = this.canvasObj.creatingPromise(options.mapSrc)    // options.mapSrc // this.load_And_DrawBackground(options.mapSrc)
+        p.
+            then((img) => {
+                this.canvasObj.draw(p, { top: 0, left: 0, evented: false, selectable: false, }, () => { this.canvasObj.canvas.sendToBack(img) })//this.canvas.sendToBack(img) 
 
-        //         //this._drawCounters()
+            }).
+            then(() => {
 
-        //         for (let id in this.counterTrayHash) {
+                let promisesToLoadImagesArr = allCountersArr.map((counter)=>{       // this.loadImages(allCountersArr)
+                    return this.canvasObj.creatingPromise(counter.src)
+                })
 
-        //             let c = this.counterTrayHash[id]
-        //             //this.drawCounter(this.counterTrayHash[c])
+                return Promise.all(promisesToLoadImagesArr)
+            }).
+            then((imgArr) => {
 
-        //             let ref = c.src
-        //             let ops = c.options
-        //             Object.assign(ops, {
-        //                 originX: 'center',
-        //                 originY: 'center',
-        //                 //selectable: false
-        //             })
-        //             // let cb = (i) => {
-        //             // c.imageID = i.id;
-        //             // i.counter = c
-        //             // }
+                //let promArr = []
 
-        //             let prom = this.canvasObj.creatingPromise(ref)
+                let counter
+                let ops
+                let group
 
-        //             prom.then((img) => {
+                imgArr.forEach((img,index)=>{       // this.addLoadedImagesToCanvas_setDrawOptions_createGroup(imgArr,allCountersArr)
 
-        //                 img.set(ops)
+                    //------- set options for images and add them to canvas as group ---------
+                    counter = allCountersArr[index]
+                    ops = counter.options
 
-        //                 let g = this.canvasObj.createGroup(...[img]) //, t])
+                    Object.assign(ops, {
+                        originX: 'center',
+                        originY: 'center',
+                    })
 
-        //                 //img = g
-        //                 c.group = g
-        //                 c.group.counter = c
-        //                 c.initialImg = img
+                    img.set(ops)
+                    group = this.canvasObj.createGroup(...[img])    // group with only img
 
-        //                 this.canvasObj.create_and_fill_ID_ImageHash(img)
-        //                 c.imageID = img.id;
-        //                 img.counter = c
+                    counter.group = group
+                    counter.group.counter = counter
+                    counter.initialImg = img
 
-        //                 //-------------------------------------------------------
+                    this.canvasObj.create_and_fill_ID_ImageHash(img)
+                    counter.imageID = img.id;
+                    img.counter = counter
 
-        //                 if (c.getType() != 'MashineGun') {
+                    this.canvasObj.canvas.add(group)
 
-        //                     this.animateChangingCounterState('broken', c, dr)
-        //                 }
+                    // ---------- end ------------
+                    
+                })
 
+                //----------- create promises to load otherSides of man counters. Only for Rout ---
 
-        //                 //-------------------------------------------------------
-        //                 this.canvasObj.canvas.add(g)
+                let promArr = []
 
+                imgArr.forEach((image,index)=>{
 
-        //             })
+                    counter = allCountersArr[index]
 
-        //             if (c.getType() != 'MashineGun') {
+                    if (counter.getType() == 'MashineGun') {
+                        return false
+                    }
 
-        //                 this.changeCounterStateUnderFire('broken', c)
-        //             }
-
-        //             if (c.getType() == 'MashineGun' && c.normalRange == 16 && c.owner == 'Ally') {
-
-        //                 this.secondPlayerHeavyMashineGunsArray.push(c)
-        //             }
-
-        //             if (c.getType() == 'MashineGun' && c.normalRange < 16 && c.owner == 'Ally') {
-        //                 this.secondPlayerLightMashineGunsArray.push(c)
-        //             }
-
-        //             //this.canvasObj.draw(prom, ops, cb)
-        //         }
-
-        //     }).
-
-//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-
-let p = this.canvasObj.creatingPromise(options.mapSrc)    // options.mapSrc
-p.
-    then((img) => {
-        this.canvasObj.draw(p, { top: 0, left: 0, evented: false, selectable: false, }, () => { this.canvasObj.canvas.sendToBack(img) })//this.canvas.sendToBack(img) 
-
-    }).
-    then(() => {
-        let dr
-        let promArr = []
-
-        for (let c of Object.values(this.counterTrayHash)){
-
-            let ref = c.src
-            let ops = c.options
-            Object.assign(ops, {
-                originX: 'center',
-                originY: 'center',
-            })
-
-
-            let prom = this.canvasObj.creatingPromise(ref)
-
-            promArr.push(prom)
-            // prom.then((img) => {
-
-            //     img.set(ops)
-
-            //     let g = this.canvasObj.createGroup(...[img]) //, t])
-
-            //     //img = g
-            //     c.group = g
-            //     c.group.counter = c
-            //     c.initialImg = img
-
-            //     this.canvasObj.create_and_fill_ID_ImageHash(img)
-            //     c.imageID = img.id;
-            //     img.counter = c
-
-            //     //-------------------------------------------------------
-
-            //     if (c.getType() != 'MashineGun') {
-
-            //         this.animateChangingCounterState('broken', c, dr)
-            //     }
-
-
-            //     //-------------------------------------------------------
-            //     this.canvasObj.canvas.add(g)
-
-
-            // })
-
-            if (c.getType() != 'MashineGun') {
-
-                this.changeCounterStateUnderFire('broken', c)
-            }
-
-            if (c.getType() == 'MashineGun' && c.normalRange == 16 && c.owner == 'Ally') {
-
-                this.secondPlayerHeavyMashineGunsArray.push(c)
-            }
-
-            if (c.getType() == 'MashineGun' && c.normalRange < 16 && c.owner == 'Ally') {
-                this.secondPlayerLightMashineGunsArray.push(c)
-            }
-
-            
-
-        }
-
-        //let p = Promise.all(promArr)
-        return Promise.all(promArr)
-
-    }).
-
-    then((imgArr)=>{
-
-        let index = 0
-        let img
-        let dr
-
-        let promArr = []
-
-        // for (let id in this.counterTrayHash) {
-
-        //     let c = this.counterTrayHash[id]
-
-        for (let c of Object.values(this.counterTrayHash)){
-
-
-            let ops = c.options
-            img = imgArr[index]
-
-            Object.assign(ops, {
-                originX: 'center',
-                originY: 'center',
-            })
-
-                img.set(ops)
-
-                let g = this.canvasObj.createGroup(...[img]) //, t])
-
-                //img = g
-                c.group = g
-                c.group.counter = c
-                c.initialImg = img
-
-                this.canvasObj.create_and_fill_ID_ImageHash(img)
-                c.imageID = img.id;
-                img.counter = c
-
-                //-------------------------------------------------------
-
-                if (c.getType() != 'MashineGun') {
-
-                    //this.animateChangingCounterState('broken', c, dr)
-
-                    let promise = new Promise((resolve, reject) => {
-                        c.initialImg.setSrc(c.otherSideSrc, (img) => {
-                            resolve(img)
+                    let  p = new Promise((resolve, reject) => {
+                        image.setSrc(counter.otherSideSrc, (image) => {
+                            resolve(image)
                         })
                     })
 
-                    promArr.push(promise)
-                
-                }
+                    promArr.push(p)
+                })
 
+                return Promise.all(promArr)
 
-                this.canvasObj.canvas.add(g)
+            }).
 
-                index +=1
-            }
+            then((imgArr2) => {
 
-            return Promise.all(promArr)
-
-    }).
-
-
-            then((imgArr) => {
-
-                imgArr.forEach((img)=>{
+                imgArr2.forEach((img) => {
                     img.set({
                         stroke: null,
                         strokeWidth: 3
@@ -492,18 +353,10 @@ p.
                 // })
 
                 this.routPhase()
-                
 
-                // console.log(this.secondPlayerHeavyMashineGunsArray)
-                // console.log(this.secondPlayerLightMashineGunsArray)
-
-                // console.log(this.firstPlayerBrokenCountersArr)
-                // console.log(this.secondPlayerBrokenCountersArr)
-
-                
             })
+            //.catch(err => alert(err))
 
-        //--------------------------------------------------------
         this.canvasObj.setZoomListener()
 
     };
@@ -524,7 +377,7 @@ p.
 
     //             let c = createCounter(ops)
 
-    //             this.fillCounterTrayHash(c.ID, c)
+    //             this.fillCounterID_Counter_Hash(c.ID, c)
     //             this.fillHex_CounterID_setHexOwner(hex, c)
 
     //         })
@@ -546,10 +399,25 @@ p.
                 ops.options = { top: centerPoint.y, left: centerPoint.x }       // {q:6,r:0,s:-6}
                 ops.ownHex = obj
 
-                let c = createCounter(ops)
+                let counter = createCounter(ops)
 
-                this.fillCounterTrayHash(c.ID, c)
-                this.fillHex_CounterID_setHexOwner(obj, c)
+                this.fillCounterID_Counter_Hash(counter.ID, counter)
+                this.fillHex_CounterID_setHexOwner(obj, counter)
+
+                //--------------------------------------------------------------------------
+
+                
+                if (counter.getType() != 'MashineGun') {                    // remove it when rout phase is done
+                    
+                    this.changeCounterStateUnderFire('broken', counter)
+                }
+                if (counter.getType() == 'MashineGun' && counter.normalRange == 16 && counter.owner == 'Ally') {
+                    this.secondPlayerHeavyMashineGunsArray.push(counter)
+                }
+                if (counter.getType() == 'MashineGun' && counter.normalRange < 16 && counter.owner == 'Ally') {
+                    this.secondPlayerLightMashineGunsArray.push(counter)
+                }
+                //--------------------------------------------------------------------------
 
             })
 
@@ -557,9 +425,9 @@ p.
     }
 
     _drawCounters() {
-        for (let c in this.counterTrayHash) {
+        for (let c in this.counterID_Counter_Hash) {
 
-            this.drawCounter(this.counterTrayHash[c])
+            this.drawCounter(this.counterID_Counter_Hash[c])
         }
     }
 
@@ -785,11 +653,11 @@ p.
     }
 
     getCounterByItsID(ID) {
-        return this.counterTrayHash[ID]
+        return this.counterID_Counter_Hash[ID]
     }
 
-    fillCounterTrayHash(ID, counter) {
-        this.counterTrayHash[ID] = counter
+    fillCounterID_Counter_Hash(ID, counter) {
+        this.counterID_Counter_Hash[ID] = counter
     }
 
     changeColorOfBorder(counter, color) {
@@ -1684,9 +1552,7 @@ p.
                 counter.initialImg.setSrc(counter.otherSideSrc, () => {
 
                     counter.group.bringToFront()
-                    //self.canvasObj.canvas.renderAll()
 
-                    console.log('should be first')
                     self.changeColorOfBorder(counter, null)
                 })
                 break;
@@ -1754,7 +1620,7 @@ p.
                         //----------------- flipCounterOnOtherSide ---------------------------
                         counter.initialImg.setSrc(counter.otherSideSrc, () => {
                             counter.group.bringToFront()
-                            
+
                             self.changeColorOfBorder(counter, null)
                         })
 
@@ -1810,6 +1676,8 @@ p.
 
 
     changeCounterStateUnderFire(status, counter) {  // + add to this.firstPlayerBrokenCountersArr if broken
+
+        console.log(this.firstPlayer)
 
         if (status === counter.status) {
             return console.log('check passed')
@@ -1869,6 +1737,7 @@ p.
 
                 //---------------------------------------------------------
                 if (counter.owner == this.firstPlayer) {
+                    
                     this.firstPlayerBrokenCountersArr.push(counter)
                 }
                 else {
@@ -2027,8 +1896,8 @@ p.
 
         console.log(mustRoutArr)
 
-        let self= this
-        mustRoutArr.forEach((counter)=>{
+        let self = this
+        mustRoutArr.forEach((counter) => {
 
             console.log(this.canvasObj.getImageByID(counter.getImageID()))
             // this.canvasObj.getImageByID(counter.getImageID()).set({
@@ -2036,7 +1905,7 @@ p.
             //     strokeWidth: 3
             // })
 
-            this.changeColorOfBorderImage(counter.initialImg,"red") 
+            this.changeColorOfBorderImage(this.canvasObj.getImageByID(counter.getImageID()), "red")
 
         })
 
@@ -2097,7 +1966,7 @@ p.
         //     let hexType = this.map.getHexType(counter.ownHex)
 
         //     if (hexType == 'wooden building' || hexType == 'stone building' || hexType == 'woods' ) {
-                
+
         //         if (!this.isEnemyNear(counter.ownHex)) {
         //             return console.log(`counter ${counter.name} is in safe place and there is no nearest enemy`)
         //         }
@@ -2106,12 +1975,12 @@ p.
         //     mustRout.push(counter)
         // })
 
-        return brokenArr.filter((counter)=>{
+        return brokenArr.filter((counter) => {
 
             let hexType = this.map.getHexType(counter.ownHex)
 
-            if (hexType == 'wooden building' || hexType == 'stone building' || hexType == 'woods' ) {
-                
+            if (hexType == 'wooden building' || hexType == 'stone building' || hexType == 'woods') {
+
                 if (!this.isEnemyNear(counter.ownHex)) {
                     console.log(`counter ${counter.name} is in safe place and there is no nearest enemy`)
 

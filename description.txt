@@ -985,3 +985,39 @@ this.routPhase() - куда ?
 
 Поменял init , чтобы при загрузке Ломались все , кроме Пулеметов и mustRout получают красный бордер
 
+
+                    if (counter.getType() != 'MashineGun') {
+
+                        let promise = new Promise((resolve, reject) => {
+                            counter.initialImg.setSrc(counter.otherSideSrc, (img) => {
+                                resolve(img)
+                            })
+                        })
+
+                        promArr.push(promise)
+                    }
+
+                    Почему ?!
+
+                // let promArr = imgArr.map((image,index)=>{
+
+                //     counter = allCountersArr[index]
+
+                //     // return new Promise((resolve, reject) => {
+                //     //     image.setSrc(counter.otherSideSrc, (img) => {
+                //     //         resolve(img)
+                //     //     })
+                //     // })
+                //     if (counter.getType() != 'MashineGun') {
+
+                //         return new Promise((resolve, reject) => {
+                //             image.setSrc(counter.otherSideSrc, (img) => {
+                //                 resolve(img)
+                //             })
+                //         })
+                //     }
+                // })
+
+                почему не ловит ошибку и ничего не выдает ?
+                reject(new Error("Ошибка!"))
+

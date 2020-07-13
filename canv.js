@@ -68,7 +68,7 @@ this.ID_ImageHash = {}
 
         var textbox = new fabric.Textbox(text, options)
         //textbox.set(where)
-        this.canvas.add(textbox)
+        this.canvas.add(textbox) 
     }
     // ----------- added  10 02 2020 -----------------
     getRondelPicture() {
@@ -79,6 +79,7 @@ this.ID_ImageHash = {}
         let promise = new Promise((resolve, reject) => {
             window.fabric.Image.fromURL(reference, (img) => {
                 resolve(img)
+                //reject(new Error("Ошибка!"))
             })
         })
 
