@@ -15,6 +15,7 @@ function addBasicProps (counter,param) {
     counter.weightHex = 1
     counter.ID = (Math.random() + 1).toString(36).slice(2, 18);
     counter.otherSideSrc = param.otherSideSrc;
+    counter.name = param.name
 }
 
 function addMoveProps(counter) {

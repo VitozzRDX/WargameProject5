@@ -9,9 +9,12 @@ let methods = {
         console.log(this.map.getHexFromCoords(absolutePointer))
         console.log(absolutePointer)
 
+        let h= this.map.getHexFromCoords(absolutePointer)
+
         if (options.target == null) {
             return //console.log('clicked on empty space in FPRPhase')
         }
+
 
         let counter = options.target.counter
 
@@ -51,19 +54,6 @@ let methods = {
             return console.log('clicked on empty space in FPPFPhase')
         }
 
-        // let counter = options.target.counter
-
-        // if (counter.group) { // && group.type == 'attachedWeapon'
-
-        //     let group = options.target.counter.group
-
-        //     this.buildGUI(group)
-
-        //     return
-        // }
-
-        // this.clearGroupUI()
-        //----------------------------------------------------------------------------------------------------------------
         let absolutePointer = options.absolutePointer
 
         let counter = options.target.counter
@@ -101,10 +91,6 @@ let methods = {
 
             case 'readyToFire':
 
-                // if (!this._isLegalTargetToAddToFiringStack(options.target)) {   //already added
-                //     return
-                // }
-
                 if (!this._isClickedCounterOwnerIsSameAsPhaseOwner(options.target.counter, this.firstPlayer)) {
                     // stack.calculateCommanderBonus()
                     // stack.setCommanderCover()
@@ -129,22 +115,7 @@ let methods = {
                 }
 
                 this.addingToFireStack(counter, stack)
-                // if (counter.getType() == 'SingleManCounter' && stack._isHex_CountersArrayEmpty(hex)){
-                //     return console.log('u cannot add SMC to FG without MMC or Weapon')
-                // }
 
-                // if (counter.getType() == 'SingleManCounter') {
-                //     stack.setHex_Bonus(counter.ownHex,counter.commandBonus)
-                // }
-
-                // stack.addToGeneralCountersArray(counter)
-                // stack.setHex_countersArray(counter.ownHex,counter)
-
-                // this.changeColorOfBorder(counter, "red")
-
-                // this.clearGroupUI()
-
-                // this.fireProcessing // fireSquadProcess
                 break;
         }
     },

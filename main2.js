@@ -49,6 +49,32 @@ let initialSettings = {
                 },
             },
 
+            'ruMMG': {
+                src: "assets/ruMMG.gif",
+                otherSideSrc: "assets/ruMMGb.gif",
+                className: "Weapon",
+                owner: 'Ally',
+                name: 'ruMMG',
+                type: 'MashineGun',
+                normalRange:16,
+                firePower:4,
+                rateOfFire:2,
+                breakdownNumber:12,
+            },
+
+            'ruLMG': {
+                src: "assets/ruLMG.gif",
+                otherSideSrc: "assets/ruLMGb.gif",
+                className: "Weapon",
+                owner: 'Ally',
+                name: 'ruMMG',
+                type: 'MashineGun',
+                normalRange:6,
+                firePower:2,
+                rateOfFire:1,
+                breakdownNumber:12,
+            },
+
             'geSquadE-0': {
                 src: 'assets/ge467S.gif',   // 'assets/ge467S.gif',
                 otherSideSrc: 'assets/geh7b.gif',
@@ -98,7 +124,7 @@ let initialSettings = {
                 owner: 'Nazi',
                 name: 'geHMG',
                 type: 'MashineGun',
-                normalRange:4,
+                normalRange:16,
                 firePower:6,
                 rateOfFire:2,
                 breakdownNumber:12,
@@ -136,10 +162,11 @@ let initialSettings = {
                 commandBonus:-0,
                 morale : 8,
             },
+            
         },
 
         parametersOnCreationHash: {
-            'ruSquadE-0': [{ q: 6, r: 0, s: -6 }],                                        // {top:100,left:100}
+            'ruSquadE-0': [{ q: 6, r: 0, s: -6 },],           //{q: 13, r: -1, s: -12}                             // {top:100,left:100}
             'geSquadE-0': [{ q: 12, r: 0, s: -12 },{ q: 9, r: 4, s: -13 },{ q: 10, r: 3, s: -13 },{ q: 10, r: 3, s: -13 },{ q: 10, r: 3, s: -13 }],
             'geSquadE-1': [{ q: 8, r: 5, s: -13 }],
             'geSMC9-1': [{ q: 8, r: 5, s: -13 }],
@@ -148,6 +175,9 @@ let initialSettings = {
             'ruSMC8-0': [{ q: 6, r: 0, s: -6 }],
             'ruSMC8-1': [{ q: 6, r: 0, s: -6 }],
             'ruSMC7-0': [{ q: 6, r: 0, s: -6 }],
+
+            'ruLMG':[{q: 16, r: -6, s: -10}],
+            'ruMMG':[{ q: 17, r: -5, s: -12}],
 
         },
 

@@ -83,11 +83,12 @@ class Client {
         this.image = undefined
 
         this.counterTrayHash = {}
-        //------------------------ 20 03 2020 ----------------------------------------------------------------
-        //this.stackFactory = stackFactory
+        //---------------------------------------------------------------------------------------------------------------------
+        this.secondPlayerHeavyMashineGunsArray = []
+        this.secondPlayerLightMashineGunsArray = []
 
-        //this.countersFactory = countersFactory
-
+        this.firstPlayerBrokenCountersArr = []
+        this.secondPlayerBrokenCountersArr = []
     }
 
     setInterfaceScheme() {
@@ -256,65 +257,250 @@ class Client {
         // -------- Loading Creating and Drawing Background and Counters
 
         //this.canvasObj.loadSVGFromURL(options.mapSrc)
+//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+        // let p = this.canvasObj.creatingPromise(options.mapSrc)    // options.mapSrc
+        // p.
+        //     then((img) => {
+        //         this.canvasObj.draw(p, { top: 0, left: 0, evented: false, selectable: false, }, () => { this.canvasObj.canvas.sendToBack(img) })//this.canvas.sendToBack(img) 
 
-        let p = this.canvasObj.creatingPromise(options.mapSrc)    // options.mapSrc
-        p.
-            then((img) => {
-                this.canvasObj.draw(p, { top: 0, left: 0, evented: false, selectable: false, }, () => { this.canvasObj.canvas.sendToBack(img) })//this.canvas.sendToBack(img) 
+        //     }).
+        //     then(() => {
+        //         let dr
 
-            }).
-            then(() => {
+        //         //this._drawCounters()
 
-                //this._drawCounters()
+        //         for (let id in this.counterTrayHash) {
 
-                for (let id in this.counterTrayHash) {
+        //             let c = this.counterTrayHash[id]
+        //             //this.drawCounter(this.counterTrayHash[c])
 
-                    let c = this.counterTrayHash[id]
-                    //this.drawCounter(this.counterTrayHash[c])
+        //             let ref = c.src
+        //             let ops = c.options
+        //             Object.assign(ops, {
+        //                 originX: 'center',
+        //                 originY: 'center',
+        //                 //selectable: false
+        //             })
+        //             // let cb = (i) => {
+        //             // c.imageID = i.id;
+        //             // i.counter = c
+        //             // }
 
-                    let ref = c.src
-                    let ops = c.options
-                    Object.assign(ops, {
-                        originX: 'center',
-                        originY: 'center',
-                        //selectable: false
+        //             let prom = this.canvasObj.creatingPromise(ref)
+
+        //             prom.then((img) => {
+
+        //                 img.set(ops)
+
+        //                 let g = this.canvasObj.createGroup(...[img]) //, t])
+
+        //                 //img = g
+        //                 c.group = g
+        //                 c.group.counter = c
+        //                 c.initialImg = img
+
+        //                 this.canvasObj.create_and_fill_ID_ImageHash(img)
+        //                 c.imageID = img.id;
+        //                 img.counter = c
+
+        //                 //-------------------------------------------------------
+
+        //                 if (c.getType() != 'MashineGun') {
+
+        //                     this.animateChangingCounterState('broken', c, dr)
+        //                 }
+
+
+        //                 //-------------------------------------------------------
+        //                 this.canvasObj.canvas.add(g)
+
+
+        //             })
+
+        //             if (c.getType() != 'MashineGun') {
+
+        //                 this.changeCounterStateUnderFire('broken', c)
+        //             }
+
+        //             if (c.getType() == 'MashineGun' && c.normalRange == 16 && c.owner == 'Ally') {
+
+        //                 this.secondPlayerHeavyMashineGunsArray.push(c)
+        //             }
+
+        //             if (c.getType() == 'MashineGun' && c.normalRange < 16 && c.owner == 'Ally') {
+        //                 this.secondPlayerLightMashineGunsArray.push(c)
+        //             }
+
+        //             //this.canvasObj.draw(prom, ops, cb)
+        //         }
+
+        //     }).
+
+//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+let p = this.canvasObj.creatingPromise(options.mapSrc)    // options.mapSrc
+p.
+    then((img) => {
+        this.canvasObj.draw(p, { top: 0, left: 0, evented: false, selectable: false, }, () => { this.canvasObj.canvas.sendToBack(img) })//this.canvas.sendToBack(img) 
+
+    }).
+    then(() => {
+        let dr
+        let promArr = []
+
+        for (let c of Object.values(this.counterTrayHash)){
+
+            let ref = c.src
+            let ops = c.options
+            Object.assign(ops, {
+                originX: 'center',
+                originY: 'center',
+            })
+
+
+            let prom = this.canvasObj.creatingPromise(ref)
+
+            promArr.push(prom)
+            // prom.then((img) => {
+
+            //     img.set(ops)
+
+            //     let g = this.canvasObj.createGroup(...[img]) //, t])
+
+            //     //img = g
+            //     c.group = g
+            //     c.group.counter = c
+            //     c.initialImg = img
+
+            //     this.canvasObj.create_and_fill_ID_ImageHash(img)
+            //     c.imageID = img.id;
+            //     img.counter = c
+
+            //     //-------------------------------------------------------
+
+            //     if (c.getType() != 'MashineGun') {
+
+            //         this.animateChangingCounterState('broken', c, dr)
+            //     }
+
+
+            //     //-------------------------------------------------------
+            //     this.canvasObj.canvas.add(g)
+
+
+            // })
+
+            if (c.getType() != 'MashineGun') {
+
+                this.changeCounterStateUnderFire('broken', c)
+            }
+
+            if (c.getType() == 'MashineGun' && c.normalRange == 16 && c.owner == 'Ally') {
+
+                this.secondPlayerHeavyMashineGunsArray.push(c)
+            }
+
+            if (c.getType() == 'MashineGun' && c.normalRange < 16 && c.owner == 'Ally') {
+                this.secondPlayerLightMashineGunsArray.push(c)
+            }
+
+            
+
+        }
+
+        //let p = Promise.all(promArr)
+        return Promise.all(promArr)
+
+    }).
+
+    then((imgArr)=>{
+
+        let index = 0
+        let img
+        let dr
+
+        let promArr = []
+
+        // for (let id in this.counterTrayHash) {
+
+        //     let c = this.counterTrayHash[id]
+
+        for (let c of Object.values(this.counterTrayHash)){
+
+
+            let ops = c.options
+            img = imgArr[index]
+
+            Object.assign(ops, {
+                originX: 'center',
+                originY: 'center',
+            })
+
+                img.set(ops)
+
+                let g = this.canvasObj.createGroup(...[img]) //, t])
+
+                //img = g
+                c.group = g
+                c.group.counter = c
+                c.initialImg = img
+
+                this.canvasObj.create_and_fill_ID_ImageHash(img)
+                c.imageID = img.id;
+                img.counter = c
+
+                //-------------------------------------------------------
+
+                if (c.getType() != 'MashineGun') {
+
+                    //this.animateChangingCounterState('broken', c, dr)
+
+                    let promise = new Promise((resolve, reject) => {
+                        c.initialImg.setSrc(c.otherSideSrc, (img) => {
+                            resolve(img)
+                        })
                     })
-                    // let cb = (i) => {
-                    // c.imageID = i.id;
-                    // i.counter = c
-                    // }
 
-                    let prom = this.canvasObj.creatingPromise(ref)
-                    prom.then((img) => {
-                        img.set(ops)
-
-                        //let t = this.canvasObj.createPhaseTextBox(img, 'PREP_FIRE')
-                        //this.canvasObj.canvas.add(t);
-                        let g = this.canvasObj.createGroup(...[img]) //, t])
-
-                        //img = g
-                        c.group = g
-                        c.group.counter = c
-                        c.initialImg = img
-
-                        this.canvasObj.create_and_fill_ID_ImageHash(img)
-                        c.imageID = img.id;
-                        img.counter = c
-
-                        this.canvasObj.canvas.add(g)
-                    })
-
-                    //this.canvasObj.draw(prom, ops, cb)
+                    promArr.push(promise)
+                
                 }
 
-            }).
-            then(() => {
-                this._buildMenuInterface(startingPhaseTitle)
 
+                this.canvasObj.canvas.add(g)
+
+                index +=1
+            }
+
+            return Promise.all(promArr)
+
+    }).
+
+
+            then((imgArr) => {
+
+                imgArr.forEach((img)=>{
+                    img.set({
+                        stroke: null,
+                        strokeWidth: 3
+                    })
+                })
+
+                this._buildMenuInterface(startingPhaseTitle)
 
                 // this.canvasObj.getRondelPicture().animate('angle', '-=90', {
                 //     onChange: this.canvasObj.canvas2.requestRenderAll.bind(this.canvasObj.canvas2),
                 // })
+
+                this.routPhase()
+                
+
+                // console.log(this.secondPlayerHeavyMashineGunsArray)
+                // console.log(this.secondPlayerLightMashineGunsArray)
+
+                // console.log(this.firstPlayerBrokenCountersArr)
+                // console.log(this.secondPlayerBrokenCountersArr)
+
+                
             })
 
         //--------------------------------------------------------
@@ -1221,7 +1407,7 @@ class Client {
         let drm = this.calcDRM(stack, targetHex)// commanderDRM + hindranceDRM + temDRM
 
         //-----------------------------------------------------------------------------------------------------------------------------------
-        console.log('drm - ',drm)
+        console.log('drm - ', drm)
 
         let effectOnTarget = this.calculateEffectOfFiring(diceRoll, stack, targetHex, drm)
 
@@ -1284,7 +1470,7 @@ class Client {
     }
 
     calculateEffectOfFiring(diceRoll, stack, targetHex, drm) {
-        let cower 
+        let cower
 
         if (diceRoll.RedDice == diceRoll.WhiteDice && !this.isStackUnderCommand(stack)) {    // this.isStackUnderCommand(stack)
             cower = true
@@ -1294,7 +1480,7 @@ class Client {
         let DRsumPlusDRM = diceRoll['sum'] + drm
         let sumOfAllCountersFP = this.summingCounterFPforEachHex(stack, targetHex)
 
-        console.log('sumOfAllCountersFP - ',sumOfAllCountersFP)
+        console.log('sumOfAllCountersFP - ', sumOfAllCountersFP)
 
         let firePower = this.game.getActualFirePower(sumOfAllCountersFP, cower, stack.experience)
 
@@ -1472,6 +1658,9 @@ class Client {
 
 
     animateChangingCounterState(status, counter, dr) {
+
+        // console.log(counter)
+        // console.log(counter.initialImg)
         //let cb
         let self = this
         switch (status) {
@@ -1483,28 +1672,42 @@ class Client {
                 counter.initialImg.setSrc(counter.otherSideSrc, () => {
 
                     counter.group.bringToFront()
-                    self.canvasObj.canvas.renderAll()
+                    //self.canvasObj.canvas.renderAll()
+                    self.changeColorOfBorder(counter, null)
                 })
 
                 console.log('-------- fire ----------')
-                console.log(dr)
+                break;
 
-                // cb = () => {
+            case 'broken':
 
-                //     let t = self.canvasObj.createUnderFireTextBox(counter.initialImg, 'DM_+_4')
+                counter.initialImg.setSrc(counter.otherSideSrc, () => {
 
-                //     counter.group.add(t)
-                //     counter.initialImg.setSrc(counter.otherSideSrc, () => {
+                    counter.group.bringToFront()
+                    //self.canvasObj.canvas.renderAll()
 
-                //         counter.group.bringToFront()
-                //         self.canvasObj.canvas.renderAll()
-                //     })
+                    console.log('should be first')
+                    self.changeColorOfBorder(counter, null)
+                })
+                break;
+            //console.log(dr)
 
-                //     console.log('-------- fire ----------')
-                //     console.log(dr)
+            // cb = () => {
 
-                // }
-                //return cb
+            //     let t = self.canvasObj.createUnderFireTextBox(counter.initialImg, 'DM_+_4')
+
+            //     counter.group.add(t)
+            //     counter.initialImg.setSrc(counter.otherSideSrc, () => {
+
+            //         counter.group.bringToFront()
+            //         self.canvasObj.canvas.renderAll()
+            //     })
+
+            //     console.log('-------- fire ----------')
+            //     console.log(dr)
+
+            // }
+            //return cb
         }
 
     }
@@ -1551,6 +1754,7 @@ class Client {
                         //----------------- flipCounterOnOtherSide ---------------------------
                         counter.initialImg.setSrc(counter.otherSideSrc, () => {
                             counter.group.bringToFront()
+                            
                             self.changeColorOfBorder(counter, null)
                         })
 
@@ -1605,7 +1809,7 @@ class Client {
 
 
 
-    changeCounterStateUnderFire(status, counter) {
+    changeCounterStateUnderFire(status, counter) {  // + add to this.firstPlayerBrokenCountersArr if broken
 
         if (status === counter.status) {
             return console.log('check passed')
@@ -1625,6 +1829,15 @@ class Client {
                 counter.setNewStatus('desperate')
                 //counter.morale = 
 
+                //---------------------------------------------------------
+                if (counter.owner == this.firstPlayer) {
+                    this.firstPlayerBrokenCountersArr.push(counter)
+                }
+                else {
+                    this.secondPlayerBrokenCountersArr.push(counter)
+                }
+
+                //---------------------------------------------------------
 
                 break;
 
@@ -1649,6 +1862,22 @@ class Client {
 
                 break;
 
+            case 'broken':
+
+                counter.setNewStatus('broken')
+                //counter.morale =
+
+                //---------------------------------------------------------
+                if (counter.owner == this.firstPlayer) {
+                    this.firstPlayerBrokenCountersArr.push(counter)
+                }
+                else {
+                    this.secondPlayerBrokenCountersArr.push(counter)
+                }
+
+                //---------------------------------------------------------
+
+                break;
         }
     }
 
@@ -1670,7 +1899,7 @@ class Client {
             setTimeout(() => {
 
                 let dr = self.getResultRollingTwoDice()
-                let status = self.calcStatusUnderFire(effect, effectNum,bestLeader, commandBonus,dr)
+                let status = self.calcStatusUnderFire(effect, effectNum, bestLeader, commandBonus, dr)
 
                 self.changeCounterStateUnderFire(status, bestLeader)
                 self.animateChangingCounterState(status, bestLeader, dr)
@@ -1694,7 +1923,7 @@ class Client {
             setTimeout(() => {
 
                 let dr = self.getResultRollingTwoDice()
-                let status = self.calcStatusUnderFire(effect, effectNum,counter, commandBonus,dr)
+                let status = self.calcStatusUnderFire(effect, effectNum, counter, commandBonus, dr)
 
                 self.changeCounterStateUnderFire(status, counter)
                 self.animateChangingCounterState(status, counter, dr)
@@ -1708,10 +1937,10 @@ class Client {
         }
     }
 
-    roll_CalcStatus_ChangeState_Animate(effect, effectNum,counter, commandBonus) {
+    roll_CalcStatus_ChangeState_Animate(effect, effectNum, counter, commandBonus) {
 
         let dr = this.getResultRollingTwoDice()
-        let status = this.calcStatusUnderFire(effect, effectNum,counter, commandBonus,dr)
+        let status = this.calcStatusUnderFire(effect, effectNum, counter, commandBonus, dr)
 
         this.changeCounterStateUnderFire(status, counter)
         this.animateChangingCounterState(status, counter, dr)
@@ -1764,17 +1993,12 @@ class Client {
             return res
         })();
 
-        const arrToKill = targetCountersArray.reduce((acc,counter)=>{
+        const arrToKill = targetCountersArray.reduce((acc, counter) => {
 
-        },[])
-
-
-
-
-
+        }, [])
     }
 
-    calcStatusUnderFire(effect, effectNum,counter, commandBonus,dr){
+    calcStatusUnderFire(effect, effectNum, counter, commandBonus, dr) {
 
         switch (effect) {
 
@@ -1784,9 +2008,143 @@ class Client {
 
                 console.log('status :', status)
 
-            return status;
+                return status;
         }
 
+    }
+
+    //------------------------------------------------------------------------------------------------------------
+    routPhase() {
+
+        //this.createHMGinNormalRangeArray()
+
+        // collect all Broken and MustRout counters
+        //let mustRout = this.collectAllMustRout(this.firstPlayer)
+
+        //console.log(this.collectAllMustRout(this.firstPlayer))
+
+        let mustRoutArr = this.collectAllMustRout(this.firstPlayer)
+
+        console.log(mustRoutArr)
+
+        let self= this
+        mustRoutArr.forEach((counter)=>{
+
+            console.log(this.canvasObj.getImageByID(counter.getImageID()))
+            // this.canvasObj.getImageByID(counter.getImageID()).set({
+            //     stroke: 'red',
+            //     strokeWidth: 3
+            // })
+
+            this.changeColorOfBorderImage(counter.initialImg,"red") 
+
+        })
+
+
+
+
+    }
+
+    // collectAllMustRout(player) {
+
+    //     let brokenArr
+    //     let mustRout = []
+
+    //     switch (player) {
+    //         case 'Nazi':
+    //             brokenArr = this.firstPlayerBrokenCountersArr
+
+    //             brokenArr.forEach((counter) => {
+
+    //                 let hexType = this.map.getHexType(counter.ownHex)
+    //                 console.log(hexType)
+
+    //                 if (hexType == 'wooden building' || hexType == 'stone building' || hexType == 'woods') {
+
+    //                     if (!this.isEnemyNear(counter.ownHex)) {
+    //                         return console.log(`counter ${counter.name} is in safe place and there is no nearest enemy`)
+    //                     }
+    //                 }
+
+    //                 mustRout.push(counter)
+    //             })
+    //             break;
+
+    //         case 'Ally':
+    //             brokenArr = this.secondPlayerBrokenCountersArr
+    //             break;
+    //     }
+
+    //     return mustRout
+    // }
+
+    collectAllMustRout(player) {
+
+        //let mustRout = []
+
+        // switch (player) {
+        //     case 'Nazi':
+        //         brokenArr = this.firstPlayerBrokenCountersArr
+        //     case 'Ally':
+        //         brokenArr = this.secondPlayerBrokenCountersArr
+        //         break;
+        // }
+
+        let brokenArr = (player == 'Nazi') ? this.firstPlayerBrokenCountersArr : this.secondPlayerBrokenCountersArr
+
+        // brokenArr.forEach((counter)=>{
+
+        //     let hexType = this.map.getHexType(counter.ownHex)
+
+        //     if (hexType == 'wooden building' || hexType == 'stone building' || hexType == 'woods' ) {
+                
+        //         if (!this.isEnemyNear(counter.ownHex)) {
+        //             return console.log(`counter ${counter.name} is in safe place and there is no nearest enemy`)
+        //         }
+        //     }
+
+        //     mustRout.push(counter)
+        // })
+
+        return brokenArr.filter((counter)=>{
+
+            let hexType = this.map.getHexType(counter.ownHex)
+
+            if (hexType == 'wooden building' || hexType == 'stone building' || hexType == 'woods' ) {
+                
+                if (!this.isEnemyNear(counter.ownHex)) {
+                    console.log(`counter ${counter.name} is in safe place and there is no nearest enemy`)
+
+                    return false
+                }
+            }
+
+            return true
+        })
+
+        //return mustRout
+    }
+
+
+    isEnemyNear(hex) {
+
+        let nearestHexesArr = this.map.nearestHexesArr(hex)
+        let ownerOfStartHex = this.map.getOwnerOfHex(hex)
+
+        // for (let i in nearestHexesArr) {    
+
+        //     if (this.map.getOwnerOfHex(nearestHexesArr[i]) != undefined && this.map.getOwnerOfHex(nearestHexesArr[i]) != ownerOfStartHex) {
+        //         return true
+        //     }
+        // }
+        // return false
+
+        return nearestHexesArr.some((hex) => {
+            if (this.map.getOwnerOfHex(hex) != undefined && this.map.getOwnerOfHex(hex) != ownerOfStartHex) {
+                return true
+            }
+            return false
+        })
     }
 
 }

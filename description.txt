@@ -938,7 +938,7 @@ for each :
 1 Adjacent to Known Enemy ? -  add to array
 2 In Open Ground ? In LoS and normal range of Known Enemy (that capable to Interdict it i.e fire  at least 1FP)? -  add to array
 
-Known Enemy - все кто In LoS and normal range в стартовом гексе
+Known Enemy - все кто In LoS and normal range в стартовом гексе (для каждого Сломленного)
     a) Все Тяжелые пулеметы проверяем на нормал рейндж (16). Если да - в массив
     б) Все легкие (8)
     в) полученный массив проверяем на ЛоС - в новый массив
@@ -963,8 +963,25 @@ Known Enemy - все кто In LoS and normal range в стартовом гек
 
 ------------------------------------------------------------------------------------------------------------------------
 
-порушим
-        this.changeCounterStateUnderFire(status, counter)
-        this.animateChangingCounterState(status, counter, dr)
+    routPhase(){
 
+        
+    }
+
+вместо 
+                        if (c.getType() == 'MashineGun' && c.normalRange == 16 && c.owner == 'Ally'){
+                            this.secondPlayerHeavyMashineGunsArray.push(c)
+                        }
+
+используем Set для создания коллекции Гексов с Пулеметами
+
+collectAllMustRout &
+
+проверяем все гексы вокруг на врагов
+
+this.routPhase() - куда ?
+
+--------------------------------------------------13 07 2020------------------------------------------------------------------
+
+Поменял init , чтобы при загрузке Ломались все , кроме Пулеметов и mustRout получают красный бордер
 
