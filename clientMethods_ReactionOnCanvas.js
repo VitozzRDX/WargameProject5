@@ -7,9 +7,20 @@ let methods = {
         let absolutePointer = options.absolutePointer
 
         console.log(this.map.getHexFromCoords(absolutePointer))
-        console.log(absolutePointer)
+        //console.log(absolutePointer)
 
         let h= this.map.getHexFromCoords(absolutePointer)
+        let hexes =this.map.calcHexesInRange(h,3)
+
+        hexes.forEach((hex)=>{
+
+            let sixCoords = this.map.getPolyCorners(hex)
+
+            this.canvasObj.drawPoly(sixCoords, 'red')
+        })
+
+        let sss = this.filterHexesForEnemyPresence(hexes,this.secondPlayer)
+
 
         if (options.target == null) {
             return //console.log('clicked on empty space in FPRPhase')

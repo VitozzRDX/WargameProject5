@@ -217,7 +217,7 @@ class Client {
 
         this._createCounters(options.countersOptions)
 
-        let allCountersArr =  Object.values(this.counterID_Counter_Hash)
+        let allCountersArr = Object.values(this.counterID_Counter_Hash)
 
 
 
@@ -262,61 +262,27 @@ class Client {
 
         //this.canvasObj.loadSVGFromURL(options.mapSrc)
 
-        let p = this.canvasObj.creatingPromise(options.mapSrc)    // options.mapSrc // this.load_And_DrawBackground(options.mapSrc)
-        p.
-            then((img) => {
-                this.canvasObj.draw(p, { top: 0, left: 0, evented: false, selectable: false, }, () => { this.canvasObj.canvas.sendToBack(img) })//this.canvas.sendToBack(img) 
+        // let p = this.canvasObj.creatingPromise(options.mapSrc)    // options.mapSrc // this.load_And_DrawBackground(options.mapSrc)
+        // p.
+        //     then((img) => {
+        //         this.canvasObj.draw(p, { top: 0, left: 0, evented: false, selectable: false, }, () => { this.canvasObj.canvas.sendToBack(img) })//this.canvas.sendToBack(img) 
 
-            }).
+        //     })
+        this.load_And_DrawBackground(options.mapSrc).
             then(() => {
 
-                let promisesToLoadImagesArr = allCountersArr.map((counter)=>{       // this.loadImages(allCountersArr)
-                    return this.canvasObj.creatingPromise(counter.src)
-                })
-
-                return Promise.all(promisesToLoadImagesArr)
+                return Promise.all(this.getPromisesToLoadImages(allCountersArr))
             }).
             then((imgArr) => {
 
-                //let promArr = []
-
-                let counter
-                let ops
-                let group
-
-                imgArr.forEach((img,index)=>{       // this.addLoadedImagesToCanvas_setDrawOptions_createGroup(imgArr,allCountersArr)
-
-                    //------- set options for images and add them to canvas as group ---------
-                    counter = allCountersArr[index]
-                    ops = counter.options
-
-                    Object.assign(ops, {
-                        originX: 'center',
-                        originY: 'center',
-                    })
-
-                    img.set(ops)
-                    group = this.canvasObj.createGroup(...[img])    // group with only img
-
-                    counter.group = group
-                    counter.group.counter = counter
-                    counter.initialImg = img
-
-                    this.canvasObj.create_and_fill_ID_ImageHash(img)
-                    counter.imageID = img.id;
-                    img.counter = counter
-
-                    this.canvasObj.canvas.add(group)
-
-                    // ---------- end ------------
-                    
-                })
+                this.setDrawOptions_addLoadedImagesToCanvas_createGroup(imgArr, allCountersArr)
 
                 //----------- create promises to load otherSides of man counters. Only for Rout ---
 
+                let counter
                 let promArr = []
 
-                imgArr.forEach((image,index)=>{
+                imgArr.forEach((image, index) => {
 
                     counter = allCountersArr[index]
 
@@ -324,7 +290,7 @@ class Client {
                         return false
                     }
 
-                    let  p = new Promise((resolve, reject) => {
+                    let p = new Promise((resolve, reject) => {
                         image.setSrc(counter.otherSideSrc, (image) => {
                             resolve(image)
                         })
@@ -346,44 +312,22 @@ class Client {
                     })
                 })
 
-                this._buildMenuInterface(startingPhaseTitle)
-
                 // this.canvasObj.getRondelPicture().animate('angle', '-=90', {
                 //     onChange: this.canvasObj.canvas2.requestRenderAll.bind(this.canvasObj.canvas2),
                 // })
 
                 this.routPhase()
 
+                //------------ end ------------------------------
+
+                this._buildMenuInterface(startingPhaseTitle)
+
             })
-            //.catch(err => alert(err))
+        //.catch(err => alert(err))
 
         this.canvasObj.setZoomListener()
 
     };
-
-    // _createCounters(countersOptions) {
-    //     let name_coordsArray_Hash = countersOptions.name_coordsArray_Hash
-    //     for (let name in name_coordsArray_Hash) {
-
-    //         let arrayOfCoords = name_coordsArray_Hash[name]
-
-    //         arrayOfCoords.forEach((hex) => {
-    //             let ops = countersOptions.squadType_propertiesHash[i]
-
-    //             let centerPoint = this.map._calculateFreeCoords(hex, 48)
-
-    //             ops.options = { top: centerPoint.y, left: centerPoint.x }       // {q:6,r:0,s:-6}
-    //             ops.ownHex = hex
-
-    //             let c = createCounter(ops)
-
-    //             this.fillCounterID_Counter_Hash(c.ID, c)
-    //             this.fillHex_CounterID_setHexOwner(hex, c)
-
-    //         })
-
-    //     }
-    // }
 
     _createCounters(countersOptions) {
         let parametersOnCreationHash = countersOptions.parametersOnCreationHash
@@ -406,9 +350,9 @@ class Client {
 
                 //--------------------------------------------------------------------------
 
-                
+
                 if (counter.getType() != 'MashineGun') {                    // remove it when rout phase is done
-                    
+
                     this.changeCounterStateUnderFire('broken', counter)
                 }
                 if (counter.getType() == 'MashineGun' && counter.normalRange == 16 && counter.owner == 'Ally') {
@@ -1737,7 +1681,7 @@ class Client {
 
                 //---------------------------------------------------------
                 if (counter.owner == this.firstPlayer) {
-                    
+
                     this.firstPlayerBrokenCountersArr.push(counter)
                 }
                 else {
@@ -1883,130 +1827,82 @@ class Client {
     }
 
     //------------------------------------------------------------------------------------------------------------
-    routPhase() {
-
-        //this.createHMGinNormalRangeArray()
-
-        // collect all Broken and MustRout counters
-        //let mustRout = this.collectAllMustRout(this.firstPlayer)
-
-        //console.log(this.collectAllMustRout(this.firstPlayer))
-
-        let mustRoutArr = this.collectAllMustRout(this.firstPlayer)
-
-        console.log(mustRoutArr)
-
-        let self = this
-        mustRoutArr.forEach((counter) => {
-
-            console.log(this.canvasObj.getImageByID(counter.getImageID()))
-            // this.canvasObj.getImageByID(counter.getImageID()).set({
-            //     stroke: 'red',
-            //     strokeWidth: 3
-            // })
-
-            this.changeColorOfBorderImage(this.canvasObj.getImageByID(counter.getImageID()), "red")
-
-        })
 
 
 
-
-    }
 
     // collectAllMustRout(player) {
 
-    //     let brokenArr
-    //     let mustRout = []
+    //     let brokenArr = (player == 'Nazi') ? this.firstPlayerBrokenCountersArr : this.secondPlayerBrokenCountersArr
 
-    //     switch (player) {
-    //         case 'Nazi':
-    //             brokenArr = this.firstPlayerBrokenCountersArr
+    //     return brokenArr.filter((counter) => {
 
-    //             brokenArr.forEach((counter) => {
+    //         let hexType = this.map.getHexType(counter.ownHex)
 
-    //                 let hexType = this.map.getHexType(counter.ownHex)
-    //                 console.log(hexType)
+    //         // if(!this.isHex_KnownEnemyHexes_Hash(counter.ownHex)){
+    //         //     console.log(`counter ${counter.name} hex got no known enemy`)
 
-    //                 if (hexType == 'wooden building' || hexType == 'stone building' || hexType == 'woods') {
+    //         //     return false
+    //         // }
 
-    //                     if (!this.isEnemyNear(counter.ownHex)) {
-    //                         return console.log(`counter ${counter.name} is in safe place and there is no nearest enemy`)
-    //                     }
-    //                 }
+    //         if (hexType == 'wooden building' || hexType == 'stone building' || hexType == 'woods') {
 
-    //                 mustRout.push(counter)
-    //             })
-    //             break;
+    //             if (!this.isEnemyNear(counter.ownHex)) {
+    //                 console.log(`counter ${counter.name} is in safe place and there is no nearest enemy`)
 
-    //         case 'Ally':
-    //             brokenArr = this.secondPlayerBrokenCountersArr
-    //             break;
-    //     }
+    //                 return false
+    //             }
+    //         }
 
-    //     return mustRout
+    //         let knownEnemyArr = this.calcKnownEnemyForCounter(counter)
+
+    //         if (!knownEnemyArr) {
+    //             return false
+    //         }
+
+    //         counter.setKnownEnemy(knownEnemyArr)
+
+    //         // if(this.isInLoSAndNormalRangeOfNotBrokenEnemy(counter))
+
+    //         return true
+    //     })
     // }
 
-    collectAllMustRout(player) {
+    // calcKnownEnemyForCounter(counter) {
 
-        //let mustRout = []
+    //     let possibleEnemyMG = this.calcPossibleKnownEnemyMG(counter, 'HMG')
+    //     let possibleEnemyMC
+    // }
 
-        // switch (player) {
-        //     case 'Nazi':
-        //         brokenArr = this.firstPlayerBrokenCountersArr
-        //     case 'Ally':
-        //         brokenArr = this.secondPlayerBrokenCountersArr
-        //         break;
-        // }
+    // calcPossibleKnownEnemyMG(counter, MGType) {
 
-        let brokenArr = (player == 'Nazi') ? this.firstPlayerBrokenCountersArr : this.secondPlayerBrokenCountersArr
+    //     let hexesWithEnemyMG    // =
+    //     let distance
 
-        // brokenArr.forEach((counter)=>{
+    //     switch (MGType) {
+    //         case 'HMG':
+    //             hexesWithEnemyMG = this.calcHexesWithEnemyHMG(counter.owner)
+    //             distance = 16
+    //             break
+    //         case 'LMG':
+    //             hexesWithEnemyMG = this.calcHexesWithEnemyHMG(counter.owner)
+    //             distance = 8
+    //             break
+    //     }
 
-        //     let hexType = this.map.getHexType(counter.ownHex)
 
-        //     if (hexType == 'wooden building' || hexType == 'stone building' || hexType == 'woods' ) {
-
-        //         if (!this.isEnemyNear(counter.ownHex)) {
-        //             return console.log(`counter ${counter.name} is in safe place and there is no nearest enemy`)
-        //         }
-        //     }
-
-        //     mustRout.push(counter)
-        // })
-
-        return brokenArr.filter((counter) => {
-
-            let hexType = this.map.getHexType(counter.ownHex)
-
-            if (hexType == 'wooden building' || hexType == 'stone building' || hexType == 'woods') {
-
-                if (!this.isEnemyNear(counter.ownHex)) {
-                    console.log(`counter ${counter.name} is in safe place and there is no nearest enemy`)
-
-                    return false
-                }
-            }
-
-            return true
-        })
-
-        //return mustRout
-    }
+    //     hexesWithEnemyMG.filter(() => {
+    //         if (this.map.getHexesBetween(counter.ownHex) > distance) {
+    //             return false
+    //         }
+    //     })
+    // }
 
 
     isEnemyNear(hex) {
 
         let nearestHexesArr = this.map.nearestHexesArr(hex)
         let ownerOfStartHex = this.map.getOwnerOfHex(hex)
-
-        // for (let i in nearestHexesArr) {    
-
-        //     if (this.map.getOwnerOfHex(nearestHexesArr[i]) != undefined && this.map.getOwnerOfHex(nearestHexesArr[i]) != ownerOfStartHex) {
-        //         return true
-        //     }
-        // }
-        // return false
 
         return nearestHexesArr.some((hex) => {
             if (this.map.getOwnerOfHex(hex) != undefined && this.map.getOwnerOfHex(hex) != ownerOfStartHex) {
@@ -2015,6 +1911,258 @@ class Client {
             return false
         })
     }
+
+    getPromisesToLoadImages(countersArr) {
+
+        return countersArr.map((counter) => {
+            return this.canvasObj.creatingPromise(counter.src)
+        })
+    }
+
+    setDrawOptions_addLoadedImagesToCanvas_createGroup(imgArr, allCountersArr) {
+
+        let counter
+        let ops
+        let group
+
+        imgArr.forEach((img, index) => {
+
+            //------- set options for images and add them to canvas as group ---------
+            counter = allCountersArr[index]
+            ops = counter.options
+
+            Object.assign(ops, {
+                originX: 'center',
+                originY: 'center',
+            })
+
+            img.set(ops)
+            group = this.canvasObj.createGroup(...[img])    // group with only img
+
+            counter.group = group
+            counter.group.counter = counter
+            counter.initialImg = img
+
+            this.canvasObj.create_and_fill_ID_ImageHash(img)
+            counter.imageID = img.id;
+            img.counter = counter
+
+            this.canvasObj.canvas.add(group)
+
+            // ---------- end ------------
+
+        })
+    }
+
+    load_And_DrawBackground(mapSrc) {
+
+        let p = this.canvasObj.creatingPromise(mapSrc)
+        p.
+            then((img) => {
+                this.canvasObj.draw(p, { top: 0, left: 0, evented: false, selectable: false, }, () => { this.canvasObj.canvas.sendToBack(img) })//this.canvas.sendToBack(img) 
+            })
+
+        return new Promise(resolve => resolve(1));
+    }
+    //--------------------------------------------------------------------------------------------------------------------
+
+    routPhase() {   // routPhase Preparing  // routPhase(player) -after end for 1st pl case pl1 - 
+
+        // collect all Broken and MustRout counters
+
+        // console.log(this.collectHexesSet(this.firstPlayerBrokenCountersArr))
+        // console.log(this.collectHexesSet(this.secondPlayerHeavyMashineGunsArray,this.secondPlayerLightMashineGunsArray))
+
+        // let brokenCountersHexesSet = this.collectBrokenCountersHexesSet(this.firstPlayerBrokenCountersArr)
+        // let mashineGunsHexesSet = this.collectMashineGunsHexesSet(this.secondPlayerHeavyMashineGunsArray,this.secondPlayerLightMashineGunsArray)
+
+        // console.log(brokenCountersHexesSet)
+        // console.log(mashineGunsHexesSet)
+
+
+        let brokenCountersHexesSet = this.collectHexesSet(this.firstPlayerBrokenCountersArr)
+        let mashineGunsHexesSet = this.collectHexesSet(this.secondPlayerHeavyMashineGunsArray, this.secondPlayerLightMashineGunsArray)
+
+        // console.log(brokenCountersHexesSet)
+        // console.log(mashineGunsHexesSet)
+
+        let hex_KnownEnemyHexesArr_Hash = this.calcHex_KnownEnemyHexesArr_Hash(brokenCountersHexesSet, mashineGunsHexesSet)
+
+        console.log(hex_KnownEnemyHexesArr_Hash)
+        // let mustRoutCountersArr = this.collectMustRoutCountersArr(this.firstPlayerBrokenCountersArr)
+
+        // this.setKnownEnemyHexesForCounters(mustRoutCountersArr, hex_KnownEnemyHexesArr_Hash)
+
+        // // let mustRoutArr = this.collectAllMustRout(this.firstPlayer)
+
+        // mustRoutCountersArr.forEach((counter) => {
+
+        //     this.canvasObj.getImageByID(counter.getImageID()).set({ //changeColorOfBorder
+        //         stroke: 'red',
+        //         strokeWidth: 3
+        //     })
+        // })
+
+        this.canvasObj.canvas.renderAll()
+
+    }
+
+    calcHex_KnownEnemyHexesArr_Hash(brokenHexesSet, MGhexesSet) {
+        
+        brokenHexesSet = Array.from(brokenHexesSet)
+
+        let res = {}
+
+        brokenHexesSet.forEach((hex)=>{
+
+            if(this.isSafeHex(hex)) {
+                return console.log(`hex ${hex} is in safe place and there is no nearest enemy`)
+            }
+
+
+            let allHexesKnownEnemyArr = this.calcKnownEnemyMGHexes(hex, MGhexesSet).concat(this.calcKnownEnemyHexesInMaxPossibleDistance(hex,this.secondPlayer))
+
+            if (allHexesKnownEnemyArr.length == 0) {
+                return console.log(`hex ${hex} got no Known Enemy`)
+            }
+
+            console.log(`hex ${hex} got known enemy : ${allHexesKnownEnemyArr}`)
+
+            res[hex] = allHexesKnownEnemyArr
+        })
+
+        return res
+    }
+
+    isSafeHex(hex){
+
+        let hexType = this.map.getHexType(hex)
+
+        if (hexType == 'wooden building' || hexType == 'stone building' || hexType == 'woods') {    // this.isSafeHex(hex)
+
+            if (!this.isEnemyNear(hex)) {
+                return true
+            }
+        }
+        return false
+    }
+
+    calcKnownEnemyHexesInMaxPossibleDistance(hex,enemy) {
+        if (typeof hex === 'string') {
+            hex = JSON.parse(hex)
+        }
+
+        // ---------- let us take all hexes around us on maximum possible for MMC distance
+        let allHexesInMaxPossibleNormalRangeArr = this.map.calcHexesInRange(hex, 6)
+
+
+
+        // ---------- then search for Enemy presence in those hexes
+        let allHexesWithEnemyInMaxPossibleNormalRangeArr = this.filterHexesForEnemyPresence(allHexesInMaxPossibleNormalRangeArr,enemy)
+
+
+        //----------- is there any Enemy around us on maximum possible distance ?
+        if (allHexesWithEnemyInMaxPossibleNormalRangeArr.length == 0) {
+            console.log(`hex ${JSON.stringify(hex)} got no Enemy in Max Normal Range`)
+            return []
+        }
+
+        // -------- let us take all enemy counters that has normal range on us
+        let countersInItsNormalRangeOfHexArr = this.calcAllCountersInItsNormalRangeOfHex(allHexesWithEnemyInMaxPossibleNormalRangeArr, hex)
+
+        console.log(countersInItsNormalRangeOfHexArr)
+        // -------- then take hexes where they are
+        let countersInItsNormalRangeHexesSet = this.collectHexesSet(countersInItsNormalRangeOfHexArr)
+        
+        // -------- then return those which got LoS
+        return this.filterHexesForLoSOnHex(countersInItsNormalRangeHexesSet, hex)
+
+    }
+
+    calcAllCountersInItsNormalRangeOfHex(hexesArr,hex){
+        console.log(hexesArr,hex)
+
+        hexesArr = hexesArr.filter((enemyHex)=>{
+
+            let countersArr = this.map.getCountersIDinHexArray(enemyHex).map(id => this.getCounterByItsID(id))
+
+            return countersArr.some((counter) =>{
+                return this.map.hex_distance(counter.ownHex, hex) < counter.normalRange
+            })
+
+        })
+
+        return hexesArr
+    }
+
+    filterHexesForEnemyPresence(hexesArr,player) {
+
+        return hexesArr.filter((hex)=>{
+            return this.map.getOwnerOfHex(hex) == player
+        })
+    }
+
+    calcKnownEnemyMGHexes(hex, MGhexesSet) {
+        
+        MGhexesSet = Array.from(MGhexesSet)
+
+        let arr = []
+
+        MGhexesSet.forEach((mgHex)=>{   // wrong what if LMG is in 9 hexes ?
+
+            // if (this.map.hex_distance(hex, mgHex) > 2) {
+            //     return console.log(`hex ${mgHex} is too far away`)
+            // }
+
+            // if (!this.map.isLoS(mgHex, hex)) {
+            //     return console.log(`hex ${mgHex} got no LoS with  ${hex}`)
+            // }
+
+            arr.push(mgHex)
+        })
+        return arr
+    }
+
+
+
+    collectHexesSet(...arr) {
+
+        let a = arr.reduce((res, countersArr) => {
+
+            let a = countersArr.map(counter => JSON.stringify(counter.ownHex))
+            res = res.concat(a)
+            return res
+        }, [])
+
+        return new Set(a)
+    }
+
+        // collectBrokenCountersHexesSet(brokenCountersArr) {
+
+    //     let arr = brokenCountersArr.map(counter => JSON.stringify(counter.ownHex))
+
+    //     return new Set(arr)
+    // }
+
+    // collectMashineGunsHexesSet(HMGArr,LMGArr) {
+    //     let arr1 = HMGArr.map(counter => JSON.stringify(counter.ownHex))
+    //     let arr2 = LMGArr.map(counter => JSON.stringify(counter.ownHex))
+
+    //     let arr = arr1.concat(arr2)
+
+    //     return new Set(arr)
+    // }
+
+    // collectHexesSet(...arr){
+    //     let res = []
+    //     arr.forEach((countersArr)=>{
+    //         let a = countersArr.map(counter => JSON.stringify(counter.ownHex))
+    //         res = res.concat(a)
+
+    //     })
+    //     return new Set(res)
+    // }
+
 
 }
 

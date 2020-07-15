@@ -14,7 +14,7 @@ let hexFunctions = {
         return { orientation: orientation, size: size, origin: origin };
     },
     Hex(q, r, s) {
-        if (Math.round(q + r + s) !== 0) throw "q + r + s must be 0";
+        if (Math.round(q + r + s) != 0) throw "q + r + s must be 0";
         return { q: q, r: r, s: s };
     },
     polygon_corners(layout, h) {
@@ -73,7 +73,7 @@ let hexFunctions = {
             else {
                 si = -qi - ri;
             }
-        
+
 
         return this.Hex(qi, ri, si);
     },
@@ -92,6 +92,12 @@ let hexFunctions = {
 
     hex_distance(a, b) {
 
+        if (typeof a === 'string') {
+            a = JSON.parse(a)
+        }
+        if (typeof b === 'string') {
+            b = JSON.parse(b)
+        }
         return this.hex_length(this.hex_subtract(a, b));
     },
 
@@ -105,7 +111,23 @@ let hexFunctions = {
     hex_lerp(a, b, t) {
 
         return this.Hex(a.q * (1.0 - t) + b.q * t, a.r * (1.0 - t) + b.r * t, a.s * (1.0 - t) + b.s * t);
-    }
+    },
+
+    hex_add(a, b) {
+        return this.Hex(a.q + b.q, a.r + b.r, a.s + b.s);
+    },
+
+    hex_scale(a, k) {
+        return this.Hex(a.q * k, a.r * k, a.s * k);
+    },
+    hex_neighbor(hex, direction) {
+        return this.hex_add(hex, this.hex_direction(direction));
+    },
+
+    hex_direction(direction) {
+        let hex_directions = [this.Hex(1, 0, -1), this.Hex(1, -1, 0), this.Hex(0, -1, 1), this.Hex(-1, 0, 1), this.Hex(-1, 1, 0), this.Hex(0, 1, -1)];
+        return hex_directions[direction];
+    },
 
 }
 

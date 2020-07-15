@@ -10,6 +10,8 @@ class Map {
         this.hex_ownerHash = {}
         this.hex_lastCounterCoordinates = {}
 
+        this.hex_KnownEnemyHexesHash = {}
+
         this.hex_hexTypeHash = {
             '{"q":8,"r":5,"s":-13}': 'road',
             '{"q":9,"r":4,"s":-13}': 'road',
@@ -40,7 +42,7 @@ class Map {
             '{"q":24,"r":-10,"s":-14}': 'road',
             '{"q":24,"r":-11,"s":-13}': 'road',
             '{"q":24,"r":-12,"s":-12}': 'road',
-            '{"q":12,"r":0,"s":-12}': 'wooden building',
+            '{"q":12,"r":0,"s":-12}': 'road',//'wooden building',
         }
 
         this.hex_hexType_segmentsObjHash = {
@@ -86,8 +88,10 @@ class Map {
 
     getOwnerOfHex(hex) {
 
-        let h = JSON.stringify(hex)
-        return this.hex_ownerHash[h]
+        if (typeof hex != 'string') {
+            hex = JSON.stringify(hex)
+        }
+        return this.hex_ownerHash[hex]
 
     }
 
@@ -97,8 +101,11 @@ class Map {
     }
 
     getHexType(hex) {
-        let h = JSON.stringify(hex)
-        return this.hex_hexTypeHash[h] || 'plain'
+        if (typeof hex != 'string') {
+            hex = JSON.stringify(hex)
+        }
+        
+        return this.hex_hexTypeHash[hex] || 'plain'
     }
 
     _checkIfHexIsOccupied(hex) {
@@ -171,6 +178,14 @@ class Map {
 
     getHexesBetween(hexClicked, hexFired) {
 
+
+        if (typeof hexClicked == 'string') {
+            hexClicked = JSON.parse(hexClicked)
+        }
+        if (typeof hexFired == 'string') {
+            hexFired = JSON.parse(hexFired)
+        }
+        
         return this.hex_linedraw(hexFired, hexClicked);
     }
 
@@ -231,7 +246,11 @@ class Map {
 
         let segmentA = [pointA, pointB]
 
-        callbackToDrawLines(segmentA)
+        if (callbackToDrawLines){
+            callbackToDrawLines(segmentA)
+        }
+
+        
 
         let arrayOfHexesInLoS = this.getHexesBetween(hex, targetHex)
 
@@ -360,46 +379,13 @@ class Map {
 
         return { 'bool': false, 'obstaclePoint': null }
     }
-//--------------------------------------------------------------------------------------------------------------------------------------------
-
-    // listOfNearestHexes(startingHexCoord, radius) {
-    //     var results = [];
-    //     var hex = hex_add(startingHexCoord, hex_scale(hex_direction(4), radius));              // optimize it  - radius is always == 1
-    //     for (var i = 0; i < 6; i++) {
-    //         for (var j = 0; j < radius; j++) {
-    //             results.push(hex);
-    //             hex = hex_neighbor(hex, i)
-    //         }
-    //     }
-    //     return results
-    // };
-
-    // hex_neighbor(hex, direction) {
-    //     return hex_add(hex, hex_direction(direction));
-    // }
 
 
-
-    // hex_scale(a, k) {
-    //     return Hex(a.q * k, a.r * k, a.s * k);
-    // };
-    
-    // hex_direction(direction) {
-    //     return hex_directions[direction];
-    // }
-
-    // Hex(q, r, s) {
-    //     return { q: q, r: r, s: s };
-    // }
-
-    // hex_directions = [Hex(1, 0, -1), Hex(1, -1, 0), Hex(0, -1, 1), Hex(-1, 0, 1), Hex(-1, 1, 0), Hex(0, 1, -1)];
-
-    //---------------------------------------------------------------------------------------------------------------------------------------------
-
-    hex_add(a, b) {
-        return this.Hex(a.q + b.q, a.r + b.r, a.s + b.s);
-    }
     nearestHexesArr(hex) {
+
+        if (typeof hex === 'string') {
+            hex = JSON.parse(hex)
+        }
 
         let hex_directions = [this.Hex(1, 0, -1), this.Hex(1, -1, 0), this.Hex(0, -1, 1), this.Hex(-1, 0, 1), this.Hex(-1, 1, 0), this.Hex(0, 1, -1)];
         let h
@@ -413,6 +399,51 @@ class Map {
 
         return results
     }
+
+
+
+    hexesInRing(startingHexCoord, radius) {
+        var results = [];
+        var hex = this.hex_add(startingHexCoord, this.hex_scale(this.Hex(-1, 0, 1), radius));              // optimize it  - radius is always == 1
+        for (var i = 0; i < 6; i++) {
+            for (var j = 0; j < radius; j++) {
+                results.push(hex);
+                hex = this.hex_neighbor(hex, i)
+            }
+        }
+        return results
+    }
+
+
+    hexOnDistance(startHex,dist){
+        return this.hex_add(startHex, this.hex_scale(this.Hex(0, 1, -1), dist))
+    }
+
+
+    calcHexesOnRadius(startingHexCoord, radius) {
+        let arr = []
+        for (var j = 1; j <= radius; j++) {
+            let  h = this.hexOnDistance(startingHexCoord, j)
+            arr.push(h)
+        }
+        return arr
+    }
+
+
+    calcHexesInRange(startingHexCoord, radius) {
+        let res = []
+        let arr = this.calcHexesOnRadius(startingHexCoord, radius)
+        radius = 1
+        arr.forEach((hex)=>{
+            res = res.concat(this.hexesInRing(hex, radius))
+            radius +=1
+            
+        })
+
+        return res
+    }
+
+
 }
 
 Object.assign(Map.prototype, hexFunctions)

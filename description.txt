@@ -1019,5 +1019,71 @@ this.routPhase() - куда ?
                 // })
 
                 почему не ловит ошибку и ничего не выдает ?
-                reject(new Error("Ошибка!"))
+                reject(new Error("Ошибка!")
+
+------------------------------------------------------------------------------------------------------------
+
+
+calcPossibleKnownEnemyMG
+
+
+hex : [hex,hex]
+
+создаем Set гексов сломанных каунтеров
+Set гексов с тяжелыми пулеметами плюс Set c легкими = 
+
+
+
+
+проверяем Set гексов сломанных каунтеров на 
+    1) Дом, лес + нет Врагов рядом
+        true - вписываем в NoKnownEnemyHexesArr
+        return
+    2) Проходим по  Set c пулеметн. гексами 
+        находим дотянувшийся - проверяем на ЛоС
+            да - вписываем в hex : [hex,hex] 
+    3) Проходим по Массиву со всеми гексами в радиусе Нормал от стартового
+        находим тот , что оккупирован Врагом - проверяем на ЛоС
+            да - вписываем в hex : [hex,hex]
+    4) попал ли гекс в hex : [hex,hex] ?
+            нет - вписываем в NoKnownEnemyHexesArr
+        return
+
+проходим по каунтерам . 
+    свой гекс в hex : [hex,hex] ?
+        да - пишем counter.knownEnemy , добавляем в mustRoutCountersArr
+
+
+
+------------------------------------------------------------------------------------------------------------
+
+Похоже нам не нужно свойсвто Каунтера .knownEnemy , поскольку есть hex_KnownEnemyHexesArr_Hash ?
+Нет вроде надо , иначе после каждог движения нам надо пересчитывать hex_KnownEnemyHexesArr_Hash
+или просто делать это
+
+получаем  knownEnemyManCountersArr пока проходим по Брокенам . Писать сразу ? Не обязательно можем вписать из hex_KnownEnemyHexesArr_Hash
+
+Каунтер двигаясь в новый гекс проверяет удаленность от КноунЭнеми , которых берет из hex_KnownEnemyHexesArr_Hash
+в новом гексе каунтер просчитывает КноунЭнеми для нового гекса используя calcHex_KnownEnemyHexesArr_Hash() для одного гекса
+
+            if (allHexesWithEnemyInMaxPossibleNormalRangeArr){
+                countersInItsNormalRangeOfHexArr = this.calcAllCountersInItsNormalRangeOfHex(allHexesWithEnemyInMaxPossibleNormalRangeArr,hex)
+                countersInItsNormalRangeHexesSet = this.collectHexesSet(countersInItsNormalRangeOfHexArr)
+                knownEnemyManCountersHexesArr = this.filterHexesForLoSOnHex(countersInItsNormalRangeHexesSet,hex)
+                knownEnemyManCountersHexesSet = this.collectHexesSet(knownEnemyManCountersArr)
+
+        Прокомментим
+
+
+Спросить на форуме что если он ушел из Лос Одного врага и вошел в Лос Другого ? Остается ли первй КЕ ?
+
+
+
+
+------------------------------ 16 07 2020 --------------------------------------------------------
+
+Продолжаем делать Rout Phase 
+Добавил сбор гексов в радиусе N 
+
+calcAllCountersInItsNormalRangeOfHex проверить верность
 
