@@ -35,7 +35,7 @@ let initialSettings = {
                 owner: 'Ally',
                 movementFactor: 4,
                 type: 'MultiManCounter',
-                normalRange:6,
+                normalRange:10,
                 firePower:2,
                 experience:'E',
                 morale : 8,
@@ -176,7 +176,7 @@ let initialSettings = {
             'ruSMC8-1': [{ q: 6, r: 0, s: -6 }],
             'ruSMC7-0': [{ q: 6, r: 0, s: -6 }],
 
-            'ruLMG':[{q: 16, r: -6, s: -10}],
+            'ruLMG':[{q: 16, r: -6, s: -10},{ q: 17, r: -5, s: -12}],
             'ruMMG':[{ q: 17, r: -5, s: -12}],
 
         },

@@ -1979,14 +1979,21 @@ class Client {
         // console.log(brokenCountersHexesSet)
         // console.log(mashineGunsHexesSet)
 
+        console.log(this.firstPlayerBrokenCountersArr)
+        console.log('-------------------------------------')
 
-        let brokenCountersHexesSet = this.collectHexesSet(this.firstPlayerBrokenCountersArr)
-        let mashineGunsHexesSet = this.collectHexesSet(this.secondPlayerHeavyMashineGunsArray, this.secondPlayerLightMashineGunsArray)
+        // let brokenCountersHexesSet = this.collectUniqueHexesArr(this.firstPlayerBrokenCountersArr)
+        // let mashineGunsHexesSet = this.collectUniqueHexesArr(this.secondPlayerHeavyMashineGunsArray, this.secondPlayerLightMashineGunsArray)
 
-        // console.log(brokenCountersHexesSet)
-        // console.log(mashineGunsHexesSet)
+        let brokenCountersUniqueHexesArr = this.collectUniqueElemsArray(this.firstPlayerBrokenCountersArr.map(counter => counter.ownHex))
+        let HMGuniqueHexesArr = this.collectUniqueElemsArray(this.secondPlayerHeavyMashineGunsArray.map(counter => counter.ownHex))
+        let LMGuniqueHexesArr = this.collectUniqueElemsArray(this.secondPlayerLightMashineGunsArray.map(counter => counter.ownHex))
+        //let MGUniqueHexesArr = this.collectUniqueElemsArray(HMGuniqueHexesArr.concat(LMGuniqueHexesArr))
 
-        let hex_KnownEnemyHexesArr_Hash = this.calcHex_KnownEnemyHexesArr_Hash(brokenCountersHexesSet, mashineGunsHexesSet)
+        console.log(brokenCountersUniqueHexesArr)
+        console.log(HMGuniqueHexesArr, LMGuniqueHexesArr)
+
+        let hex_KnownEnemyHexesArr_Hash = this.calcHex_KnownEnemyHexesArr_Hash(brokenCountersUniqueHexesArr, HMGuniqueHexesArr, LMGuniqueHexesArr)
 
         console.log(hex_KnownEnemyHexesArr_Hash)
         // let mustRoutCountersArr = this.collectMustRoutCountersArr(this.firstPlayerBrokenCountersArr)
@@ -2007,34 +2014,46 @@ class Client {
 
     }
 
-    calcHex_KnownEnemyHexesArr_Hash(brokenHexesSet, MGhexesSet) {
-        
-        brokenHexesSet = Array.from(brokenHexesSet)
+    calcHex_KnownEnemyHexesArr_Hash(brokenHexesArr, HMGuniqueHexesArr, LMGuniqueHexesArr) {
 
+        //brokenHexesSet = Array.from(brokenHexesSet)
+
+        //console.log(brokenHexesArr)
         let res = {}
 
-        brokenHexesSet.forEach((hex)=>{
+        brokenHexesArr.forEach((hex) => { // reduce
 
-            if(this.isSafeHex(hex)) {
+            if (this.isSafeHex(hex)) {
                 return console.log(`hex ${hex} is in safe place and there is no nearest enemy`)
             }
 
+            //----------------------------------------------------------------------------------------------
 
-            let allHexesKnownEnemyArr = this.calcKnownEnemyMGHexes(hex, MGhexesSet).concat(this.calcKnownEnemyHexesInMaxPossibleDistance(hex,this.secondPlayer))
+            // let knownEnemyWeaponHexesArr = this.calcKnownEnemyMGHexes(hex, LMGuniqueHexesArr, 6).concat(this.calcKnownEnemyMGHexes(hex, HMGuniqueHexesArr, 16))
 
-            if (allHexesKnownEnemyArr.length == 0) {
+            // let allHexesKnownEnemyArr = knownEnemyWeaponHexesArr.concat(this.calcKnownEnemyHexesInMaxPossibleDistance(hex, this.secondPlayer))
+
+            let uniqueHexesKnownEnemyArr = this.calcAllUniqueKEHexesArr(hex,this.secondPlayer,HMGuniqueHexesArr,LMGuniqueHexesArr,) //= this.collectUniqueElemsArray(allHexesKnownEnemyArr) // 
+
+            //----------------------------------------------------------------------------------------------
+
+            if (uniqueHexesKnownEnemyArr.length == 0) {
                 return console.log(`hex ${hex} got no Known Enemy`)
             }
 
-            console.log(`hex ${hex} got known enemy : ${allHexesKnownEnemyArr}`)
+            console.log(`hex ${JSON.stringify(hex)} got known enemy : ${JSON.stringify(allUniqueHexesKnownEnemyArr)}`)
 
-            res[hex] = allHexesKnownEnemyArr
+            res[JSON.stringify(hex)] = uniqueHexesKnownEnemyArr
         })
 
         return res
     }
 
-    isSafeHex(hex){
+    // calcAllKnownEnemyArr(hex, MGhexesSet,){
+
+    // }
+
+    isSafeHex(hex) {
 
         let hexType = this.map.getHexType(hex)
 
@@ -2047,18 +2066,18 @@ class Client {
         return false
     }
 
-    calcKnownEnemyHexesInMaxPossibleDistance(hex,enemy) {
-        if (typeof hex === 'string') {
-            hex = JSON.parse(hex)
-        }
+    calcKnownEnemyHexesInMaxPossibleDistance(hex, enemy) {
+        // if (typeof hex === 'string') {
+        //     hex = JSON.parse(hex)
+        // }
 
         // ---------- let us take all hexes around us on maximum possible for MMC distance
-        let allHexesInMaxPossibleNormalRangeArr = this.map.calcHexesInRange(hex, 6)
+        let allHexesInMaxPossibleNormalRangeArr = this.map.calcHexesInRange(hex, 7)    //JSON.parse(hex)
 
 
 
         // ---------- then search for Enemy presence in those hexes
-        let allHexesWithEnemyInMaxPossibleNormalRangeArr = this.filterHexesForEnemyPresence(allHexesInMaxPossibleNormalRangeArr,enemy)
+        let allHexesWithEnemyInMaxPossibleNormalRangeArr = this.filterHexesForEnemyPresence(allHexesInMaxPossibleNormalRangeArr, enemy)
 
 
         //----------- is there any Enemy around us on maximum possible distance ?
@@ -2067,26 +2086,29 @@ class Client {
             return []
         }
 
-        // -------- let us take all enemy counters that has normal range on us
-        let countersInItsNormalRangeOfHexArr = this.calcAllCountersInItsNormalRangeOfHex(allHexesWithEnemyInMaxPossibleNormalRangeArr, hex)
+        // -------- let us take all hexes where enemy counters that has normal range on us
+        let hexesWithCountersInItsNormalRangeOfHexArr = this.calcAllHexesWithCountersInItsNormalRangeOfHex(allHexesWithEnemyInMaxPossibleNormalRangeArr, hex)
 
-        console.log(countersInItsNormalRangeOfHexArr)
-        // -------- then take hexes where they are
-        let countersInItsNormalRangeHexesSet = this.collectHexesSet(countersInItsNormalRangeOfHexArr)
-        
+
         // -------- then return those which got LoS
-        return this.filterHexesForLoSOnHex(countersInItsNormalRangeHexesSet, hex)
+        return this.filterHexesForLoSOnHex(hexesWithCountersInItsNormalRangeOfHexArr, hex)
 
     }
 
-    calcAllCountersInItsNormalRangeOfHex(hexesArr,hex){
-        console.log(hexesArr,hex)
+    filterHexesForLoSOnHex(hexesArr, targetHex) {
 
-        hexesArr = hexesArr.filter((enemyHex)=>{
+        return hexesArr.filter(hex => this.map.isLoS(hex, targetHex))
+
+    }
+
+    calcAllHexesWithCountersInItsNormalRangeOfHex(hexesArr, hex) {
+
+        hexesArr = hexesArr.filter((enemyHex) => {
 
             let countersArr = this.map.getCountersIDinHexArray(enemyHex).map(id => this.getCounterByItsID(id))
 
-            return countersArr.some((counter) =>{
+            return countersArr.some((counter) => {
+
                 return this.map.hex_distance(counter.ownHex, hex) < counter.normalRange
             })
 
@@ -2095,73 +2117,67 @@ class Client {
         return hexesArr
     }
 
-    filterHexesForEnemyPresence(hexesArr,player) {
+    filterHexesForEnemyPresence(hexesArr, player) {
 
-        return hexesArr.filter((hex)=>{
+        return hexesArr.filter((hex) => {
             return this.map.getOwnerOfHex(hex) == player
         })
     }
 
-    calcKnownEnemyMGHexes(hex, MGhexesSet) {
-        
-        MGhexesSet = Array.from(MGhexesSet)
+    calcKnownEnemyMGHexes(hex, weaponsArr, distance) {
 
         let arr = []
 
-        MGhexesSet.forEach((mgHex)=>{   // wrong what if LMG is in 9 hexes ?
+        weaponsArr.forEach((mgHex) => {
 
-            // if (this.map.hex_distance(hex, mgHex) > 2) {
+            // if (this.map.hex_distance(hex, mgHex) > distance) {
             //     return console.log(`hex ${mgHex} is too far away`)
             // }
 
             // if (!this.map.isLoS(mgHex, hex)) {
             //     return console.log(`hex ${mgHex} got no LoS with  ${hex}`)
             // }
-
             arr.push(mgHex)
         })
-        return arr
+
+        //console.log(this.collectUniqueElemsArray(arr))
+        //return this.collectUniqueElemsArray(arr)
+        return (arr)
     }
 
 
 
-    collectHexesSet(...arr) {
+    // collectUniqueHexesArr(...arr) {
 
-        let a = arr.reduce((res, countersArr) => {
-
-            let a = countersArr.map(counter => JSON.stringify(counter.ownHex))
-            res = res.concat(a)
-            return res
-        }, [])
-
-        return new Set(a)
-    }
-
-        // collectBrokenCountersHexesSet(brokenCountersArr) {
-
-    //     let arr = brokenCountersArr.map(counter => JSON.stringify(counter.ownHex))
-
-    //     return new Set(arr)
-    // }
-
-    // collectMashineGunsHexesSet(HMGArr,LMGArr) {
-    //     let arr1 = HMGArr.map(counter => JSON.stringify(counter.ownHex))
-    //     let arr2 = LMGArr.map(counter => JSON.stringify(counter.ownHex))
-
-    //     let arr = arr1.concat(arr2)
-
-    //     return new Set(arr)
-    // }
-
-    // collectHexesSet(...arr){
-    //     let res = []
-    //     arr.forEach((countersArr)=>{
-    //         let a = countersArr.map(counter => JSON.stringify(counter.ownHex))
+    //     console.log(arr)
+    //     let a = arr.reduce((res, countersArr) => {
+    //         console.log(countersArr)
+    //         let a = countersArr.map(counter => counter.ownHex)    //JSON.stringify(counter.ownHex)
     //         res = res.concat(a)
+    //         return res
+    //     }, [])
 
-    //     })
-    //     return new Set(res)
+    //     // console.log(a)
+    //     // console.log(a.map(JSON.stringify))
+    //     // console.log(new Set(a.map(JSON.stringify)))
+    //     // console.log(Array.from(new Set(a.map(JSON.stringify))).map(JSON.parse))
+
+    //     return this.collectUniqueElemsArray(a)
     // }
+
+    collectUniqueElemsArray(array) {
+        return Array.from(new Set(array.map(JSON.stringify))).map(JSON.parse)
+    }
+
+    calcAllUniqueKEHexesArr(hex,enemy,HMGuniqueHexesArr,LMGuniqueHexesArr) {
+
+        let knownEnemyWeaponHexesArr = this.calcKnownEnemyMGHexes(hex, LMGuniqueHexesArr, 6).concat(this.calcKnownEnemyMGHexes(hex, HMGuniqueHexesArr, 16))
+
+        let allHexesKnownEnemyArr = knownEnemyWeaponHexesArr.concat(this.calcKnownEnemyHexesInMaxPossibleDistance(hex,enemy))
+
+        return this.collectUniqueElemsArray(allHexesKnownEnemyArr)
+    }
+
 
 
 }

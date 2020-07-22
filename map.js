@@ -235,8 +235,13 @@ class Map {
     }
     isLoS(hex, targetHex, callbackToDrawLines) {
 
+        if (typeof hex == 'string') {
+            hex = JSON.parse(hex)
+        }
+        if (typeof targetHex == 'string') {
+            targetHex = JSON.parse(targetHex)
+        }
 
-        hex = JSON.parse(hex)
         let result = true
         let pointA = this.getCenterCoordsObjFromHex(hex)
         let pointB = this.getCenterCoordsObjFromHex(targetHex)
@@ -248,7 +253,12 @@ class Map {
 
         if (callbackToDrawLines){
             callbackToDrawLines(segmentA)
+        }else {
+            callbackToDrawLines = () => {
+                console.log('can not draw line')
+            }
         }
+        
 
         
 
