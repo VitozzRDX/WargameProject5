@@ -255,7 +255,7 @@ class Map {
             callbackToDrawLines(segmentA)
         }else {
             callbackToDrawLines = () => {
-                console.log('can not draw line')
+                //console.log('can not draw line')
             }
         }
         
@@ -279,7 +279,7 @@ class Map {
             })
 
             if (result) {
-                console.log('line crossing !')
+                //console.log('line crossing !')
                 return false
             }
 
@@ -451,6 +451,12 @@ class Map {
         })
 
         return res
+    }
+
+    filterHexesForLoSOnHex(hexesArr, targetHex) {
+
+        return hexesArr.filter(hex => this.isLoS(hex, targetHex))
+
     }
 
 

@@ -5,6 +5,7 @@ import { Game } from './game.js'
 import { Map } from './map.js'
 
 import { methods } from './clientMethods_ReactionOnCanvas.js'
+import { rout } from './routPhase.js'
 // import { Counter, MultiManCounters, SingleManCounters, Weapon } from './counters.js'
 //------------------------ 20 03 2020 ----------------------------------------------------------------
 import { createStack } from './stackFactory.js'
@@ -12,6 +13,7 @@ import { createStack } from './stackFactory.js'
 import { createCounter } from './countersFinal.js'
 
 import { buttonsCallbacks } from './buttonsCallbacks.js'
+
 
 
 class Client {
@@ -62,14 +64,6 @@ class Client {
         this.game = new Game()
         this.map = new Map()
 
-        // this.counterTable = {
-        //     'Counter': Counter,
-        //     'MultiManCounters': MultiManCounters,
-        //     'SingleManCounters': SingleManCounters,
-        //     'Weapon': Weapon
-
-        // }
-
         this.currentCounterInterface = undefined
 
         this.selectedCounter = undefined
@@ -89,6 +83,9 @@ class Client {
 
         this.firstPlayerBrokenCountersArr = []
         this.secondPlayerBrokenCountersArr = []
+
+        this.hex_KnownEnemyHexesArr_Hash = undefined
+        this.mustRoutArr = undefined
     }
 
     setInterfaceScheme() {
@@ -255,19 +252,11 @@ class Client {
 
         this.game.setGamePhase(options.startingPhase)
 
-        //----------------------- added 21 02 2020
-        //this.canvasObj.preloadAndDrawBackground(options.mapSrc,{top:0,left:0})
 
         // -------- Loading Creating and Drawing Background and Counters
 
         //this.canvasObj.loadSVGFromURL(options.mapSrc)
 
-        // let p = this.canvasObj.creatingPromise(options.mapSrc)    // options.mapSrc // this.load_And_DrawBackground(options.mapSrc)
-        // p.
-        //     then((img) => {
-        //         this.canvasObj.draw(p, { top: 0, left: 0, evented: false, selectable: false, }, () => { this.canvasObj.canvas.sendToBack(img) })//this.canvas.sendToBack(img) 
-
-        //     })
         this.load_And_DrawBackground(options.mapSrc).
             then(() => {
 
@@ -316,11 +305,13 @@ class Client {
                 //     onChange: this.canvasObj.canvas2.requestRenderAll.bind(this.canvasObj.canvas2),
                 // })
 
-                this.routPhase()
+                //this.routPhasePreparing()
 
                 //------------ end ------------------------------
 
                 this._buildMenuInterface(startingPhaseTitle)
+
+                this.canvasObj.canvas.renderAll()
 
             })
         //.catch(err => alert(err))
@@ -398,7 +389,6 @@ class Client {
         this.canvasObj.draw(prom, ops, cb)
     }
 
-    // ---------------- added 19 02 2020 ------------------
     switchPlayers() {
         let temp;
         temp = this.firstPlayer;
@@ -619,8 +609,6 @@ class Client {
         })
         this.canvasObj.canvas.renderAll()
     }
-    // -------------- Refactor 17 03 2020 ------------------------------------------------
-
 
     _checkForMovingStatus(status, counter) {
         if (counter.getMovingState) {
@@ -965,8 +953,6 @@ class Client {
         //return Math.floor(Math.random() * 6) + 1;
         return 6
     }
-
-
 
     calculate_And_SetFiringStatus(diceRoll, phase, stack) {
 
@@ -1471,9 +1457,6 @@ class Client {
 
     animateChangingCounterState(status, counter, dr) {
 
-        // console.log(counter)
-        // console.log(counter.initialImg)
-        //let cb
         let self = this
         switch (status) {
             case 'desperate':
@@ -1500,6 +1483,14 @@ class Client {
                     self.changeColorOfBorder(counter, null)
                 })
                 break;
+
+            case 'KIA' :
+
+                console.log('KIA')
+
+                this.canvasObj.canvas.remove(counter.group)
+                this.canvasObj.canvas.remove(counter.initialImg)
+                break
             //console.log(dr)
 
             // cb = () => {
@@ -1614,10 +1605,6 @@ class Client {
                 break
         }
     }
-
-
-
-
 
     changeCounterStateUnderFire(status, counter) {  // + add to this.firstPlayerBrokenCountersArr if broken
 
@@ -1826,92 +1813,6 @@ class Client {
 
     }
 
-    //------------------------------------------------------------------------------------------------------------
-
-
-
-
-    // collectAllMustRout(player) {
-
-    //     let brokenArr = (player == 'Nazi') ? this.firstPlayerBrokenCountersArr : this.secondPlayerBrokenCountersArr
-
-    //     return brokenArr.filter((counter) => {
-
-    //         let hexType = this.map.getHexType(counter.ownHex)
-
-    //         // if(!this.isHex_KnownEnemyHexes_Hash(counter.ownHex)){
-    //         //     console.log(`counter ${counter.name} hex got no known enemy`)
-
-    //         //     return false
-    //         // }
-
-    //         if (hexType == 'wooden building' || hexType == 'stone building' || hexType == 'woods') {
-
-    //             if (!this.isEnemyNear(counter.ownHex)) {
-    //                 console.log(`counter ${counter.name} is in safe place and there is no nearest enemy`)
-
-    //                 return false
-    //             }
-    //         }
-
-    //         let knownEnemyArr = this.calcKnownEnemyForCounter(counter)
-
-    //         if (!knownEnemyArr) {
-    //             return false
-    //         }
-
-    //         counter.setKnownEnemy(knownEnemyArr)
-
-    //         // if(this.isInLoSAndNormalRangeOfNotBrokenEnemy(counter))
-
-    //         return true
-    //     })
-    // }
-
-    // calcKnownEnemyForCounter(counter) {
-
-    //     let possibleEnemyMG = this.calcPossibleKnownEnemyMG(counter, 'HMG')
-    //     let possibleEnemyMC
-    // }
-
-    // calcPossibleKnownEnemyMG(counter, MGType) {
-
-    //     let hexesWithEnemyMG    // =
-    //     let distance
-
-    //     switch (MGType) {
-    //         case 'HMG':
-    //             hexesWithEnemyMG = this.calcHexesWithEnemyHMG(counter.owner)
-    //             distance = 16
-    //             break
-    //         case 'LMG':
-    //             hexesWithEnemyMG = this.calcHexesWithEnemyHMG(counter.owner)
-    //             distance = 8
-    //             break
-    //     }
-
-
-    //     hexesWithEnemyMG.filter(() => {
-    //         if (this.map.getHexesBetween(counter.ownHex) > distance) {
-    //             return false
-    //         }
-    //     })
-    // }
-
-
-    isEnemyNear(hex) {
-
-        let nearestHexesArr = this.map.nearestHexesArr(hex)
-        let ownerOfStartHex = this.map.getOwnerOfHex(hex)
-
-        return nearestHexesArr.some((hex) => {
-            if (this.map.getOwnerOfHex(hex) != undefined && this.map.getOwnerOfHex(hex) != ownerOfStartHex) {
-                return true
-            }
-            return false
-        })
-    }
-
     getPromisesToLoadImages(countersArr) {
 
         return countersArr.map((counter) => {
@@ -1964,94 +1865,8 @@ class Client {
 
         return new Promise(resolve => resolve(1));
     }
+
     //--------------------------------------------------------------------------------------------------------------------
-
-    routPhase() {   // routPhase Preparing  // routPhase(player) -after end for 1st pl case pl1 - 
-
-        // collect all Broken and MustRout counters
-
-        // console.log(this.collectHexesSet(this.firstPlayerBrokenCountersArr))
-        // console.log(this.collectHexesSet(this.secondPlayerHeavyMashineGunsArray,this.secondPlayerLightMashineGunsArray))
-
-        // let brokenCountersHexesSet = this.collectBrokenCountersHexesSet(this.firstPlayerBrokenCountersArr)
-        // let mashineGunsHexesSet = this.collectMashineGunsHexesSet(this.secondPlayerHeavyMashineGunsArray,this.secondPlayerLightMashineGunsArray)
-
-        // console.log(brokenCountersHexesSet)
-        // console.log(mashineGunsHexesSet)
-
-        console.log(this.firstPlayerBrokenCountersArr)
-        console.log('-------------------------------------')
-
-        // let brokenCountersHexesSet = this.collectUniqueHexesArr(this.firstPlayerBrokenCountersArr)
-        // let mashineGunsHexesSet = this.collectUniqueHexesArr(this.secondPlayerHeavyMashineGunsArray, this.secondPlayerLightMashineGunsArray)
-
-        let brokenCountersUniqueHexesArr = this.collectUniqueElemsArray(this.firstPlayerBrokenCountersArr.map(counter => counter.ownHex))
-        let HMGuniqueHexesArr = this.collectUniqueElemsArray(this.secondPlayerHeavyMashineGunsArray.map(counter => counter.ownHex))
-        let LMGuniqueHexesArr = this.collectUniqueElemsArray(this.secondPlayerLightMashineGunsArray.map(counter => counter.ownHex))
-        //let MGUniqueHexesArr = this.collectUniqueElemsArray(HMGuniqueHexesArr.concat(LMGuniqueHexesArr))
-
-        console.log(brokenCountersUniqueHexesArr)
-        console.log(HMGuniqueHexesArr, LMGuniqueHexesArr)
-
-        let hex_KnownEnemyHexesArr_Hash = this.calcHex_KnownEnemyHexesArr_Hash(brokenCountersUniqueHexesArr, HMGuniqueHexesArr, LMGuniqueHexesArr)
-
-        console.log(hex_KnownEnemyHexesArr_Hash)
-        // let mustRoutCountersArr = this.collectMustRoutCountersArr(this.firstPlayerBrokenCountersArr)
-
-        // this.setKnownEnemyHexesForCounters(mustRoutCountersArr, hex_KnownEnemyHexesArr_Hash)
-
-        // // let mustRoutArr = this.collectAllMustRout(this.firstPlayer)
-
-        // mustRoutCountersArr.forEach((counter) => {
-
-        //     this.canvasObj.getImageByID(counter.getImageID()).set({ //changeColorOfBorder
-        //         stroke: 'red',
-        //         strokeWidth: 3
-        //     })
-        // })
-
-        this.canvasObj.canvas.renderAll()
-
-    }
-
-    calcHex_KnownEnemyHexesArr_Hash(brokenHexesArr, HMGuniqueHexesArr, LMGuniqueHexesArr) {
-
-        //brokenHexesSet = Array.from(brokenHexesSet)
-
-        //console.log(brokenHexesArr)
-        let res = {}
-
-        brokenHexesArr.forEach((hex) => { // reduce
-
-            if (this.isSafeHex(hex)) {
-                return console.log(`hex ${hex} is in safe place and there is no nearest enemy`)
-            }
-
-            //----------------------------------------------------------------------------------------------
-
-            // let knownEnemyWeaponHexesArr = this.calcKnownEnemyMGHexes(hex, LMGuniqueHexesArr, 6).concat(this.calcKnownEnemyMGHexes(hex, HMGuniqueHexesArr, 16))
-
-            // let allHexesKnownEnemyArr = knownEnemyWeaponHexesArr.concat(this.calcKnownEnemyHexesInMaxPossibleDistance(hex, this.secondPlayer))
-
-            let uniqueHexesKnownEnemyArr = this.calcAllUniqueKEHexesArr(hex,this.secondPlayer,HMGuniqueHexesArr,LMGuniqueHexesArr,) //= this.collectUniqueElemsArray(allHexesKnownEnemyArr) // 
-
-            //----------------------------------------------------------------------------------------------
-
-            if (uniqueHexesKnownEnemyArr.length == 0) {
-                return console.log(`hex ${hex} got no Known Enemy`)
-            }
-
-            console.log(`hex ${JSON.stringify(hex)} got known enemy : ${JSON.stringify(allUniqueHexesKnownEnemyArr)}`)
-
-            res[JSON.stringify(hex)] = uniqueHexesKnownEnemyArr
-        })
-
-        return res
-    }
-
-    // calcAllKnownEnemyArr(hex, MGhexesSet,){
-
-    // }
 
     isSafeHex(hex) {
 
@@ -2066,57 +1881,6 @@ class Client {
         return false
     }
 
-    calcKnownEnemyHexesInMaxPossibleDistance(hex, enemy) {
-        // if (typeof hex === 'string') {
-        //     hex = JSON.parse(hex)
-        // }
-
-        // ---------- let us take all hexes around us on maximum possible for MMC distance
-        let allHexesInMaxPossibleNormalRangeArr = this.map.calcHexesInRange(hex, 7)    //JSON.parse(hex)
-
-
-
-        // ---------- then search for Enemy presence in those hexes
-        let allHexesWithEnemyInMaxPossibleNormalRangeArr = this.filterHexesForEnemyPresence(allHexesInMaxPossibleNormalRangeArr, enemy)
-
-
-        //----------- is there any Enemy around us on maximum possible distance ?
-        if (allHexesWithEnemyInMaxPossibleNormalRangeArr.length == 0) {
-            console.log(`hex ${JSON.stringify(hex)} got no Enemy in Max Normal Range`)
-            return []
-        }
-
-        // -------- let us take all hexes where enemy counters that has normal range on us
-        let hexesWithCountersInItsNormalRangeOfHexArr = this.calcAllHexesWithCountersInItsNormalRangeOfHex(allHexesWithEnemyInMaxPossibleNormalRangeArr, hex)
-
-
-        // -------- then return those which got LoS
-        return this.filterHexesForLoSOnHex(hexesWithCountersInItsNormalRangeOfHexArr, hex)
-
-    }
-
-    filterHexesForLoSOnHex(hexesArr, targetHex) {
-
-        return hexesArr.filter(hex => this.map.isLoS(hex, targetHex))
-
-    }
-
-    calcAllHexesWithCountersInItsNormalRangeOfHex(hexesArr, hex) {
-
-        hexesArr = hexesArr.filter((enemyHex) => {
-
-            let countersArr = this.map.getCountersIDinHexArray(enemyHex).map(id => this.getCounterByItsID(id))
-
-            return countersArr.some((counter) => {
-
-                return this.map.hex_distance(counter.ownHex, hex) < counter.normalRange
-            })
-
-        })
-
-        return hexesArr
-    }
-
     filterHexesForEnemyPresence(hexesArr, player) {
 
         return hexesArr.filter((hex) => {
@@ -2124,64 +1888,24 @@ class Client {
         })
     }
 
-    calcKnownEnemyMGHexes(hex, weaponsArr, distance) {
-
-        let arr = []
-
-        weaponsArr.forEach((mgHex) => {
-
-            // if (this.map.hex_distance(hex, mgHex) > distance) {
-            //     return console.log(`hex ${mgHex} is too far away`)
-            // }
-
-            // if (!this.map.isLoS(mgHex, hex)) {
-            //     return console.log(`hex ${mgHex} got no LoS with  ${hex}`)
-            // }
-            arr.push(mgHex)
-        })
-
-        //console.log(this.collectUniqueElemsArray(arr))
-        //return this.collectUniqueElemsArray(arr)
-        return (arr)
-    }
-
-
-
-    // collectUniqueHexesArr(...arr) {
-
-    //     console.log(arr)
-    //     let a = arr.reduce((res, countersArr) => {
-    //         console.log(countersArr)
-    //         let a = countersArr.map(counter => counter.ownHex)    //JSON.stringify(counter.ownHex)
-    //         res = res.concat(a)
-    //         return res
-    //     }, [])
-
-    //     // console.log(a)
-    //     // console.log(a.map(JSON.stringify))
-    //     // console.log(new Set(a.map(JSON.stringify)))
-    //     // console.log(Array.from(new Set(a.map(JSON.stringify))).map(JSON.parse))
-
-    //     return this.collectUniqueElemsArray(a)
-    // }
-
     collectUniqueElemsArray(array) {
         return Array.from(new Set(array.map(JSON.stringify))).map(JSON.parse)
     }
+    
+    isEnemyNear(hex) {
 
-    calcAllUniqueKEHexesArr(hex,enemy,HMGuniqueHexesArr,LMGuniqueHexesArr) {
+        let nearestHexesArr = this.map.nearestHexesArr(hex)
+        let ownerOfStartHex = this.map.getOwnerOfHex(hex)
 
-        let knownEnemyWeaponHexesArr = this.calcKnownEnemyMGHexes(hex, LMGuniqueHexesArr, 6).concat(this.calcKnownEnemyMGHexes(hex, HMGuniqueHexesArr, 16))
-
-        let allHexesKnownEnemyArr = knownEnemyWeaponHexesArr.concat(this.calcKnownEnemyHexesInMaxPossibleDistance(hex,enemy))
-
-        return this.collectUniqueElemsArray(allHexesKnownEnemyArr)
+        return nearestHexesArr.some((hex) => {
+            if (this.map.getOwnerOfHex(hex) != undefined && this.map.getOwnerOfHex(hex) != ownerOfStartHex) {
+                return true
+            }
+            return false
+        })
     }
-
-
-
 }
 
 // -- let's mix canvas reaction into our class
-Object.assign(Client.prototype, methods, buttonsCallbacks)
+Object.assign(Client.prototype, methods, buttonsCallbacks, rout)
 export { Client };

@@ -9,17 +9,15 @@ let methods = {
         console.log(this.map.getHexFromCoords(absolutePointer))
         //console.log(absolutePointer)
 
-        let h= this.map.getHexFromCoords(absolutePointer)
-        let hexes =this.map.calcHexesInRange(h,3)
+        // let h= this.map.getHexFromCoords(absolutePointer)
+        // let hexes =this.map.calcHexesInRange(h,3)
 
-        hexes.forEach((hex)=>{
+        // hexes.forEach((hex)=>{
 
-            let sixCoords = this.map.getPolyCorners(hex)
+        //     let sixCoords = this.map.getPolyCorners(hex)
 
-            this.canvasObj.drawPoly(sixCoords, 'red')
-        })
-
-        let sss = this.filterHexesForEnemyPresence(hexes,this.secondPlayer)
+        //     this.canvasObj.drawPoly(sixCoords, 'red')
+        // })
 
 
         if (options.target == null) {
@@ -144,6 +142,28 @@ let methods = {
         if (options.target == null) {
             return console.log('clicked on empty space in FPRtPhase')
         }
+
+        let counter = options.target.counter
+
+        //console.log(this.mustRoutArr.indexOf(counter))
+
+        if (this.mustRoutArr.indexOf(counter) == -1) {
+            return console.log('u choose not routed unit')
+        }
+
+        // higlight all safeplaces for choosed hex and set new listener
+
+        let safeplacesArr = true//this.calcSafeplacesArr(counter.ownHex)
+        //this.higlightSafeplaces(safeplacesArr)
+
+        this.canvasObj.setMouseClickListener(this.firstPlayerRoutPhaseSelectedRouting.bind(this),safeplacesArr)
+        
+
+
+    },
+
+    firstPlayerRoutPhaseSelectedRouting(options,safeplacesArr){
+        console.log(safeplacesArr)
     },
 
     secondPlayerRoutPhase(options) {

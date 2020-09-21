@@ -21,3 +21,4 @@ this._is_Click_NotInCoverArc_inOwnHex_onEnemy_EnterCostTooHigh(this.stack, targe
 баг - переполняется this.hex_ownerHash
 
 баг - changeColorOfBorder опять помог проявить изменения
+

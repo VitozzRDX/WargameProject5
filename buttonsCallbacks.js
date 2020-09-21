@@ -1,5 +1,37 @@
 
 let buttonsCallbacks = {
+        preparePhase(phase){
+            
+            console.log(phase)
+
+            switch (phase) {
+                case  'firstPlayerRoutPhase':
+
+                    this.routPhasePreparing()   /// (player)
+                break
+
+                case  'secondPlayerRoutPhase':
+
+                    let dr
+                    let self = this
+                    let count = 0
+                    this.mustRoutArr.forEach((counter)=>{
+
+                        counter.setNewStatus('KIA')
+
+                        setTimeout(() => {
+                            self.animateChangingCounterState('KIA', counter, dr)
+                        },count)
+
+                        count+=1000
+                    })
+
+
+                break
+
+            } 
+
+        },
 
         endPhaseCallback(button) {
 
@@ -10,6 +42,12 @@ let buttonsCallbacks = {
             let phase = this.game.getPhase()    // rename to newPhase
     
             console.log('New phase :', phase)
+
+            // then 
+
+            this.preparePhase(this.game.getPhase())
+
+            // then
     
             let newPhaseCallback = this.allPhases_CallbacksHash[phase]
     
@@ -22,7 +60,7 @@ let buttonsCallbacks = {
     
             // --- is new Phase 'secondPlayerRallyPhase' ? In single Player variant it is same Phase as FPRP,so no Rondel Rotation
             if (phase == 'secondPlayerRallyPhase' || phase == 'secondPlayerRoutPhase' || phase == 'firstPlayerRallyPhaseHalfTurn'
-                || phase == 'firstPlayerRoutPhaseHalfTurn') {
+                ) {
     
                 this.canvasObj.setOffMouseClickListener()
                 this.canvasObj.setMouseClickListener(newPhaseCallback);
@@ -45,10 +83,17 @@ let buttonsCallbacks = {
                     this._buildMenuInterface(phase)
                 })
             }
-            
-    
-    
         },
+
+        // endPhaseCallback(button) {
+
+        //     this.game.switchToNextPhase()
+
+        //     console.log('New phase :', this.game.getPhase())
+
+        //     this.preparePhase(this.game.getPhase())
+
+        // },
         
         endOppsRallyCallback(button) {
     

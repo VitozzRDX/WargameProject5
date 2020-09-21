@@ -48,6 +48,14 @@ this.ID_ImageHash = {}
         })
     };
 
+    // setMouseClickListener(callback,ops) {
+    //     this.canvas.on(
+    //         'mouse:up',(options) => {
+    //             callback(options,ops)
+    //         }
+    //     )
+    // };
+
 
     drawText(text, param) {
         var options = {
